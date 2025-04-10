@@ -26,6 +26,7 @@ dependencies:
     google_fonts: 6.2.1
     go_router: ^14.8.1
     google_sign_in: ^6.3.0
+    flip_card: ^0.7.0
 dev_dependencies:
     flutter_test:
         sdk: flutter
