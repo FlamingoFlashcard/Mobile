@@ -78,9 +78,9 @@ class AuthRepository {
       debugPrint('Start Google Sign In');
       final GoogleSignInAccount? account = await GoogleSignIn(
         scopes: [
-        'email',
-        'https://www.googleapis.com/auth/contacts.readonly',
+        'email'
         ],
+        serverClientId: '352071145880-1stn4081qetb1epj5iflej9qkt0fvuun.apps.googleusercontent.com',
         ).signIn();
       if (account == null) {
         debugPrint('Account null');
@@ -90,8 +90,10 @@ class AuthRepository {
       final GoogleSignInAuthentication auth = await account.authentication;
       if (auth.idToken != null) {
         debugPrint('ID Token: ${auth.idToken}');
+
         final idToken = auth.idToken;
         final loginSuccessDto = await authApiClient.googleSignIn(idToken!);
+
         await authLocalDataSource.saveToken(loginSuccessDto.data.token);
         debugPrint('SuccessToken: ${loginSuccessDto.data.token}');
         return Success(idToken);
