@@ -79,8 +79,8 @@ class AuthRepository {
       final GoogleSignInAccount? account = await GoogleSignIn(
         scopes: [
         'email',
-        'https://www.googleapis.com/auth/contacts.readonly',
         ],
+        clientId: '532642501147-dme5e1944m01hevgldh91hi7k94chq3i.apps.googleusercontent.com',        
         ).signIn();
       if (account == null) {
         debugPrint('Account null');
