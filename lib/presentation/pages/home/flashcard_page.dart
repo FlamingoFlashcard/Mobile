@@ -59,7 +59,12 @@ class FlashcardPage extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(width: 40),
+            const SizedBox(width: 15),
+            IconButton(
+              icon: const Icon(FontAwesomeIcons.plus, color: Colors.white),
+              onPressed: () {},
+            ),
+            const SizedBox(width: 10),
           ],
         ),
       ),
