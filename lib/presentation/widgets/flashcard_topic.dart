@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lacquer/presentation/widgets/flashcard_options.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
 class FlashcardTopic extends StatefulWidget {
@@ -26,10 +27,12 @@ class FlashcardTopicState extends State<FlashcardTopic> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('${widget.title} clicked!')));
+        showDialog(
+          context: context,
+          builder: (context) => const FlashcardOptionDialog(),
+        );
       },
+
       onTapDown: (_) => setState(() => _isPressed = true),
       onTapUp: (_) => setState(() => _isPressed = false),
       onTapCancel: () => setState(() => _isPressed = false),
