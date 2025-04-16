@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:lacquer/config/theme.dart';
 import 'package:lacquer/presentation/widgets/flashcard_confirm_delete.dart';
+import 'package:lacquer/presentation/widgets/flashcard_topic_edit.dart';
 
 class FlashcardOptionDialog extends StatefulWidget {
   const FlashcardOptionDialog({super.key});
@@ -95,7 +96,13 @@ class _FlashcardOptionDialogState extends State<FlashcardOptionDialog> {
                       size: 20,
                       color: Colors.black,
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pop(context);
+                      showDialog(
+                        context: context,
+                        builder: (context) => const FlashcardTopicEdit(),
+                      );
+                    },
                   ),
                   IconButton(
                     icon: Icon(
