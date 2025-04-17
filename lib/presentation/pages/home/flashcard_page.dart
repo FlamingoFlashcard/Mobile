@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:lacquer/config/theme.dart';
 import 'package:lacquer/presentation/utils/card_list.dart';
 import 'package:lacquer/presentation/widgets/flashcard_category.dart';
+import 'package:lacquer/presentation/widgets/flashcard_topic_create.dart';
 
 class FlashcardPage extends StatelessWidget {
   const FlashcardPage({super.key});
@@ -17,7 +18,7 @@ class FlashcardPage extends StatelessWidget {
           children: [
             Stack(
               clipBehavior: Clip.none,
-              children: [_buildAppBar(), _buildSearchBar()],
+              children: [_buildAppBar(context), _buildSearchBar()],
             ),
             const SizedBox(height: 80),
             FlashcardCategory(title: "Traditional Cuisine", cards: cuisine),
@@ -30,7 +31,7 @@ class FlashcardPage extends StatelessWidget {
     );
   }
 
-  Widget _buildAppBar() {
+  Widget _buildAppBar(BuildContext context) {
     return ClipRRect(
       borderRadius: const BorderRadius.only(
         bottomLeft: Radius.circular(8),
@@ -62,7 +63,12 @@ class FlashcardPage extends StatelessWidget {
             const SizedBox(width: 15),
             IconButton(
               icon: const Icon(FontAwesomeIcons.plus, color: Colors.white),
-              onPressed: () {},
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => const FlashcardTopicCreate(),
+                );
+              },
             ),
             const SizedBox(width: 10),
           ],
