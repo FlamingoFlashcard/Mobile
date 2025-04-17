@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flip_card/flip_card.dart';
 
 class FlipCardComp extends StatelessWidget {
-  final String fronttext;
-  final String backtext;
+  final String frontText;
+  final String backText;
 
   const FlipCardComp({
     super.key,
-    required this.fronttext,
-    required this.backtext,
+    required this.frontText,
+    required this.backText,
   });
 
   @override
@@ -27,7 +27,7 @@ class FlipCardComp extends StatelessWidget {
             child: Padding(
               padding: EdgeInsets.all(16),
               child: Text(
-                fronttext,
+                frontText,
                 style: TextStyle(fontSize: 24),
                 textAlign: TextAlign.center,
               ),
@@ -45,7 +45,7 @@ class FlipCardComp extends StatelessWidget {
             child: Padding(
               padding: EdgeInsets.all(16),
               child: Text(
-                backtext,
+                backText,
                 style: TextStyle(fontSize: 24),
                 textAlign: TextAlign.center,
               ),
