@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:lacquer/presentation/utils/flipcard_list.dart';
-import 'package:lacquer/presentation/widgets/flipcard_component.dart';
+import 'package:lacquer/presentation/utils/flip_card_list.dart';
+import 'package:lacquer/presentation/widgets/flip_card_component.dart';
 import 'package:lacquer/config/theme.dart';
 
 class LearningFlashcardPage extends StatelessWidget {
-  final List<FlipcardModel> items;
+  final List<FlipCardModel> items;
   const LearningFlashcardPage({super.key, required this.items});
 
   @override
@@ -54,7 +54,7 @@ class CustomAppBar extends StatelessWidget {
 }
 
 class HorizontalCardList extends StatefulWidget {
-  final List<FlipcardModel> flashcardItems;
+  final List<FlipCardModel> flashcardItems;
 
   const HorizontalCardList({super.key, required this.flashcardItems});
 
@@ -120,8 +120,8 @@ class _HorizontalCardListState extends State<HorizontalCardList> {
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 1),
                         child: FlipCardComp(
-                          fronttext: widget.flashcardItems[index].fronttext,
-                          backtext: widget.flashcardItems[index].backtext,
+                          frontText: widget.flashcardItems[index].frontText,
+                          backText: widget.flashcardItems[index].backText,
                         ),
                       ),
                     ),
