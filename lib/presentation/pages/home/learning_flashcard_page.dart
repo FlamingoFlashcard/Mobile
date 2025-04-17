@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:lacquer/presentation/utils/flip_card_list.dart';
 import 'package:lacquer/presentation/widgets/flip_card_component.dart';
 import 'package:lacquer/config/theme.dart';
@@ -13,7 +14,7 @@ class LearningFlashcardPage extends StatelessWidget {
       backgroundColor: CustomTheme.lightbeige,
       body: Stack(
         children: [
-          CustomAppBar(),
+          _buildAppBar(),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [HorizontalCardList(flashcardItems: items)],
@@ -22,32 +23,40 @@ class LearningFlashcardPage extends StatelessWidget {
       ),
     );
   }
-}
 
-class CustomAppBar extends StatelessWidget {
-  const CustomAppBar({super.key});
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildAppBar() {
     return Container(
-      height: 300,
+      height: 80,
       width: double.infinity,
-      decoration: const BoxDecoration(
-        color: CustomTheme.cinnabar,
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(30),
-          bottomRight: Radius.circular(30),
-        ),
-      ),
+      decoration: const BoxDecoration(color: CustomTheme.cinnabar),
       alignment: Alignment.topCenter,
-      padding: const EdgeInsets.only(top: 100),
-      child: const Text(
-        'Learning Flashcards',
-        style: TextStyle(
-          fontSize: 32,
-          fontWeight: FontWeight.bold,
-          color: Colors.white,
-        ),
+      padding: const EdgeInsets.only(top: 30),
+      child: const Row(
+        children: [
+          SizedBox(width: 10),
+          IconButton(
+            icon: Icon(FontAwesomeIcons.arrowLeft, color: Colors.white),
+            onPressed: null,
+          ),
+          Expanded(
+            child: Center(
+              child: Text(
+                'Explore',
+                style: TextStyle(
+                  fontSize: 24,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(width: 15),
+          IconButton(
+            icon: Icon(FontAwesomeIcons.plus, color: Colors.white),
+            onPressed: null,
+          ),
+          SizedBox(width: 10),
+        ],
       ),
     );
   }
@@ -132,26 +141,26 @@ class _HorizontalCardListState extends State<HorizontalCardList> {
           ),
         ),
 
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 16.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(widget.flashcardItems.length, (index) {
-              return Container(
-                width: 12.0,
-                height: 12.0,
-                margin: const EdgeInsets.symmetric(horizontal: 4.0),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color:
-                      _currentPage == index
-                          ? CustomTheme.cinnabar
-                          : Colors.grey.withAlpha((255 * 0.5).toInt()),
-                ),
-              );
-            }),
-          ),
-        ),
+        // Padding(
+        //   padding: const EdgeInsets.symmetric(vertical: 16.0),
+        //   child: Row(
+        //     mainAxisAlignment: MainAxisAlignment.center,
+        //     children: List.generate(widget.flashcardItems.length, (index) {
+        //       return Container(
+        //         width: 12.0,
+        //         height: 12.0,
+        //         margin: const EdgeInsets.symmetric(horizontal: 4.0),
+        //         decoration: BoxDecoration(
+        //           shape: BoxShape.circle,
+        //           color:
+        //               _currentPage == index
+        //                   ? CustomTheme.cinnabar
+        //                   : Colors.grey.withAlpha((255 * 0.5).toInt()),
+        //         ),
+        //       );
+        //     }),
+        //   ),
+        // ),
       ],
     );
   }

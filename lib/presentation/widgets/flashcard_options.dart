@@ -17,7 +17,7 @@ class _FlashcardOptionDialogState extends State<FlashcardOptionDialog> {
   final List<Map<String, dynamic>> options = [
     {
       "icon": FontAwesomeIcons.play,
-      "title": "Learn",
+      "title": "Explore",
       "subtitle": "10 new cards",
     },
     {
