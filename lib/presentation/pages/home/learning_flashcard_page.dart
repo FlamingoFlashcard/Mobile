@@ -26,9 +26,15 @@ class LearningFlashcardPage extends StatelessWidget {
 
   Widget _buildAppBar() {
     return Container(
-      height: 80,
+      height: 150,
       width: double.infinity,
-      decoration: const BoxDecoration(color: CustomTheme.cinnabar),
+      decoration: const BoxDecoration(
+        color: CustomTheme.cinnabar,
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(20),
+          bottomRight: Radius.circular(20),
+        ),
+      ),
       alignment: Alignment.topCenter,
       padding: const EdgeInsets.only(top: 30),
       child: const Row(
@@ -103,6 +109,7 @@ class _HorizontalCardListState extends State<HorizontalCardList> {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        SizedBox(height: 100),
         SizedBox(
           height: 600,
           child: PageView.builder(
@@ -131,6 +138,9 @@ class _HorizontalCardListState extends State<HorizontalCardList> {
                         child: FlipCardComp(
                           frontText: widget.flashcardItems[index].frontText,
                           backText: widget.flashcardItems[index].backText,
+                          imagePath: widget.flashcardItems[index].imagePath,
+                          pronunciation:
+                              widget.flashcardItems[index].pronunciation,
                         ),
                       ),
                     ),
