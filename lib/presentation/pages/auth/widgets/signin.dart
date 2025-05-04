@@ -354,8 +354,8 @@ class SignInState extends State<SignIn> {
             label: Text("Return to Login"),
             icon: Icon(Icons.refresh),
             style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all<Color>(
-                CustomTheme.primaryGradient.colors.first,
+                backgroundColor: WidgetStateProperty.resolveWith<Color>(
+                (states) => CustomTheme.primaryGradient.colors.first,
               ),
             ),
           ),

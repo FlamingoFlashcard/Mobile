@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "532642501147",
+    "project_id": "flamingo-2025",
+    "storage_bucket": "flamingo-2025.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:532642501147:android:f195bf7614a84778435ebe",
+        "android_client_info": {
+          "package_name": "com.uit.lacquer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "532642501147-nuvb3a4ac3u5qog4h59kouqnnb6orr1h.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.uit.lacquer",
+            "certificate_hash": "a657e6ba6fceb12b9d4fe384bf7ba8c6995a8898"
+          }
+        },
+        {
+          "client_id": "532642501147-57c5q5a46o5q0d8ip6ueu7b5dimekoce.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBo05bfwmELtAQK3T-EEKsGQU7O1nf8EwU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "532642501147-57c5q5a46o5q0d8ip6ueu7b5dimekoce.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

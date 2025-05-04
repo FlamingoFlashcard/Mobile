@@ -78,9 +78,9 @@ class AuthRepository {
       debugPrint('Start Google Sign In');
       final GoogleSignInAccount? account = await GoogleSignIn(
         scopes: [
-        'email'
+        'email',
         ],
-        serverClientId: '352071145880-1stn4081qetb1epj5iflej9qkt0fvuun.apps.googleusercontent.com',
+        clientId: '532642501147-dme5e1944m01hevgldh91hi7k94chq3i.apps.googleusercontent.com',        
         ).signIn();
       if (account == null) {
         debugPrint('Account null');
