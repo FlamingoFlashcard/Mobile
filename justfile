@@ -5,3 +5,5 @@ run:
 
 init:
     dart run ./bootstrap.dart
+
+set shell := ["powershell.exe", "-c"]

@@ -1,16 +1,20 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 class CustomTheme {
   const CustomTheme();
 
-  static const Color primaryColor = Color(0xFFc13e80);
-  static const Color secondaryColor = Color(0xFF317153);
-  static const Color loginGradientStart = Color.fromARGB(255, 224, 150, 135);
-  static const Color loginGradientEnd = Color(0xFFCD5036);
+  static const Color primaryColor = Color(0xFFA31D1D);
+  static const Color secondaryColor = Color(0xFFC8872B);
+  static const Color loginGradientStart = Color(0xFFFFFFFF);
+  static const Color loginGradientEnd = Color(0xFFFEF9E1);
   static const Color white = Color(0xFFFFFFFF);
   static const Color black = Color(0xFF000000);
-  static const Color lightbeige = Color(0xFFFCEEC6);
-  static const Color cinnabar = Color(0xFFCD5036);
+  static const Color lightbeige = Colors.white;
+  static const Color cinnabar = Colors.white;
+  static const Color mainColor1 = Color(0xFF6D2323);
+  static const Color mainColor2 = Color(0xFFE5D0AC);
+  static const Color mainColor3 = Color(0xFFFEF9E1);
+
 
   static const LinearGradient primaryGradient = LinearGradient(
     colors: <Color>[loginGradientStart, loginGradientEnd],
@@ -19,3 +23,4 @@ class CustomTheme {
     end: Alignment.bottomCenter,
   );
 }
+

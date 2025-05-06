@@ -1,5 +1,4 @@
 import 'package:flutter/widgets.dart';
-import 'package:lacquer/config/theme.dart';
 
 class HomeItemModel {
   final String imagePath;
@@ -17,21 +16,21 @@ final List<HomeItemModel> homeItems = [
   HomeItemModel(
     imagePath: "assets/images/flashcardLogo.png",
     title: "Flashcard",
-    backgroundColor: Color(0xFF274874),
+    backgroundColor: Color(0xFF4285F4),
   ),
   HomeItemModel(
     imagePath: "assets/images/translatorLogo.png",
     title: "Translator",
-    backgroundColor: CustomTheme.secondaryColor,
+    backgroundColor: Color(0xFF34A853),
   ),
   HomeItemModel(
     imagePath: "assets/images/dictionaryLogo.png",
     title: "Dictionary",
-    backgroundColor: Color(0xFFC8872B),
+    backgroundColor: Color(0xFFFBBC05),
   ),
   HomeItemModel(
     imagePath: "assets/images/flashcardLogo.png",
     title: "Quiz",
-    backgroundColor: Color(0xFFCD5036),
+    backgroundColor: Color(0xFFEA4335),
   ),
 ];

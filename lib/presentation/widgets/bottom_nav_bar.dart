@@ -28,12 +28,12 @@ class BottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color unselectedColor = const Color.fromARGB(255, 168, 167, 163);
-    final Color selectedColor = CustomTheme.lightbeige;
+    final Color unselectedColor = Colors.black;
+    final Color selectedColor = CustomTheme.primaryColor;
 
     return Container(
       decoration: BoxDecoration(
-        color: CustomTheme.secondaryColor,
+        color: Colors.white,
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(10),
           topRight: Radius.circular(10),

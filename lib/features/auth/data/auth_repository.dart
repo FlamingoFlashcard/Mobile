@@ -90,8 +90,10 @@ class AuthRepository {
       final GoogleSignInAuthentication auth = await account.authentication;
       if (auth.idToken != null) {
         debugPrint('ID Token: ${auth.idToken}');
+
         final idToken = auth.idToken;
         final loginSuccessDto = await authApiClient.googleSignIn(idToken!);
+
         await authLocalDataSource.saveToken(loginSuccessDto.data.token);
         debugPrint('SuccessToken: ${loginSuccessDto.data.token}');
         return Success(idToken);
