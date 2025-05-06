@@ -75,7 +75,7 @@ class SignInState extends State<SignIn> {
           children: <Widget>[
             Card(
               elevation: 2.0,
-              color: CustomTheme.lightbeige,
+              color: Colors.white,//CustomTheme.lightbeige,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8.0),
               ),
@@ -190,7 +190,7 @@ class SignInState extends State<SignIn> {
               margin: const EdgeInsets.only(top: 180.0),
               decoration: const BoxDecoration(
                 borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                color: CustomTheme.secondaryColor,
+                color: CustomTheme.primaryColor,
               ),
               child: MaterialButton(
                 highlightColor: Colors.transparent,
@@ -201,11 +201,11 @@ class SignInState extends State<SignIn> {
                     horizontal: 36.0,
                   ),
                   child: Text(
-                    'SIGN IN',
+                    'Sign In',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 25.0,
-                      fontFamily: 'WorkSansBold',
+                      fontFamily: 'RobotoBold',
                     ),
                   ),
                 ),
@@ -217,7 +217,7 @@ class SignInState extends State<SignIn> {
           ],
         ),
         Padding(
-          padding: const EdgeInsets.only(top: 10.0),
+          padding: const EdgeInsets.only(top: 20.0),
           child: TextButton(
             onPressed: () {
               context.go(RouteName.forgotPassword);
@@ -225,7 +225,7 @@ class SignInState extends State<SignIn> {
             child: const Text(
               'Forgot Your Password?',
               style: TextStyle(
-                color: CustomTheme.lightbeige,
+                color: CustomTheme.mainColor1,
                 fontSize: 17.0,
                 fontWeight: FontWeight.w500,
                 fontFamily: 'WorkSansMedium',
@@ -234,14 +234,14 @@ class SignInState extends State<SignIn> {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.only(top: 10.0),
+          padding: const EdgeInsets.only(top: 2.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Container(
                 decoration: const BoxDecoration(
                   gradient: LinearGradient(
-                    colors: <Color>[Colors.white10, Colors.white],
+                    colors: <Color>[Colors.white10, CustomTheme.mainColor1],
                     begin: FractionalOffset(0.0, 0.0),
                     end: FractionalOffset(1.0, 1.0),
                     stops: <double>[0.0, 1.0],
@@ -256,7 +256,7 @@ class SignInState extends State<SignIn> {
                 child: Text(
                   'Or',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: CustomTheme.black,
                     fontSize: 16.0,
                     fontFamily: 'WorkSansMedium',
                   ),
@@ -265,7 +265,7 @@ class SignInState extends State<SignIn> {
               Container(
                 decoration: const BoxDecoration(
                   gradient: LinearGradient(
-                    colors: <Color>[Colors.white, Colors.white10],
+                    colors: <Color>[CustomTheme.mainColor1, Colors.white10],
                     begin: FractionalOffset(0.0, 0.0),
                     end: FractionalOffset(1.0, 1.0),
                     stops: <double>[0.0, 1.0],
@@ -283,7 +283,10 @@ class SignInState extends State<SignIn> {
           children: <Widget>[
             Padding(
               padding: const EdgeInsets.only(top: 20.0),
-              child: _buildGoogleButton(),
+              child: Card(
+                elevation: 2.0,
+                child: _buildGoogleButton()
+                ),
             ),
           ],
         ),

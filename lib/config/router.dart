@@ -9,6 +9,7 @@ import 'package:lacquer/presentation/pages/camera/camera_page.dart';
 import 'package:lacquer/presentation/pages/chatBot/chat_bot_page.dart';
 import 'package:lacquer/presentation/pages/home/home_page.dart';
 import 'package:lacquer/presentation/pages/profile/profile_page.dart';
+import 'package:flutter/widgets.dart';
 
 class RouteName {
   static const String home = '/';
@@ -23,6 +24,18 @@ class RouteName {
   static const publicRoutes = [login, forgotPassword, verify, register];
 }
 
+GoRoute noTransitionRoute({
+  required String path,
+  required Widget Function(BuildContext, GoRouterState) builder,
+}) {
+  return GoRoute(
+    path: path,
+    pageBuilder: (context, state) => NoTransitionPage(
+      child: builder(context, state),
+    ),
+  );
+}
+
 final router = GoRouter(
   redirect: (context, state) {
     if (RouteName.publicRoutes.contains(state.fullPath)) {
@@ -34,22 +47,22 @@ final router = GoRouter(
     return RouteName.login;
   },
   routes: [
-    GoRoute(path: RouteName.home, builder: (context, state) => HomePage()),
-    GoRoute(path: RouteName.login, builder: (context, state) => LoginPage()),
-    GoRoute(
+    noTransitionRoute(path: RouteName.home, builder: (context, state) => HomePage()),
+    noTransitionRoute(path: RouteName.login, builder: (context, state) => LoginPage()),
+    noTransitionRoute(
       path: RouteName.chatBot,
       builder: (context, state) => ChatBotPage(),
     ),
-    GoRoute(path: RouteName.camera, builder: (context, state) => CameraPage()),
-    GoRoute(
+    noTransitionRoute(path: RouteName.camera, builder: (context, state) => CameraPage()),
+    noTransitionRoute(
       path: RouteName.profile,
       builder: (context, state) => ProfilePage(),
     ),
-    GoRoute(
+    noTransitionRoute(
       path: RouteName.forgotPassword,
       builder: (context, state) => ForgotPasswordPage(),
     ),
-    GoRoute(
+    noTransitionRoute(
       path: RouteName.verify,
       builder: (context, state) => VerifyEmailPage(),
     ),

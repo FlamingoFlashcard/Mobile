@@ -48,8 +48,8 @@ class LoginPageState extends State<LoginPage>
                   CustomTheme.loginGradientStart,
                   CustomTheme.loginGradientEnd,
                 ],
-                begin: FractionalOffset(0.0, 0.0),
-                end: FractionalOffset(1.0, 1.0),
+                begin: FractionalOffset(0.5, 0.0),
+                end: FractionalOffset(0.5, 1.0),
                 stops: <double>[0.0, 1.0],
                 tileMode: TileMode.clamp,
               ),
@@ -124,7 +124,7 @@ class LoginPageState extends State<LoginPage>
           children: <Widget>[
             Expanded(
               child: TextButton(
-                style: ButtonStyle(
+                style: ButtonStyle(               
                   overlayColor: WidgetStateProperty.all(Colors.transparent),
                 ),
                 onPressed: _onSignInButtonPress,

@@ -278,11 +278,11 @@ class SignUpState extends State<SignUp> {
                     horizontal: 42.0,
                   ),
                   child: Text(
-                    'SIGN UP',
+                    'Sign Up',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 25.0,
-                      fontFamily: 'WorkSansBold',
+                      fontFamily: 'RobotoBold',
                     ),
                   ),
                 ),

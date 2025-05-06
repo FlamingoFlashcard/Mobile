@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:lacquer/config/theme.dart';
 import 'package:lacquer/presentation/utils/card_list.dart';
 import 'package:lacquer/presentation/utils/home_item_list.dart';
 import 'package:lacquer/presentation/widgets/bottom_nav_bar.dart';
 import 'package:lacquer/presentation/widgets/flashcard_category.dart';
 import 'package:lacquer/presentation/widgets/home_item.dart';
+import 'package:lacquer/presentation/widgets/todayprogress_card.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -13,16 +15,16 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: CustomTheme.lightbeige,
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Stack(
               clipBehavior: Clip.none,
-              children: [_buildAppBar(), _buildLearnedTodayCard()],
+              children: [_buildAppBar(), TodayprogressCard()],
             ),
-            const SizedBox(height: 80),
+            const SizedBox(height: 150),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: const Text(
@@ -50,13 +52,13 @@ class HomePage extends StatelessWidget {
   Widget _buildAppBar() {
     return ClipRRect(
       borderRadius: const BorderRadius.only(
-        bottomLeft: Radius.circular(8),
-        bottomRight: Radius.circular(8),
+        bottomLeft: Radius.circular(24),
+        bottomRight: Radius.circular(24),
       ),
       child: Container(
-        height: 170,
-        color: CustomTheme.cinnabar,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+        height: 150,
+        color: CustomTheme.mainColor2,
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
         child: Row(
           children: [
             const SizedBox(width: 10),
@@ -71,82 +73,20 @@ class HomePage extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 10),
-            const Text(
-              'Vu Phan',
-              style: TextStyle(
+            Text(
+              'Welcome, Vu Phan !',
+              style: GoogleFonts.montserratAlternates(
                 fontSize: 20,
-                color: Colors.white,
+                color: Colors.black,
                 fontWeight: FontWeight.bold,
               ),
             ),
             const Spacer(),
             IconButton(
-              icon: const Icon(FontAwesomeIcons.bell, color: Colors.white),
+              icon: const Icon(FontAwesomeIcons.bell, color: Colors.black),
               onPressed: () {},
             ),
             const SizedBox(width: 10),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLearnedTodayCard() {
-    return Positioned(
-      left: 16,
-      right: 16,
-      top: 130,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: CustomTheme.lightbeige,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: const Color.fromRGBO(0, 0, 0, 0.1),
-              blurRadius: 6,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              "Learned today",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                const Text(
-                  "46min",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                const Text(" / 60min"),
-                const Spacer(),
-                Container(
-                  width: 150,
-                  height: 5,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Stack(
-                    children: [
-                      Container(
-                        width: 110,
-                        height: 5,
-                        decoration: BoxDecoration(
-                          color: Colors.orange,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
           ],
         ),
       ),
