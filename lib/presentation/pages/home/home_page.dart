@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lacquer/config/theme.dart';
 import 'package:lacquer/presentation/utils/card_list.dart';
 import 'package:lacquer/presentation/utils/home_item_list.dart';
-import 'package:lacquer/presentation/widgets/bottom_nav_bar.dart';
 import 'package:lacquer/presentation/widgets/flashcard_category.dart';
 import 'package:lacquer/presentation/widgets/home_item.dart';
 import 'package:lacquer/presentation/widgets/todayprogress_card.dart';
@@ -45,7 +44,6 @@ class HomePage extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: const BottomNavBar(selectedIndex: 0),
     );
   }
 

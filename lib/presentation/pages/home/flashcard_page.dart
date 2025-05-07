@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:lacquer/config/theme.dart';
 import 'package:lacquer/presentation/utils/card_list.dart';
-import 'package:lacquer/presentation/widgets/bottom_nav_bar.dart';
 import 'package:lacquer/presentation/widgets/flashcard_category.dart';
 
 class FlashcardPage extends StatelessWidget {
@@ -28,7 +27,6 @@ class FlashcardPage extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: const BottomNavBar(selectedIndex: 0),
     );
   }
 

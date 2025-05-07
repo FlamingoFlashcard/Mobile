@@ -5,7 +5,6 @@ import 'package:lacquer/config/router.dart';
 import 'package:lacquer/features/auth/bloc/auth_bloc.dart';
 import 'package:lacquer/features/auth/bloc/auth_event.dart';
 import 'package:lacquer/features/auth/bloc/auth_state.dart';
-import 'package:lacquer/presentation/widgets/bottom_nav_bar.dart';
 
 class ProfilePage extends StatelessWidget {
   //----------------------------- VARIABLES -----------------------------
@@ -23,7 +22,6 @@ class ProfilePage extends StatelessWidget {
           child: const Text('Log out'),
         ),
       ),
-      bottomNavigationBar: const BottomNavBar(selectedIndex: 3),
     );
 
     widget = BlocListener<AuthBloc, AuthState>(
