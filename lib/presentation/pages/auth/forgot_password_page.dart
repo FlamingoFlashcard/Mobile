@@ -169,7 +169,5 @@ class ForgotPasswordPage extends StatelessWidget {
   }
 
   //----------------------------- FUNCTIONS -----------------------------
-  void _onSendVerify(BuildContext context) {
-
-  }
+  void _onSendVerify(BuildContext context) {}
 }

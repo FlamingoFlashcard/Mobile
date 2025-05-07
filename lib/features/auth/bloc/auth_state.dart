@@ -6,6 +6,7 @@ class AuthInitial extends AuthState {}
 class AuthLoginInProgress extends AuthState {}
 
 class AuthLoginSuccess extends AuthState {}
+
 class AuthLoginFailure extends AuthState {
   final String message;
 
@@ -14,47 +15,49 @@ class AuthLoginFailure extends AuthState {
 
 //REGISTER
 class AuthRegisterInProgress extends AuthState {}
- 
+
 class AuthRegisterSuccess extends AuthState {}
-class AuthRegisterFailure  extends AuthState {
-   final String message;
- 
-   AuthRegisterFailure(this.message);
- }
+
+class AuthRegisterFailure extends AuthState {
+  final String message;
+
+  AuthRegisterFailure(this.message);
+}
 
 //AUTHENTICATED
- class AuthAuthenticatedSuccess extends AuthState {
+class AuthAuthenticatedSuccess extends AuthState {
   final String token;
 
   AuthAuthenticatedSuccess(this.token);
- }
+}
 
- class AuthAuthenticatedFailure extends AuthState {
-    final String message;
-  
-    AuthAuthenticatedFailure(this.message);
- }
+class AuthAuthenticatedFailure extends AuthState {
+  final String message;
 
- class AuthAuthenticatedUnknown extends AuthState {}
+  AuthAuthenticatedFailure(this.message);
+}
+
+class AuthAuthenticatedUnknown extends AuthState {}
 
 //LOGOUT
- class AuthLogoutSuccess extends AuthState {}
+class AuthLogoutSuccess extends AuthState {}
 
- class AuthLogoutFailure extends AuthState {
-    final String message;
-  
-    AuthLogoutFailure(this.message);
- }
+class AuthLogoutFailure extends AuthState {
+  final String message;
 
- //VERIFY 
- class AuthVerifyMailSending extends AuthState {}
+  AuthLogoutFailure(this.message);
+}
 
- class AuthVerifyMailSentSuccess extends AuthState {}
- class AuthVerifyMailSentFailure extends AuthState {
-    final String message;
-  
-    AuthVerifyMailSentFailure(this.message);
-  }
+//VERIFY
+class AuthVerifyMailSending extends AuthState {}
 
-  //GOOGLE SIGN IN
-  class AuthGoogleSignInInProgress extends AuthState {}
+class AuthVerifyMailSentSuccess extends AuthState {}
+
+class AuthVerifyMailSentFailure extends AuthState {
+  final String message;
+
+  AuthVerifyMailSentFailure(this.message);
+}
+
+//GOOGLE SIGN IN
+class AuthGoogleSignInInProgress extends AuthState {}

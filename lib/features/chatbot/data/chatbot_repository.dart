@@ -10,7 +10,7 @@ class ChatbotRepository {
   Future<Result<String>> ask(String prompt) async {
     try {
       final reply = await chatbotApiClient.ask(PromptDto(prompt: prompt));
-      if(reply.success) {
+      if (reply.success) {
         return Success(reply.data);
       } else {
         return Failure(reply.message);

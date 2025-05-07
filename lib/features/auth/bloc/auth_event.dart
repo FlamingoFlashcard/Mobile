@@ -1,6 +1,7 @@
 class AuthEvent {}
 
-class AuthEventStarted extends AuthEvent {} 
+class AuthEventStarted extends AuthEvent {}
+
 class AuthEventLogin extends AuthEvent {
   AuthEventLogin({required this.email, required this.password});
 
@@ -9,17 +10,17 @@ class AuthEventLogin extends AuthEvent {
 }
 
 class AuthEventRegister extends AuthEvent {
-   final String username;
-   final String email;
-   final String password;
-   final String authProvider;
- 
-   AuthEventRegister({
-     required this.username,
-     required this.email,
-     required this.password,
-     required this.authProvider
-  } );
+  final String username;
+  final String email;
+  final String password;
+  final String authProvider;
+
+  AuthEventRegister({
+    required this.username,
+    required this.email,
+    required this.password,
+    required this.authProvider,
+  });
 }
 
 class AuthAuthenticateStarted extends AuthEvent {}

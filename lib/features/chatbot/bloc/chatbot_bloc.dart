@@ -20,8 +20,9 @@ class ChatbotBloc extends Bloc<ChatbotEvent, ChatbotState> {
     emit(ChatbotAskingInProgress());
     final result = await chatbotRepository.ask(event.prompt);
     return (switch (result) {
-      Success(data: final reply) when reply.isNotEmpty =>
-        emit(ChatbotAskingSuccess(reply)),
+      Success(data: final reply) when reply.isNotEmpty => emit(
+        ChatbotAskingSuccess(reply),
+      ),
       Success() => emit(ChatbotAskingFailure('No response')),
       Failure() => emit(ChatbotAskingFailure(result.message)),
     });

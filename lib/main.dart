@@ -41,9 +41,7 @@ class MyApp extends StatelessWidget {
 }
 
 class AppContent extends StatefulWidget {
-  const AppContent({
-    super.key,
-  });
+  const AppContent({super.key});
 
   @override
   State<AppContent> createState() => _AppContentState();
@@ -55,6 +53,7 @@ class _AppContentState extends State<AppContent> {
     super.initState();
     context.read<AuthBloc>().add(AuthAuthenticateStarted());
   }
+
   @override
   Widget build(BuildContext context) {
     final authState = context.watch<AuthBloc>().state;

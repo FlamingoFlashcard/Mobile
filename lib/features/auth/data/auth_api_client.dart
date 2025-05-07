@@ -52,9 +52,7 @@ class AuthApiClient {
     try {
       final response = await dio.post(
         'auth/forget',
-        data: {
-          'email': forgetDto.email,
-        },
+        data: {'email': forgetDto.email},
       );
       return ForgetSuccessDto.fromJson(response.data);
     } on DioException catch (e) {
@@ -70,9 +68,7 @@ class AuthApiClient {
     try {
       final response = await dio.post(
         'auth/google',
-        data: {
-          'idToken': idToken,
-        },
+        data: {'idToken': idToken},
       );
       return LoginSuccessDto.fromJson(response.data);
     } on DioException catch (e) {

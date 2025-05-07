@@ -15,7 +15,6 @@ class CustomTheme {
   static const Color mainColor2 = Color(0xFFE5D0AC);
   static const Color mainColor3 = Color(0xFFFEF9E1);
 
-
   static const LinearGradient primaryGradient = LinearGradient(
     colors: <Color>[loginGradientStart, loginGradientEnd],
     stops: <double>[0.0, 1.0],
@@ -23,4 +22,3 @@ class CustomTheme {
     end: Alignment.bottomCenter,
   );
 }
-
