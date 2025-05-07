@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lacquer/presentation/widgets/bottom_nav_bar.dart';
 
 class ChatBotPage extends StatelessWidget {
   const ChatBotPage({super.key});
@@ -20,7 +19,6 @@ class ChatBotPage extends StatelessWidget {
           child: const Text('Press me'),
         ),
       ),
-      bottomNavigationBar: const BottomNavBar(selectedIndex: 1),
     );
   }
 }

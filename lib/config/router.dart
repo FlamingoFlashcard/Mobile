@@ -5,10 +5,8 @@ import 'package:lacquer/features/auth/bloc/auth_state.dart';
 import 'package:lacquer/presentation/pages/auth/forgot_password_page.dart';
 import 'package:lacquer/presentation/pages/auth/login_page.dart';
 import 'package:lacquer/presentation/pages/auth/verify_page.dart';
-import 'package:lacquer/presentation/pages/camera/camera_page.dart';
-import 'package:lacquer/presentation/pages/chatBot/chat_bot_page.dart';
-import 'package:lacquer/presentation/pages/home/home_page.dart';
-import 'package:lacquer/presentation/pages/profile/profile_page.dart';
+
+import 'package:lacquer/presentation/pages/mainscreen.dart';
 import 'package:flutter/widgets.dart';
 
 class RouteName {
@@ -17,9 +15,6 @@ class RouteName {
   static const String forgotPassword = '/forgot-password';
   static const String verify = '/verify';
   static const String register = '/register';
-  static const String chatBot = '/chatbot';
-  static const String camera = '/camera';
-  static const String profile = '/profile';
 
   static const publicRoutes = [login, forgotPassword, verify, register];
 }
@@ -47,17 +42,8 @@ final router = GoRouter(
     return RouteName.login;
   },
   routes: [
-    noTransitionRoute(path: RouteName.home, builder: (context, state) => HomePage()),
+    noTransitionRoute(path: RouteName.home, builder: (context, state) => MainScreen()),
     noTransitionRoute(path: RouteName.login, builder: (context, state) => LoginPage()),
-    noTransitionRoute(
-      path: RouteName.chatBot,
-      builder: (context, state) => ChatBotPage(),
-    ),
-    noTransitionRoute(path: RouteName.camera, builder: (context, state) => CameraPage()),
-    noTransitionRoute(
-      path: RouteName.profile,
-      builder: (context, state) => ProfilePage(),
-    ),
     noTransitionRoute(
       path: RouteName.forgotPassword,
       builder: (context, state) => ForgotPasswordPage(),
