@@ -27,7 +27,9 @@ dependencies:
     go_router: ^14.8.1
     google_sign_in: ^6.3.0
     flip_card: ^0.7.0
+    intl: ^0.20.2
     image_picker: ^1.1.2
+    camera: ^0.11.1
 dev_dependencies:
     flutter_test:
         sdk: flutter

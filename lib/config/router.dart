@@ -7,6 +7,7 @@ import 'package:lacquer/presentation/pages/auth/login_page.dart';
 import 'package:lacquer/presentation/pages/auth/verify_page.dart';
 import 'package:lacquer/presentation/pages/camera/camera_page.dart';
 import 'package:lacquer/presentation/pages/camera/about_screen.dart';
+import 'package:lacquer/presentation/pages/home/flashcard_page.dart';
 
 import 'package:lacquer/presentation/pages/mainscreen.dart';
 import 'package:flutter/widgets.dart';
@@ -19,6 +20,7 @@ class RouteName {
   static const String register = '/register';
   static const String camera = '/camera';
   static const String about = '/about';
+  static const String flashcards = '/flashcards';
 
   static const publicRoutes = [login, forgotPassword, verify, register];
 }
@@ -71,6 +73,10 @@ final router = GoRouter(
         final imagePath = state.extra as String;
         return AboutScreen(imagePath: imagePath);
       },
+    ),
+    noTransitionRoute(
+      path: RouteName.flashcards,
+      builder: (context, state) => const FlashcardPage(),
     ),
   ],
 );
