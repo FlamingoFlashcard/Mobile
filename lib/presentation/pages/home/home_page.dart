@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lacquer/config/theme.dart';
 import 'package:lacquer/presentation/utils/card_list.dart';
@@ -107,6 +108,13 @@ class HomePage extends StatelessWidget {
           imagePath: homeItems[index].imagePath,
           title: homeItems[index].title,
           backgroundColor: homeItems[index].backgroundColor,
+          onTap: () {
+            print('Tapped: ${homeItems[index].title}');
+            print('Route: ${homeItems[index].route}');
+            if (homeItems[index].route != null) {
+              context.go(homeItems[index].route!);
+            }
+          },
         );
       },
     );

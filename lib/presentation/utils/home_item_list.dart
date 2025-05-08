@@ -4,11 +4,13 @@ class HomeItemModel {
   final String imagePath;
   final String title;
   final Color backgroundColor;
+  final String? route;
 
   HomeItemModel({
     required this.imagePath,
     required this.title,
     required this.backgroundColor,
+    this.route,
   });
 }
 
@@ -17,6 +19,7 @@ final List<HomeItemModel> homeItems = [
     imagePath: "assets/images/flashcardLogo.png",
     title: "Flashcard",
     backgroundColor: Color(0xFF4285F4),
+    route: '/flashcards',
   ),
   HomeItemModel(
     imagePath: "assets/images/translatorLogo.png",
