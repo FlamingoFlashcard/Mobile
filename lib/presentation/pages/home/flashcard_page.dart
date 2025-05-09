@@ -17,11 +17,13 @@ class FlashcardPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Stack(
-              clipBehavior: Clip.none,
-              children: [_buildAppBar(context), _buildSearchBar()],
+            _buildAppBar(context),
+            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              child: _buildSearchBar(),
             ),
-            const SizedBox(height: 80),
+            const SizedBox(height: 16),
             FlashcardCategory(title: "Traditional Cuisine", cards: cuisine),
             FlashcardCategory(title: "Festivals", cards: cuisine),
             FlashcardCategory(title: "Landscape", cards: cuisine),
@@ -39,95 +41,93 @@ class FlashcardPage extends StatelessWidget {
         bottomRight: Radius.circular(8),
       ),
       child: Container(
-        height: 170,
+        height: 80,
         color: CustomTheme.mainColor1,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-        child: Row(
-          children: [
-            const SizedBox(width: 10),
-            IconButton(
-              icon: const Icon(FontAwesomeIcons.arrowLeft, color: Colors.white),
-              onPressed: () {
-                context.go('/');
-              },
-            ),
-            Expanded(
-              child: Center(
-                child: Text(
-                  'Flashcards',
-                  style: const TextStyle(
-                    fontSize: 24,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Center(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(width: 10),
+              IconButton(
+                icon: const Icon(
+                  FontAwesomeIcons.arrowLeft,
+                  color: Colors.white,
+                ),
+                onPressed: () {
+                  context.go('/');
+                },
+              ),
+              Expanded(
+                child: Center(
+                  child: Text(
+                    'Flashcards',
+                    style: const TextStyle(
+                      fontSize: 24,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
-            ),
-            const SizedBox(width: 15),
-            IconButton(
-              icon: const Icon(FontAwesomeIcons.plus, color: Colors.white),
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (context) => const FlashcardTopicCreate(),
-                );
-              },
-            ),
-            const SizedBox(width: 10),
-          ],
+              const SizedBox(width: 15),
+              IconButton(
+                icon: const Icon(FontAwesomeIcons.plus, color: Colors.white),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => const FlashcardTopicCreate(),
+                  );
+                },
+              ),
+              const SizedBox(width: 10),
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildSearchBar() {
-    return Positioned(
-      left: 16,
-      right: 16,
-      top: 130,
-      child: Material(
-        color: Colors.transparent,
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: CustomTheme.lightbeige,
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: const Color.fromRGBO(0, 0, 0, 0.1),
-                blurRadius: 6,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                "Search Flashcards",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                decoration: InputDecoration(
-                  hintText: "Search topic you want",
-                  hintStyle: TextStyle(color: Colors.black),
-                  prefixIcon: const Icon(
-                    FontAwesomeIcons.magnifyingGlass,
-                    color: Colors.grey,
-                    size: 20,
-                  ),
-                  filled: true,
-                  fillColor: const Color.fromARGB(255, 252, 246, 227),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: Colors.grey),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(vertical: 10),
+    return Material(
+      elevation: 4,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: CustomTheme.mainColor3,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Search Flashcards",
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              decoration: InputDecoration(
+                hintText: "Search topic you want",
+                hintStyle: const TextStyle(color: Colors.black),
+                prefixIcon: const Icon(
+                  FontAwesomeIcons.magnifyingGlass,
+                  color: Colors.grey,
+                  size: 20,
                 ),
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: const BorderSide(color: Colors.grey),
+                ),
+                contentPadding: const EdgeInsets.symmetric(vertical: 10),
               ),
-            ],
-          ),
+              onTap: () {
+                print("Search field tapped");
+              },
+            ),
+          ],
         ),
       ),
     );
