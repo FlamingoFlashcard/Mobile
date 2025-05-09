@@ -109,10 +109,11 @@ class HomePage extends StatelessWidget {
           title: homeItems[index].title,
           backgroundColor: homeItems[index].backgroundColor,
           onTap: () {
-            print('Tapped: ${homeItems[index].title}');
-            print('Route: ${homeItems[index].route}');
-            if (homeItems[index].route != null) {
-              context.go(homeItems[index].route!);
+            final route = homeItems[index].route;
+            if (route != null) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                context.go(route);
+              });
             }
           },
         );

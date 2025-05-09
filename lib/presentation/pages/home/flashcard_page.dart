@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lacquer/config/theme.dart';
 import 'package:lacquer/presentation/utils/card_list.dart';
 import 'package:lacquer/presentation/widgets/flashcard_category.dart';
@@ -39,14 +40,16 @@ class FlashcardPage extends StatelessWidget {
       ),
       child: Container(
         height: 170,
-        color: CustomTheme.cinnabar,
+        color: CustomTheme.mainColor1,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
         child: Row(
           children: [
             const SizedBox(width: 10),
             IconButton(
               icon: const Icon(FontAwesomeIcons.arrowLeft, color: Colors.white),
-              onPressed: () {},
+              onPressed: () {
+                context.go('/');
+              },
             ),
             Expanded(
               child: Center(

@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:lacquer/config/theme.dart';
 import 'package:lacquer/presentation/widgets/flashcard_options.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
 class FlashcardTopic extends StatefulWidget {
-  final Color backgroundColor;
   final String title;
   final int cardCount;
   final String imagePath;
 
   const FlashcardTopic({
     super.key,
-    required this.backgroundColor,
     required this.title,
     required this.cardCount,
     required this.imagePath,
@@ -45,7 +44,7 @@ class FlashcardTopicState extends State<FlashcardTopic> {
             width: 350,
             height: 200,
             decoration: BoxDecoration(
-              color: widget.backgroundColor,
+              color: CustomTheme.mainColor3,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
