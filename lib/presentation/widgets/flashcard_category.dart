@@ -33,7 +33,6 @@ class FlashcardCategory extends StatelessWidget {
             itemCount: cards.length,
             itemBuilder: (context, index) {
               return FlashcardTopic(
-                backgroundColor: cards[index].backgroundColor,
                 title: cards[index].title,
                 cardCount: cards[index].cardCount,
                 imagePath: cards[index].imagePath,
