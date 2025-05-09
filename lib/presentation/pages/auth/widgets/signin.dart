@@ -41,6 +41,7 @@ class SignInState extends State<SignIn> {
       AuthLoginInProgress() => _buildInLoginProgressWidget(),
       AuthLoginFailure() => _buildLoginFailureWidget(authState.message),
       AuthLoginSuccess() => _buildLoginSuccessWidget(),
+      AuthGoogleSignInInProgress() => _buildInLoginProgressWidget(),
       _ => _buildInitialLoginWidget(),
     });
 
