@@ -43,7 +43,7 @@ class ForgotPasswordPage extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 36,
                         fontWeight: FontWeight.w900,
-                        color: CustomTheme.lightbeige,
+                        color: CustomTheme.mainColor1,
                       ),
                     ),
                   ),
@@ -54,7 +54,7 @@ class ForgotPasswordPage extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
-                    color: CustomTheme.lightbeige,
+                    color: CustomTheme.mainColor1,
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -117,7 +117,7 @@ class ForgotPasswordPage extends StatelessWidget {
                 Container(
                   decoration: const BoxDecoration(
                     borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                    color: CustomTheme.secondaryColor,
+                    color: CustomTheme.primaryColor,
                   ),
                   child: MaterialButton(
                     highlightColor: Colors.transparent,
@@ -149,14 +149,14 @@ class ForgotPasswordPage extends StatelessWidget {
                   icon: const Icon(
                     Icons.arrow_back,
                     size: 20,
-                    color: CustomTheme.lightbeige,
+                    color: CustomTheme.mainColor1,
                   ),
                   label: const Text(
                     'Back to login',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
-                      color: CustomTheme.lightbeige,
+                      color: CustomTheme.mainColor1,
                     ),
                   ),
                 ),
