@@ -32,30 +32,27 @@ class FlashcardApiClient {
     }
   }
 
-  // Future<List<CreateDeckResponseDto>> getDecks() async {
-  //   try {
-  //     final token = await authLocalDataSource.getToken();
+  Future<List<CreateDeckResponseDto>> getDecks() async {
+    try {
+      final token = await authLocalDataSource.getToken();
 
-  //     final options = Options(headers: {
-  //       if (token != null) 'Authorization': 'Bearer $token',
-  //     });
+      final options = Options(
+        headers: {if (token != null) 'Authorization': 'Bearer $token'},
+      );
 
-  //     final response = await dio.get(
-  //       '/decks',
-  //       options: options,
-  //     );
+      final response = await dio.get('/deck', options: options);
 
-  //     return (response.data as List)
-  //         .map((json) => CreateDeckResponseDto.fromJson(json))
-  //         .toList();
-  //   } on DioException catch (e) {
-  //     if (e.response != null) {
-  //       throw Exception(e.response!.data['message']);
-  //     } else {
-  //       throw Exception(e.message);
-  //     }
-  //   }
-  // }
+      return (response.data as List)
+          .map((json) => CreateDeckResponseDto.fromJson(json))
+          .toList();
+    } on DioException catch (e) {
+      if (e.response != null) {
+        throw Exception(e.response!.data['message']);
+      } else {
+        throw Exception(e.message);
+      }
+    }
+  }
 
   // Future<CreateDeckResponseDto> getDeckById(String deckId) async {
   //   try {

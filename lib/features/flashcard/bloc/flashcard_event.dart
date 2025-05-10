@@ -24,9 +24,9 @@ class CreateDeckRequested extends FlashcardEvent {
   List<Object> get props => [title, description, imageUrl, cardIds];
 }
 
-// class LoadDecksRequested extends FlashcardEvent {
-//   const LoadDecksRequested();
-// }
+class LoadDecksRequested extends FlashcardEvent {
+  const LoadDecksRequested();
+}
 
 // class LoadDeckByIdRequested extends FlashcardEvent {
 //   final String deckId;

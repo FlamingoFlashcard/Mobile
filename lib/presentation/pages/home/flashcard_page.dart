@@ -3,8 +3,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lacquer/config/theme.dart';
 import 'package:lacquer/presentation/utils/card_list.dart';
-import 'package:lacquer/presentation/widgets/flashcard_category.dart';
-import 'package:lacquer/presentation/widgets/flashcard_topic_create.dart';
+import 'package:lacquer/presentation/pages/home/widgets/flashcard_tag.dart';
+import 'package:lacquer/presentation/pages/home/widgets/flashcard_topic_create.dart';
 
 class FlashcardPage extends StatelessWidget {
   const FlashcardPage({super.key});
@@ -24,9 +24,9 @@ class FlashcardPage extends StatelessWidget {
               child: _buildSearchBar(),
             ),
             const SizedBox(height: 16),
-            FlashcardCategory(title: "Traditional Cuisine", cards: cuisine),
-            FlashcardCategory(title: "Festivals", cards: cuisine),
-            FlashcardCategory(title: "Landscape", cards: cuisine),
+            FlashcardTag(title: "Traditional Cuisine", decks: cuisine),
+            FlashcardTag(title: "Festivals", decks: cuisine),
+            FlashcardTag(title: "Landscape", decks: cuisine),
             const SizedBox(height: 20),
           ],
         ),
