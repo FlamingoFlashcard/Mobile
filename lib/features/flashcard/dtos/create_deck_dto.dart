@@ -35,6 +35,7 @@ class CreateDeckResponseDto {
   final String title;
   final String description;
   final String imageUrl;
+  final String tag;
   final List<String> cardIds;
   final String userId;
   final DateTime createdAt;
@@ -44,6 +45,7 @@ class CreateDeckResponseDto {
     required this.title,
     required this.description,
     required this.imageUrl,
+    required this.tag,
     required this.cardIds,
     required this.userId,
     required this.createdAt,
@@ -55,6 +57,7 @@ class CreateDeckResponseDto {
       title: json['title'] as String,
       description: json['description'] as String,
       imageUrl: json['img'] as String,
+      tag: json['tag'] as String,
       cardIds: (json['cards'] as List).map((e) => e as String).toList(),
       userId: json['userId'] as String,
       createdAt: DateTime.parse(json['createdAt'] as String),

@@ -22,9 +22,9 @@ class FlashcardRepository {
     return apiClient.createDeck(deckDto);
   }
 
-  // Future<List<CreateDeckResponseDto>> getDecks() async {
-  //   return apiClient.getDecks();
-  // }
+  Future<List<CreateDeckResponseDto>> getDecks() async {
+    return apiClient.getDecks();
+  }
 
   // Future<CreateDeckResponseDto> getDeckById(String deckId) async {
   //   return apiClient.getDeckById(deckId);
