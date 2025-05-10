@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:lacquer/presentation/widgets/flashcard_topic.dart';
+import 'package:lacquer/presentation/pages/home/widgets/flashcard_topic.dart';
 import 'package:lacquer/presentation/utils/card_list.dart';
 
-class FlashcardCategory extends StatelessWidget {
+class FlashcardTag extends StatelessWidget {
   final String title;
-  final List<FlashcardTopicModel> cards;
+  final List<FlashcardTopicModel> decks;
 
-  const FlashcardCategory({
-    super.key,
-    required this.title,
-    required this.cards,
-  });
+  const FlashcardTag({super.key, required this.title, required this.decks});
 
   @override
   Widget build(BuildContext context) {
@@ -30,12 +26,12 @@ class FlashcardCategory extends StatelessWidget {
             padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8),
             scrollDirection: Axis.horizontal,
             separatorBuilder: (context, _) => const SizedBox(width: 12),
-            itemCount: cards.length,
+            itemCount: decks.length,
             itemBuilder: (context, index) {
               return FlashcardTopic(
-                title: cards[index].title,
-                cardCount: cards[index].cardCount,
-                imagePath: cards[index].imagePath,
+                title: decks[index].title,
+                cardCount: decks[index].cardCount,
+                imagePath: decks[index].imagePath,
               );
             },
           ),

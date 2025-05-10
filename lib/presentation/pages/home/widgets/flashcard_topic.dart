@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lacquer/config/theme.dart';
-import 'package:lacquer/presentation/widgets/flashcard_options.dart';
+import 'package:lacquer/presentation/pages/home/widgets/flashcard_options.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
 class FlashcardTopic extends StatefulWidget {

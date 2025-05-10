@@ -8,7 +8,7 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
 
   FlashcardBloc({required this.repository}) : super(const FlashcardState()) {
     on<CreateDeckRequested>(_onCreateDeckRequested);
-    // on<LoadDecksRequested>(_onLoadDecksRequested);
+    on<LoadDecksRequested>(_onLoadDecksRequested);
     // on<LoadDeckByIdRequested>(_onLoadDeckByIdRequested);
     // on<DeleteDeckRequested>(_onDeleteDeckRequested);
     // on<UpdateDeckRequested>(_onUpdateDeckRequested);
@@ -45,25 +45,24 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
     }
   }
 
-  // Future<void> _onLoadDecksRequested(
-  //   LoadDecksRequested event,
-  //   Emitter<FlashcardState> emit,
-  // ) async {
-  //   emit(state.copyWith(status: FlashcardStatus.loading));
+  Future<void> _onLoadDecksRequested(
+    LoadDecksRequested event,
+    Emitter<FlashcardState> emit,
+  ) async {
+    emit(state.copyWith(status: FlashcardStatus.loading));
 
-  //   try {
-  //     final decks = await repository.getDecks();
-  //     emit(state.copyWith(
-  //       status: FlashcardStatus.success,
-  //       decks: decks,
-  //     ));
-  //   } catch (e) {
-  //     emit(state.copyWith(
-  //       status: FlashcardStatus.failure,
-  //       errorMessage: e.toString(),
-  //     ));
-  //   }
-  // }
+    try {
+      final decks = await repository.getDecks();
+      emit(state.copyWith(status: FlashcardStatus.success, decks: decks));
+    } catch (e) {
+      emit(
+        state.copyWith(
+          status: FlashcardStatus.failure,
+          errorMessage: e.toString(),
+        ),
+      );
+    }
+  }
 
   // Future<void> _onLoadDeckByIdRequested(
   //   LoadDeckByIdRequested event,
