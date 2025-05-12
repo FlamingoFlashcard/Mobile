@@ -30,7 +30,7 @@ class _ChatBotPageState extends State<ChatBotPage> with WidgetsBindingObserver {
       setState(() {}); // rebuild khi focus thay đổi
     });
     context.read<ChatbotBloc>().add(
-      ChatbotEventGetHistory(userId: widget.userId)
+      ChatbotEventGetHistory(userId: widget.userId),
     );
   }
 
@@ -53,12 +53,14 @@ class _ChatBotPageState extends State<ChatBotPage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    var title = _emptyConversation ? null : _buildHeader();
+    final title = _emptyConversation ? null : _buildAppBar();
     final chatbotState = context.watch<ChatbotBloc>().state;
 
     var chatbotWidget = (switch (chatbotState) {
       ChatbotInitial() => _buildInitialChatbotWidget(null),
-      ChatbotFetchingFailure() => _buildInitialChatbotWidget(chatbotState.message),
+      ChatbotFetchingFailure() => _buildInitialChatbotWidget(
+        chatbotState.message,
+      ),
       ChatbotFetchingInProgress() => _buildInitialChatbotWidget("Loading..."),
       _ => _buildInConversationWidget(),
     });
@@ -66,6 +68,17 @@ class _ChatBotPageState extends State<ChatBotPage> with WidgetsBindingObserver {
     chatbotWidget = BlocListener<ChatbotBloc, ChatbotState>(
       listener: (context, state) {
         switch (state) {
+          case ChatbotFetchingSuccess():
+            _conversationList.clear();
+            _emptyConversation = false;
+            for (var message in state.history) {
+              if (message.role == 'user') {
+                _conversationList.add(_buildUserMessage(message.parts[0].text));
+              } else {
+                _conversationList.add(_buildBotMessage(message.parts[0].text));
+              }
+            }
+            break;
           case ChatbotAskingInProgress():
             _conversationList.add(
               SizedBox(
@@ -74,6 +87,9 @@ class _ChatBotPageState extends State<ChatBotPage> with WidgetsBindingObserver {
                 child: const CircularProgressIndicator(),
               ),
             );
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              _scrollToBottom();
+            });
             break;
           case ChatbotAskingSuccess():
             _conversationList.removeLast(); // Remove CircularProgressIndicator
@@ -120,7 +136,7 @@ class _ChatBotPageState extends State<ChatBotPage> with WidgetsBindingObserver {
               fontFamily: GoogleFonts.roboto().fontFamily,
               color: CustomTheme.black,
             ),
-          )
+          ),
         ],
       ),
     );
@@ -179,6 +195,29 @@ class _ChatBotPageState extends State<ChatBotPage> with WidgetsBindingObserver {
           image: AssetImage('assets/images/inkwell.png'),
           width: 40,
           height: 40,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAppBar() {
+    return AppBar(
+      backgroundColor: CustomTheme.white,
+      centerTitle: true,
+      title: _buildHeader(),
+      leading: const SizedBox(),
+      actions: [
+        PopupMenuButton<String>(
+          onSelected: (value) {
+            if (value == 'delete') {
+              _onDeleteHistory(context);
+            }
+          },
+          itemBuilder:
+              (BuildContext context) => [
+                PopupMenuItem(value: 'delete', child: Text('Xóa lịch sử')),
+                PopupMenuItem(value: 'setting', child: Text('Cài đặt')),
+              ],
         ),
       ],
     );
@@ -249,14 +288,14 @@ class _ChatBotPageState extends State<ChatBotPage> with WidgetsBindingObserver {
         ),
         decoration: BoxDecoration(
           color: CustomTheme.primaryColor, // Màu nền ô
-          borderRadius: BorderRadius.circular(30), // Bo góc
+          borderRadius: BorderRadius.circular(20), // Bo góc
         ),
         child: Text(
           message,
           textAlign: TextAlign.justify, // Căn đều text bên trong
           style: TextStyle(
             fontSize: 17,
-            fontWeight: FontWeight.w300,
+            fontWeight: FontWeight.w600,
             fontFamily: GoogleFonts.roboto().fontFamily,
             color: CustomTheme.white,
           ),
@@ -271,17 +310,12 @@ class _ChatBotPageState extends State<ChatBotPage> with WidgetsBindingObserver {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10),
         margin: const EdgeInsets.only(bottom: 15),
-        constraints: BoxConstraints(
-          maxWidth:
-              MediaQuery.of(context).size.width *
-              0.8, // Giới hạn chiều rộng tối đa
-        ),
         child: Text(
           reply,
           textAlign: TextAlign.justify,
           style: TextStyle(
             fontSize: 17,
-            fontWeight: FontWeight.w500,
+            fontWeight: FontWeight.w700,
             fontFamily: GoogleFonts.lora().fontFamily,
             color: CustomTheme.black,
           ),
@@ -333,9 +367,6 @@ class _ChatBotPageState extends State<ChatBotPage> with WidgetsBindingObserver {
     setState(() {
       _emptyConversation = false;
     });
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _scrollToBottom();
-    });
   }
 
   void _scrollToBottom() {
@@ -346,7 +377,41 @@ class _ChatBotPageState extends State<ChatBotPage> with WidgetsBindingObserver {
     );
   }
 
-  void _onResendMessage() {
-    
+  void _onDeleteHistory(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: const Text('Xác nhận'),
+          content: const Text('Bạn có chắc chắn muốn xóa lịch sử không?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Hủy'),
+              onPressed: () {
+                Navigator.of(dialogContext).pop(); // Đóng dialog
+              },
+            ),
+            TextButton(
+              child: const Text('Xóa'),
+              onPressed: () {
+                Navigator.of(dialogContext).pop(); // Đóng dialog
+                // Gọi hàm xóa lịch sử thật sự ở đây
+                _deleteHistory();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
+
+  void _deleteHistory() {
+    context.read<ChatbotBloc>().add(
+      ChatbotEventDeleteHistory(userId: widget.userId),
+    );
+    _conversationList.clear();
+    _emptyConversation = true;    
+  }
+
+  void _onResendMessage() {}
 }

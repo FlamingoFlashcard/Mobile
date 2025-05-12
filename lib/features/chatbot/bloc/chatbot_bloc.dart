@@ -52,7 +52,7 @@ class ChatbotBloc extends Bloc<ChatbotEvent, ChatbotState> {
     emit(ChatbotFetchingInProgress());
     final result = await chatbotRepository.deleteHistory(event.userId);
     return (switch (result) {
-      Success() => emit(ChatbotFetchingSuccess([])),
+      Success() => emit(ChatbotInitial()),
       Failure() => emit(ChatbotFetchingFailure(result.message)),
     });
   }
