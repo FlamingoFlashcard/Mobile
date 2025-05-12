@@ -31,18 +31,21 @@ GoRoute noTransitionRoute({
   );
 }
 
+late String? userId;
+
 final router = GoRouter(
   redirect: (context, state) {
     if (RouteName.publicRoutes.contains(state.fullPath)) {
       return null;
     }
     if(context.read<AuthBloc>().state is AuthAuthenticatedSuccess){
+      userId = (context.read<AuthBloc>().state as AuthAuthenticatedSuccess).userId;
       return null;
     }
     return RouteName.login;
   },
   routes: [
-    noTransitionRoute(path: RouteName.home, builder: (context, state) => MainScreen()),
+    noTransitionRoute(path: RouteName.home, builder: (context, state) => MainScreen(userId: userId ?? '')),
     noTransitionRoute(path: RouteName.login, builder: (context, state) => LoginPage()),
     noTransitionRoute(
       path: RouteName.forgotPassword,

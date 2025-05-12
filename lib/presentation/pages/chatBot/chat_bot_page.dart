@@ -7,7 +7,9 @@ import 'package:lacquer/features/chatbot/bloc/chatbot_event.dart';
 import 'package:lacquer/features/chatbot/bloc/chatbot_state.dart';
 
 class ChatBotPage extends StatefulWidget {
-  const ChatBotPage({super.key});
+  final String userId;
+
+  const ChatBotPage({super.key, required this.userId});
 
   @override
   State<ChatBotPage> createState() => _ChatBotPageState();
@@ -18,17 +20,18 @@ class _ChatBotPageState extends State<ChatBotPage> with WidgetsBindingObserver {
   final ScrollController _scrollController = ScrollController();
   bool _isKeyboardVisible = false; //Biến để theo dõi trạng tái bàn phím
   bool _emptyConversation = true; // Biến để theo dõi trạng thái cuộc trò chuyện
-  List<String> userMessage = [];
-  List<String> botMessage = [];
+  final List<Widget> _conversationList = [];
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-
     _focusNode.addListener(() {
       setState(() {}); // rebuild khi focus thay đổi
     });
+    context.read<ChatbotBloc>().add(
+      ChatbotEventGetHistory(userId: widget.userId),
+    );
   }
 
   @override
@@ -55,6 +58,7 @@ class _ChatBotPageState extends State<ChatBotPage> with WidgetsBindingObserver {
 
     var chatbotWidget = (switch (chatbotState) {
       ChatbotInitial() => _buildInitialChatbotWidget(),
+      ChatbotFetchingFailure() => _buildInitialChatbotWidget(),
       _ => _buildInConversationWidget(),
     });
 
@@ -62,7 +66,6 @@ class _ChatBotPageState extends State<ChatBotPage> with WidgetsBindingObserver {
       listener: (context, state) {
         switch (state) {
           case ChatbotAskingInProgress():
-            _conversationList.add(_buildUserMessage(userMessage.last));
             _conversationList.add(
               SizedBox(
                 width: 30,
@@ -74,13 +77,10 @@ class _ChatBotPageState extends State<ChatBotPage> with WidgetsBindingObserver {
           case ChatbotAskingSuccess():
             _conversationList.removeLast(); // Remove CircularProgressIndicator
             _conversationList.add(_buildBotMessage(state.response));
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              _scrollToBottom(); // Cuộn xuống dưới cùng sau khi thêm tin nhắn
-            });
             break;
           case ChatbotAskingFailure():
             _conversationList.removeLast(); // Remove CircularProgressIndicator
-            _conversationList.add(_buildBotMessage(state.message));
+            _conversationList.add(_buildErrorMessage(state.message));
             break;
           default:
             break;
@@ -98,8 +98,6 @@ class _ChatBotPageState extends State<ChatBotPage> with WidgetsBindingObserver {
   }
 
   //----------------------------- WIDGETS -----------------------------
-  final List<Widget> _conversationList = [];
-
   Widget _buildInitialChatbotWidget() {
     return Container(
       padding: const EdgeInsets.all(20),
@@ -125,6 +123,7 @@ class _ChatBotPageState extends State<ChatBotPage> with WidgetsBindingObserver {
         children: [
           Expanded(
             child: ListView.builder(
+              controller: _scrollController,
               itemCount: _conversationList.length,
               itemBuilder: (context, index) {
                 return _conversationList[index];
@@ -228,35 +227,98 @@ class _ChatBotPageState extends State<ChatBotPage> with WidgetsBindingObserver {
   }
 
   Widget _buildUserMessage(String message) {
-    return Text(
-      message,
-      textAlign: TextAlign.right,
-      style: TextStyle(
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
-        fontFamily: GoogleFonts.lora().fontFamily,
-        color: CustomTheme.primaryColor,
+    return Align(
+      alignment: Alignment.centerRight, // Luôn đẩy container sang bên phải
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+        constraints: BoxConstraints(
+          maxWidth:
+              MediaQuery.of(context).size.width *
+              0.8, // Giới hạn chiều rộng tối đa
+        ),
+        decoration: BoxDecoration(
+          color: CustomTheme.primaryColor, // Màu nền ô
+          borderRadius: BorderRadius.circular(30), // Bo góc
+        ),
+        child: Text(
+          message,
+          textAlign: TextAlign.justify, // Căn đều text bên trong
+          style: TextStyle(
+            fontSize: 17,
+            fontWeight: FontWeight.w300,
+            fontFamily: GoogleFonts.roboto().fontFamily,
+            color: CustomTheme.white,
+          ),
+        ),
       ),
     );
   }
 
   Widget _buildBotMessage(String reply) {
-    return Text(
-      reply,
-      textAlign: TextAlign.left,
-      style: TextStyle(
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
-        fontFamily: GoogleFonts.lora().fontFamily,
-        color: CustomTheme.black,
+    return Align(
+      alignment: Alignment.centerLeft, // Luôn đẩy container sang bên trái
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        margin: const EdgeInsets.only(bottom: 15),
+        constraints: BoxConstraints(
+          maxWidth:
+              MediaQuery.of(context).size.width *
+              0.8, // Giới hạn chiều rộng tối đa
+        ),
+        child: Text(
+          reply,
+          textAlign: TextAlign.justify,
+          style: TextStyle(
+            fontSize: 17,
+            fontWeight: FontWeight.w500,
+            fontFamily: GoogleFonts.lora().fontFamily,
+            color: CustomTheme.black,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildErrorMessage(String message) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        margin: const EdgeInsets.only(bottom: 15),
+        constraints: BoxConstraints(
+          maxWidth:
+              MediaQuery.of(context).size.width *
+              0.8, // Giới hạn chiều rộng tối đa
+        ),
+        child: Column(
+          children: [
+            Text(
+              message,
+              textAlign: TextAlign.justify,
+              style: TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.w500,
+                fontFamily: GoogleFonts.lora().fontFamily,
+                color: CustomTheme.primaryColor,
+              ),
+            ),
+            const SizedBox(height: 10),
+            TextButton(
+              onPressed: _onResendMessage,
+              child: Icon(Icons.refresh, color: CustomTheme.black, size: 20),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   //----------------------------- FUNCTIONS -----------------------------
   void _onAsking(BuildContext context, String question) {
-    context.read<ChatbotBloc>().add(ChatbotEventAsking(prompt: question));
-    userMessage.add(question);
+    context.read<ChatbotBloc>().add(
+      ChatbotEventAsking(prompt: question, userId: widget.userId),
+    );
+    _conversationList.add(_buildUserMessage(question));
     setState(() {
       _emptyConversation = false;
     });
@@ -271,5 +333,9 @@ class _ChatBotPageState extends State<ChatBotPage> with WidgetsBindingObserver {
       duration: Duration(milliseconds: 300),
       curve: Curves.easeInOut,
     );
+  }
+
+  void _onResendMessage() {
+    
   }
 }

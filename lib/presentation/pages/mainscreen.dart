@@ -8,7 +8,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:lacquer/config/theme.dart';
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+  final String userId;
+  const MainScreen({super.key, required this.userId});
 
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -41,11 +42,11 @@ class _MainScreenState extends State<MainScreen> {
       body: PageView(
         controller: _pageController,
         onPageChanged: _onPageChanged,
-        children: const [
-          HomePage(),
-          ChatBotPage(),
-          CameraPage(),
-          ProfilePage(),
+        children: [
+          const HomePage(),
+          ChatBotPage(userId: widget.userId),
+          const CameraPage(),
+          const ProfilePage(),
         ],
       ),
       bottomNavigationBar: Container(

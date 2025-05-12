@@ -41,8 +41,9 @@ class MyApp extends StatelessWidget {
         ),
         RepositoryProvider(
           create:
-              (context) =>
-                  ChatbotRepository(chatbotApiClient: ChatbotApiClient(dio)),
+              (context) => ChatbotRepository(
+                chatbotApiClient: ChatbotApiClient(dio),
+              ),
         ),
       ],
       child: MultiBlocProvider(

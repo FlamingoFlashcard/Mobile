@@ -48,10 +48,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthAuthenticateStarted event,
     Emitter<AuthState> emit,
   ) async {
-    final result = await authRepository.getToken();
+    final result = await authRepository.getLocalSource();
     return (switch (result) {
-      Success(data: final token) when token != null => emit(
-        AuthAuthenticatedSuccess(token),
+      Success(data: final localsource) when localsource != null => emit(
+        AuthAuthenticatedSuccess(localsource.token, localsource.userId),
       ),
       Success() => emit(AuthAuthenticatedUnknown()),
       Failure() => emit(AuthAuthenticatedFailure(result.message)),
