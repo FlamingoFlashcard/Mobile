@@ -15,12 +15,16 @@ class ChatBotPage extends StatefulWidget {
   State<ChatBotPage> createState() => _ChatBotPageState();
 }
 
-class _ChatBotPageState extends State<ChatBotPage> with WidgetsBindingObserver {
+class _ChatBotPageState extends State<ChatBotPage>
+    with WidgetsBindingObserver, AutomaticKeepAliveClientMixin {
   final FocusNode _focusNode = FocusNode();
   final ScrollController _scrollController = ScrollController();
   bool _isKeyboardVisible = false; //Biến để theo dõi trạng tái bàn phím
   bool _emptyConversation = true; // Biến để theo dõi trạng thái cuộc trò chuyện
   final List<Widget> _conversationList = [];
+
+  @override
+  bool get wantKeepAlive => true; // Giữ lại trạng thái của widget khi chuyển đổi giữa các tab
 
   @override
   void initState() {
@@ -53,6 +57,7 @@ class _ChatBotPageState extends State<ChatBotPage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final title = _emptyConversation ? null : _buildAppBar();
     final chatbotState = context.watch<ChatbotBloc>().state;
 
@@ -80,13 +85,7 @@ class _ChatBotPageState extends State<ChatBotPage> with WidgetsBindingObserver {
             }
             break;
           case ChatbotAskingInProgress():
-            _conversationList.add(
-              SizedBox(
-                width: 30,
-                height: 30,
-                child: const CircularProgressIndicator(),
-              ),
-            );
+            _conversationList.add(_buildLoadingIndicator());
             WidgetsBinding.instance.addPostFrameCallback((_) {
               _scrollToBottom();
             });
@@ -128,7 +127,7 @@ class _ChatBotPageState extends State<ChatBotPage> with WidgetsBindingObserver {
           //Search bar
           _buildSearchBar(context),
           Text(
-            message ?? 'Nothing',
+            message ?? '',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 20,
@@ -167,7 +166,7 @@ class _ChatBotPageState extends State<ChatBotPage> with WidgetsBindingObserver {
 
   Widget _buildTitle() {
     return Text(
-      'UserId: ${widget.userId} | Discover culture, cuisine and more with',
+      'Discover culture, cuisine and more with',
       textAlign: TextAlign.center,
       style: TextStyle(
         fontSize: 30,
@@ -358,6 +357,10 @@ class _ChatBotPageState extends State<ChatBotPage> with WidgetsBindingObserver {
     );
   }
 
+  Widget _buildLoadingIndicator() {
+    return const Center(child: CircularProgressIndicator());
+  }
+
   //----------------------------- FUNCTIONS -----------------------------
   void _onAsking(BuildContext context, String question) {
     context.read<ChatbotBloc>().add(
@@ -410,7 +413,7 @@ class _ChatBotPageState extends State<ChatBotPage> with WidgetsBindingObserver {
       ChatbotEventDeleteHistory(userId: widget.userId),
     );
     _conversationList.clear();
-    _emptyConversation = true;    
+    _emptyConversation = true;
   }
 
   void _onResendMessage() {}

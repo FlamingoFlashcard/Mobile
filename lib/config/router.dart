@@ -1,7 +1,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lacquer/features/auth/bloc/auth_bloc.dart';
+import 'package:lacquer/features/auth/bloc/auth_event.dart';
 import 'package:lacquer/features/auth/bloc/auth_state.dart';
+import 'package:lacquer/features/chatbot/bloc/chatbot_bloc.dart';
+import 'package:lacquer/features/chatbot/bloc/chatbot_event.dart';
 import 'package:lacquer/presentation/pages/auth/forgot_password_page.dart';
 import 'package:lacquer/presentation/pages/auth/login_page.dart';
 import 'package:lacquer/presentation/pages/auth/verify_page.dart';
@@ -39,7 +42,8 @@ final router = GoRouter(
       return null;
     }
     if(context.read<AuthBloc>().state is AuthAuthenticatedSuccess){
-      userId = (context.read<AuthBloc>().state as AuthAuthenticatedSuccess).userId;
+      userId = (context.read<AuthBloc>().state as AuthAuthenticatedSuccess).userId;      
+      context.read<ChatbotBloc>().add(ChatbotEventGetHistory(userId: userId ?? ''));
       return null;
     }
     return RouteName.login;
