@@ -66,7 +66,7 @@ class _ChatBotPageState extends State<ChatBotPage>
       ChatbotFetchingFailure() => _buildInitialChatbotWidget(
         chatbotState.message,
       ),
-      ChatbotFetchingInProgress() => _buildInitialChatbotWidget("Loading..."),
+      ChatbotFetchingInProgress() => _buildInitialChatbotWidget(null),
       _ => _buildInConversationWidget(),
     });
 
@@ -169,9 +169,14 @@ class _ChatBotPageState extends State<ChatBotPage>
       'Discover culture, cuisine and more with',
       textAlign: TextAlign.center,
       style: TextStyle(
-        fontSize: 30,
+        fontSize: 35,
         fontWeight: FontWeight.bold,
         fontFamily: GoogleFonts.lora().fontFamily,
+        foreground:
+            Paint()
+              ..shader = LinearGradient(
+                colors: <Color>[CustomTheme.chatbotprimary, CustomTheme.chatbotsecondary],
+              ).createShader(Rect.fromLTWH(0.0, 0.0, 200.0, 70.0)),
       ),
     );
   }
@@ -214,8 +219,8 @@ class _ChatBotPageState extends State<ChatBotPage>
           },
           itemBuilder:
               (BuildContext context) => [
-                PopupMenuItem(value: 'delete', child: Text('Xóa lịch sử')),
-                PopupMenuItem(value: 'setting', child: Text('Cài đặt')),
+                PopupMenuItem(value: 'delete', child: Text('Delete history')),
+                PopupMenuItem(value: 'setting', child: Text('Settings')),
               ],
         ),
       ],
@@ -286,8 +291,17 @@ class _ChatBotPageState extends State<ChatBotPage>
               0.8, // Giới hạn chiều rộng tối đa
         ),
         decoration: BoxDecoration(
-          color: CustomTheme.primaryColor, // Màu nền ô
           borderRadius: BorderRadius.circular(20), // Bo góc
+          gradient: LinearGradient(
+                colors: <Color>[
+                  CustomTheme.chatbotprimary,
+                  CustomTheme.chatbotsecondary,
+                ],
+                begin: FractionalOffset(0.0, 1.0),
+                end: FractionalOffset(1.0, 1.0),
+                stops: <double>[0.0, 1.0],
+                tileMode: TileMode.clamp,
+              ),
         ),
         child: Text(
           message,
@@ -358,7 +372,10 @@ class _ChatBotPageState extends State<ChatBotPage>
   }
 
   Widget _buildLoadingIndicator() {
-    return const Center(child: CircularProgressIndicator());
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Image.asset('assets/icons/feather.gif', width: 100, height: 100),
+    );
   }
 
   //----------------------------- FUNCTIONS -----------------------------
@@ -385,20 +402,19 @@ class _ChatBotPageState extends State<ChatBotPage>
       context: context,
       builder: (BuildContext dialogContext) {
         return AlertDialog(
-          title: const Text('Xác nhận'),
-          content: const Text('Bạn có chắc chắn muốn xóa lịch sử không?'),
+          title: const Text('Confirmation'),
+          content: const Text('Are you sure you want to delete the history?'),
           actions: <Widget>[
             TextButton(
-              child: const Text('Hủy'),
+              child: const Text('Cancel'),
               onPressed: () {
                 Navigator.of(dialogContext).pop(); // Đóng dialog
               },
             ),
             TextButton(
-              child: const Text('Xóa'),
+              child: const Text('Delete', style: TextStyle(color: Colors.red)),
               onPressed: () {
                 Navigator.of(dialogContext).pop(); // Đóng dialog
-                // Gọi hàm xóa lịch sử thật sự ở đây
                 _deleteHistory();
               },
             ),
