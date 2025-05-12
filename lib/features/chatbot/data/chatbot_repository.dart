@@ -21,11 +21,11 @@ class ChatbotRepository {
     }
   }
 
-  Future<Result<List<History>>> getHistory(String userId) async {
+  Future<Result<List<Message>>> getHistory(String userId) async {
     try {
       final history = await chatbotApiClient.getHistory(userId);
       if(history.success) {
-        return Success(history.data.history);
+        return Success(history.data.messages);
       } else {
         return Failure(history.message);
       }

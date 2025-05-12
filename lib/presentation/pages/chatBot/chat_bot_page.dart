@@ -30,7 +30,7 @@ class _ChatBotPageState extends State<ChatBotPage> with WidgetsBindingObserver {
       setState(() {}); // rebuild khi focus thay đổi
     });
     context.read<ChatbotBloc>().add(
-      ChatbotEventGetHistory(userId: widget.userId),
+      ChatbotEventGetHistory(userId: widget.userId)
     );
   }
 
@@ -57,8 +57,9 @@ class _ChatBotPageState extends State<ChatBotPage> with WidgetsBindingObserver {
     final chatbotState = context.watch<ChatbotBloc>().state;
 
     var chatbotWidget = (switch (chatbotState) {
-      ChatbotInitial() => _buildInitialChatbotWidget(),
-      ChatbotFetchingFailure() => _buildInitialChatbotWidget(),
+      ChatbotInitial() => _buildInitialChatbotWidget(null),
+      ChatbotFetchingFailure() => _buildInitialChatbotWidget(chatbotState.message),
+      ChatbotFetchingInProgress() => _buildInitialChatbotWidget("Loading..."),
       _ => _buildInConversationWidget(),
     });
 
@@ -98,7 +99,7 @@ class _ChatBotPageState extends State<ChatBotPage> with WidgetsBindingObserver {
   }
 
   //----------------------------- WIDGETS -----------------------------
-  Widget _buildInitialChatbotWidget() {
+  Widget _buildInitialChatbotWidget(String? message) {
     return Container(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -110,6 +111,16 @@ class _ChatBotPageState extends State<ChatBotPage> with WidgetsBindingObserver {
           const SizedBox(height: 20),
           //Search bar
           _buildSearchBar(context),
+          Text(
+            message ?? 'Nothing',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w300,
+              fontFamily: GoogleFonts.roboto().fontFamily,
+              color: CustomTheme.black,
+            ),
+          )
         ],
       ),
     );
@@ -140,7 +151,7 @@ class _ChatBotPageState extends State<ChatBotPage> with WidgetsBindingObserver {
 
   Widget _buildTitle() {
     return Text(
-      'Discover culture, cuisine and more with',
+      'UserId: ${widget.userId} | Discover culture, cuisine and more with',
       textAlign: TextAlign.center,
       style: TextStyle(
         fontSize: 30,

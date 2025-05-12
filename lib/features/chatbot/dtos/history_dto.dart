@@ -13,33 +13,19 @@ class HistoryDto {
     return HistoryDto(
       success: json['success'] as bool,
       message: json['message'] as String,
-      data: Data.fromJson(json['data'] as Map<String, dynamic>),
+      data: Data.fromJson(json['data'] as List<dynamic>),
     );
   }
 }
 
 class Data {
-  final List<History> history;
+  final List<Message> messages;
 
-  const Data({required this.history});
-  factory Data.fromJson(Map<String, dynamic> json) {
+  const Data({required this.messages});
+  factory Data.fromJson(List<dynamic> json) {
     return Data(
-      history: (json['history'] as List)
-          .map((e) => History.fromJson(e))
-          .toList(),
-    );
-  }
-}
-
-class History {
-  final List<Message> message;
-
-  const History({required this.message});
-  factory History.fromJson(Map<String, dynamic> json) {
-    return History(
-      message: (json['message'] as List)
-          .map((e) => Message.fromJson(e))
-          .toList(),
+      messages:
+          json.map((e) => Message.fromJson(e as Map<String, dynamic>)).toList(),
     );
   }
 }
@@ -52,9 +38,7 @@ class Message {
   factory Message.fromJson(Map<String, dynamic> json) {
     return Message(
       role: json['role'] as String,
-      parts: (json['parts'] as List)
-          .map((e) => Part.fromJson(e))
-          .toList(),
+      parts: (json['parts'] as List).map((e) => Part.fromJson(e)).toList(),
     );
   }
 }
@@ -64,8 +48,6 @@ class Part {
 
   const Part({required this.text});
   factory Part.fromJson(Map<String, dynamic> json) {
-    return Part(
-      text: json['text'] as String,
-    );
+    return Part(text: json['text'] as String);
   }
 }
