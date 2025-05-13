@@ -76,7 +76,7 @@ class SignInState extends State<SignIn> {
           children: <Widget>[
             Card(
               elevation: 2.0,
-              color: Colors.white,//CustomTheme.lightbeige,
+              color: Colors.white, //CustomTheme.lightbeige,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8.0),
               ),
@@ -284,10 +284,7 @@ class SignInState extends State<SignIn> {
           children: <Widget>[
             Padding(
               padding: const EdgeInsets.only(top: 20.0),
-              child: Card(
-                elevation: 2.0,
-                child: _buildGoogleButton()
-                ),
+              child: Card(elevation: 2.0, child: _buildGoogleButton()),
             ),
           ],
         ),
@@ -358,7 +355,7 @@ class SignInState extends State<SignIn> {
             label: Text("Return to Login"),
             icon: Icon(Icons.refresh),
             style: ButtonStyle(
-                backgroundColor: WidgetStateProperty.resolveWith<Color>(
+              backgroundColor: WidgetStateProperty.resolveWith<Color>(
                 (states) => CustomTheme.primaryGradient.colors.first,
               ),
             ),
@@ -384,9 +381,7 @@ class SignInState extends State<SignIn> {
       _googleButtonColor = Colors.white;
     });
     CustomSnackBar(context, const Text('Google button pressed'));
-    context.read<AuthBloc>().add(
-      AuthEventGoogleSignIn(),
-    );
+    context.read<AuthBloc>().add(AuthEventGoogleSignIn());
   }
 
   void _toggleSignInButton(BuildContext context) {

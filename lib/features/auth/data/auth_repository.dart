@@ -29,17 +29,26 @@ class AuthRepository {
     }
   }
 
-  Future<Result<void>> register(String username, String email, String password, String authProvider) async {
+  Future<Result<void>> register(
+    String username,
+    String email,
+    String password,
+    String authProvider,
+  ) async {
     try {
       await authApiClient.register(
-       RegisterDto(username: username, email: email, password: password, authProvider: authProvider),
-     );
-    }
-    catch (e) {
-     return Failure(e.toString());
+        RegisterDto(
+          username: username,
+          email: email,
+          password: password,
+          authProvider: authProvider,
+        ),
+      );
+    } catch (e) {
+      return Failure(e.toString());
     }
     return Success(null);
-   }
+  }
 
   Future<Result<LocalSource?>> getLocalSource() async {
     try{
@@ -56,7 +65,7 @@ class AuthRepository {
     } catch (e) {
       return Failure(e.toString());
     }
-  } 
+  }
 
   Future<Result<void>> logout() async {
     try {
@@ -69,9 +78,7 @@ class AuthRepository {
 
   Future<Result<void>> forget(String email) async {
     try {
-      await authApiClient.forget(
-        ForgetDto(email: email),
-      );
+      await authApiClient.forget(ForgetDto(email: email));
       return Success(null);
     } catch (e) {
       return Failure(e.toString());
@@ -81,12 +88,12 @@ class AuthRepository {
   Future<Result<String?>> googleSignIn() async {
     try {
       debugPrint('Start Google Sign In');
-      final GoogleSignInAccount? account = await GoogleSignIn(
-        scopes: [
-        'email',
-        ],
-        clientId: '532642501147-dme5e1944m01hevgldh91hi7k94chq3i.apps.googleusercontent.com',        
-        ).signIn();
+      final GoogleSignInAccount? account =
+          await GoogleSignIn(
+            scopes: ['email'],
+            clientId:
+                '532642501147-dme5e1944m01hevgldh91hi7k94chq3i.apps.googleusercontent.com',
+          ).signIn();
       if (account == null) {
         debugPrint('Account null');
         return Success(null);

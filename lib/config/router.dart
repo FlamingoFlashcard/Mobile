@@ -8,6 +8,8 @@ import 'package:lacquer/features/chatbot/bloc/chatbot_event.dart';
 import 'package:lacquer/presentation/pages/auth/forgot_password_page.dart';
 import 'package:lacquer/presentation/pages/auth/login_page.dart';
 import 'package:lacquer/presentation/pages/auth/verify_page.dart';
+import 'package:lacquer/presentation/pages/camera/camera_page.dart';
+import 'package:lacquer/presentation/pages/camera/about_screen.dart';
 
 import 'package:lacquer/presentation/pages/mainscreen.dart';
 import 'package:flutter/widgets.dart';
@@ -18,6 +20,8 @@ class RouteName {
   static const String forgotPassword = '/forgot-password';
   static const String verify = '/verify';
   static const String register = '/register';
+  static const String camera = '/camera';
+  static const String about = '/about';
 
   static const publicRoutes = [login, forgotPassword, verify, register];
 }
@@ -28,9 +32,8 @@ GoRoute noTransitionRoute({
 }) {
   return GoRoute(
     path: path,
-    pageBuilder: (context, state) => NoTransitionPage(
-      child: builder(context, state),
-    ),
+    pageBuilder:
+        (context, state) => NoTransitionPage(child: builder(context, state)),
   );
 }
 
@@ -58,6 +61,17 @@ final router = GoRouter(
     noTransitionRoute(
       path: RouteName.verify,
       builder: (context, state) => VerifyEmailPage(),
+    ),
+    noTransitionRoute(
+      path: RouteName.camera,
+      builder: (context, state) => const CameraPage(),
+    ),
+    noTransitionRoute(
+      path: RouteName.about,
+      builder: (context, state) {
+        final imagePath = state.extra as String;
+        return AboutScreen(imagePath: imagePath);
+      },
     ),
   ],
 );

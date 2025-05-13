@@ -3,11 +3,7 @@ class ForgetSuccessDto {
   final String message;
   final String? data;
 
-  ForgetSuccessDto({
-    required this.success,
-    required this.message,
-    this.data,
-  });
+  ForgetSuccessDto({required this.success, required this.message, this.data});
 
   factory ForgetSuccessDto.fromJson(Map<String, dynamic> json) {
     return ForgetSuccessDto(

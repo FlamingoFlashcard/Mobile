@@ -66,7 +66,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     });
   }
 
-  void _onSendMailVerify(AuthEventSendMailVerify event, Emitter<AuthState> emit) async {
+  void _onSendMailVerify(
+    AuthEventSendMailVerify event,
+    Emitter<AuthState> emit,
+  ) async {
     emit(AuthVerifyMailSending());
     final result = await authRepository.forget(event.email);
     return (switch (result) {
@@ -82,9 +85,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthGoogleSignInInProgress());
     final result = await authRepository.googleSignIn();
     return (switch (result) {
-      Success(data: final token) when token != null => emit(
-        AuthLoginSuccess(),
-      ),
+      Success(data: final token) when token != null => emit(AuthLoginSuccess()),
       Success() => emit(AuthAuthenticatedUnknown()),
       Failure() => emit(AuthLoginFailure(result.message)),
     });

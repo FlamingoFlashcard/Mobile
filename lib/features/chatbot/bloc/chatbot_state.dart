@@ -19,6 +19,7 @@ class ChatbotAskingFailure extends ChatbotState {
 }
 
 class ChatbotFetchingInProgress extends ChatbotState {}
+
 class ChatbotFetchingSuccess extends ChatbotState {
   final List<Message> history;
 

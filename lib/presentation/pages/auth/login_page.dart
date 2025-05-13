@@ -124,7 +124,7 @@ class LoginPageState extends State<LoginPage>
           children: <Widget>[
             Expanded(
               child: TextButton(
-                style: ButtonStyle(               
+                style: ButtonStyle(
                   overlayColor: WidgetStateProperty.all(Colors.transparent),
                 ),
                 onPressed: _onSignInButtonPress,

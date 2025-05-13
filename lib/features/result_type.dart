@@ -11,4 +11,3 @@ class Failure<T> extends Result<T> {
 
   Failure(this.message);
 }
-
