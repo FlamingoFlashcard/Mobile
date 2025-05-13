@@ -2,6 +2,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lacquer/features/auth/bloc/auth_bloc.dart';
 import 'package:lacquer/features/auth/bloc/auth_state.dart';
+import 'package:lacquer/features/chatbot/bloc/chatbot_bloc.dart';
+import 'package:lacquer/features/chatbot/bloc/chatbot_event.dart';
 import 'package:lacquer/presentation/pages/auth/forgot_password_page.dart';
 import 'package:lacquer/presentation/pages/auth/login_page.dart';
 import 'package:lacquer/presentation/pages/auth/verify_page.dart';
@@ -34,25 +36,23 @@ GoRoute noTransitionRoute({
   );
 }
 
+late String? userId;
+
 final router = GoRouter(
   redirect: (context, state) {
     if (RouteName.publicRoutes.contains(state.fullPath)) {
       return null;
     }
-    if (context.read<AuthBloc>().state is AuthAuthenticatedSuccess) {
+    if(context.read<AuthBloc>().state is AuthAuthenticatedSuccess){
+      userId = (context.read<AuthBloc>().state as AuthAuthenticatedSuccess).userId;      
+      context.read<ChatbotBloc>().add(ChatbotEventGetHistory(userId: userId ?? ''));
       return null;
     }
     return RouteName.login;
   },
   routes: [
-    noTransitionRoute(
-      path: RouteName.home,
-      builder: (context, state) => MainScreen(),
-    ),
-    noTransitionRoute(
-      path: RouteName.login,
-      builder: (context, state) => LoginPage(),
-    ),
+    noTransitionRoute(path: RouteName.home, builder: (context, state) => MainScreen(userId: userId ?? '')),
+    noTransitionRoute(path: RouteName.login, builder: (context, state) => LoginPage()),
     noTransitionRoute(
       path: RouteName.forgotPassword,
       builder: (context, state) => ForgotPasswordPage(),

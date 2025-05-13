@@ -27,9 +27,10 @@ class AuthRegisterFailure extends AuthState {
 //AUTHENTICATED
 class AuthAuthenticatedSuccess extends AuthState {
   final String token;
+  final String userId;
 
-  AuthAuthenticatedSuccess(this.token);
-}
+  AuthAuthenticatedSuccess(this.token, this.userId);
+ }
 
 class AuthAuthenticatedFailure extends AuthState {
   final String message;

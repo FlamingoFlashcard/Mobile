@@ -14,6 +14,8 @@ class CustomTheme {
   static const Color mainColor1 = Color(0xFF6D2323);
   static const Color mainColor2 = Color(0xFFE5D0AC);
   static const Color mainColor3 = Color(0xFFFEF9E1);
+  static const Color chatbotprimary = Colors.purple;
+  static const Color chatbotsecondary = Colors.blue;
 
   static const LinearGradient primaryGradient = LinearGradient(
     colors: <Color>[loginGradientStart, loginGradientEnd],

@@ -20,4 +20,19 @@ class AuthLocalDataSource {
     // Delete token from local storage
     await sf.remove(AuthDataConstants.tokenKey);
   }
+
+  Future<void> saveUserId(String userId) async {
+    // Save userId to local storage
+    await sf.setString(AuthDataConstants.userIdKey, userId);
+  }
+
+  Future<String?> getUserId() async {
+    // Get userId from local storage
+    return sf.getString(AuthDataConstants.userIdKey);
+  }
+
+  Future<void> deleteUserId() async {
+    // Delete userId from local storage
+    await sf.remove(AuthDataConstants.userIdKey);
+  }
 }

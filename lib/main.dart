@@ -9,6 +9,10 @@ import 'package:lacquer/features/auth/data/auth_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lacquer/features/chatbot/bloc/chatbot_bloc.dart';
+import 'package:lacquer/features/chatbot/bloc/chatbot_event.dart';
+import 'package:lacquer/features/chatbot/data/chatbot_api_client.dart';
+import 'package:lacquer/features/chatbot/data/chatbot_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
@@ -26,14 +30,31 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RepositoryProvider(
-      create:
-          (context) => AuthRepository(
-            authApiClient: AuthApiClient(dio),
-            authLocalDataSource: AuthLocalDataSource(sharedPreferences),
+    return MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider(
+          create:
+              (context) => AuthRepository(
+                authApiClient: AuthApiClient(dio),
+                authLocalDataSource: AuthLocalDataSource(sharedPreferences),
+              ),
+        ),
+        RepositoryProvider(
+          create:
+              (context) => ChatbotRepository(
+                chatbotApiClient: ChatbotApiClient(dio),
+              ),
+        ),
+      ],
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (context) => AuthBloc(context.read<AuthRepository>()),
           ),
-      child: BlocProvider(
-        create: (context) => AuthBloc(context.read<AuthRepository>()),
+          BlocProvider(
+            create: (context) => ChatbotBloc(context.read<ChatbotRepository>()),
+          ),
+        ],
         child: AppContent(),
       ),
     );
@@ -52,6 +73,7 @@ class _AppContentState extends State<AppContent> {
   void initState() {
     super.initState();
     context.read<AuthBloc>().add(AuthAuthenticateStarted());
+    context.read<ChatbotBloc>().add(ChatbotEventStarted());
   }
 
   @override

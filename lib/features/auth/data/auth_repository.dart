@@ -22,6 +22,7 @@ class AuthRepository {
         LoginDto(email: email, password: password),
       );
       await authLocalDataSource.saveToken(loginSuccessDto.data.token);
+      await authLocalDataSource.saveUserId(loginSuccessDto.data.userId);
       return Success(null);
     } catch (e) {
       return Failure(e.toString());
@@ -49,11 +50,15 @@ class AuthRepository {
     return Success(null);
   }
 
-  Future<Result<String?>> getToken() async {
-    try {
+  Future<Result<LocalSource?>> getLocalSource() async {
+    try{
       final token = await authLocalDataSource.getToken();
-      if (token != null) {
-        return Success(token);
+      final userId = await authLocalDataSource.getUserId();
+      if (token != null && userId != null) {
+        return Success(LocalSource(
+          token: token,
+          userId: userId,
+        ));
       } else {
         return Success(null);
       }
@@ -102,6 +107,7 @@ class AuthRepository {
         final loginSuccessDto = await authApiClient.googleSignIn(idToken!);
 
         await authLocalDataSource.saveToken(loginSuccessDto.data.token);
+        await authLocalDataSource.saveUserId(loginSuccessDto.data.userId);
         debugPrint('SuccessToken: ${loginSuccessDto.data.token}');
         return Success(idToken);
       } else {
@@ -112,4 +118,14 @@ class AuthRepository {
       return Failure(e.toString());
     }
   }
+}
+
+class LocalSource {
+  final String token;
+  final String userId;
+
+  LocalSource({
+    required this.token,
+    required this.userId,
+  });
 }
