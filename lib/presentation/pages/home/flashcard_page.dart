@@ -1,10 +1,20 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lacquer/config/theme.dart';
-import 'package:lacquer/presentation/utils/card_list.dart';
+import 'package:lacquer/features/flashcard/bloc/flashcard_bloc.dart';
+import 'package:lacquer/features/flashcard/bloc/flashcard_state.dart';
+import 'package:lacquer/features/flashcard/dtos/create_deck_dto.dart';
 import 'package:lacquer/presentation/pages/home/widgets/flashcard_tag.dart';
 import 'package:lacquer/presentation/pages/home/widgets/flashcard_topic_create.dart';
+
+Map<String, List<CreateDeckResponseDto>> mapDecksToTags(
+  List<CreateDeckResponseDto> decks,
+) {
+  return groupBy(decks, (deck) => deck.tag);
+}
 
 class FlashcardPage extends StatelessWidget {
   const FlashcardPage({super.key});
@@ -24,9 +34,30 @@ class FlashcardPage extends StatelessWidget {
               child: _buildSearchBar(),
             ),
             const SizedBox(height: 16),
-            FlashcardTag(title: "Traditional Cuisine", decks: cuisine),
-            FlashcardTag(title: "Festivals", decks: cuisine),
-            FlashcardTag(title: "Landscape", decks: cuisine),
+            BlocBuilder<FlashcardBloc, FlashcardState>(
+              builder: (context, state) {
+                if (state.status == FlashcardStatus.loading) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (state.status == FlashcardStatus.failure) {
+                  return Center(child: Text('Error: ${state.errorMessage}'));
+                } else if (state.status == FlashcardStatus.success) {
+                  final grouped = mapDecksToTags(state.decks);
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children:
+                        grouped.entries.map((entry) {
+                          return FlashcardTag(
+                            key: ValueKey(entry.key),
+                            title: entry.key,
+                            decks: entry.value,
+                          );
+                        }).toList(),
+                  );
+                } else {
+                  return const SizedBox.shrink();
+                }
+              },
+            ),
             const SizedBox(height: 20),
           ],
         ),

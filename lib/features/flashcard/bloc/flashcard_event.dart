@@ -28,6 +28,10 @@ class LoadDecksRequested extends FlashcardEvent {
   const LoadDecksRequested();
 }
 
+class LoadTagsRequested extends FlashcardEvent {
+  const LoadTagsRequested();
+}
+
 // class LoadDeckByIdRequested extends FlashcardEvent {
 //   final String deckId;
 
