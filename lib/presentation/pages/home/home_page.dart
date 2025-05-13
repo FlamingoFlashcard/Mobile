@@ -3,9 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lacquer/config/theme.dart';
-import 'package:lacquer/presentation/utils/card_list.dart';
 import 'package:lacquer/presentation/utils/home_item_list.dart';
-import 'package:lacquer/presentation/pages/home/widgets/flashcard_tag.dart';
 import 'package:lacquer/presentation/pages/home/widgets/home_item.dart';
 import 'package:lacquer/presentation/widgets/todayprogress_card.dart';
 
@@ -37,7 +35,6 @@ class HomePage extends StatelessWidget {
                 textAlign: TextAlign.left,
               ),
             ),
-            FlashcardTag(title: "Cuisine", decks: cuisine),
             Padding(
               padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
               child: _buildGridView(),

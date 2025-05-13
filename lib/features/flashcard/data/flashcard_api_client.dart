@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:lacquer/features/flashcard/dtos/create_tag_dto.dart';
 import '../dtos/create_deck_dto.dart';
 import 'package:lacquer/features/auth/data/auth_local_data_source.dart';
 
@@ -42,8 +43,40 @@ class FlashcardApiClient {
 
       final response = await dio.get('/deck', options: options);
 
-      return (response.data as List)
+      final responseData = response.data as Map<String, dynamic>;
+      final deckData = responseData['data'] as Map<String, dynamic>;
+      final deckList = deckData['data'] as List;
+
+      return deckList
           .map((json) => CreateDeckResponseDto.fromJson(json))
+          .toList();
+    } on DioException catch (e) {
+      if (e.response != null) {
+        throw Exception(e.response!.data['message']);
+      } else {
+        throw Exception(e.message);
+      }
+    }
+  }
+
+  Future<List<CreateTagResponseDto>> getTags() async {
+    try {
+      final token = await authLocalDataSource.getToken();
+
+      final options = Options(
+        headers: {if (token != null) 'Authorization': 'Bearer $token'},
+      );
+
+      final response = await dio.get('/tag', options: options);
+      print('Response status: ${response.statusCode}');
+      print('Response data: ${response.data}');
+
+      final responseData = response.data as Map<String, dynamic>;
+      final tagData = responseData['data'] as Map<String, dynamic>;
+      final tagList = tagData['data'] as List;
+
+      return tagList
+          .map((json) => CreateTagResponseDto.fromJson(json))
           .toList();
     } on DioException catch (e) {
       if (e.response != null) {
