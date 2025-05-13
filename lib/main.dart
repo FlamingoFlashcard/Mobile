@@ -9,6 +9,10 @@ import 'package:lacquer/features/auth/data/auth_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lacquer/features/flashcard/bloc/flashcard_bloc.dart';
+import 'package:lacquer/features/flashcard/bloc/flashcard_event.dart';
+import 'package:lacquer/features/flashcard/data/flashcard_api_client.dart';
+import 'package:lacquer/features/flashcard/data/flashcard_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
@@ -32,9 +36,34 @@ class MyApp extends StatelessWidget {
             authApiClient: AuthApiClient(dio),
             authLocalDataSource: AuthLocalDataSource(sharedPreferences),
           ),
-      child: BlocProvider(
-        create: (context) => AuthBloc(context.read<AuthRepository>()),
-        child: AppContent(),
+      child: Builder(
+        builder: (context) {
+          final authRepository = context.read<AuthRepository>();
+          final authLocalDataSource = AuthLocalDataSource(sharedPreferences);
+          final flashcardApiClient = FlashcardApiClient(
+            dio,
+            authLocalDataSource,
+          );
+          final flashcardRepository = FlashcardRepository(flashcardApiClient);
+
+          return MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create:
+                    (context) =>
+                        AuthBloc(authRepository)
+                          ..add(AuthAuthenticateStarted()),
+              ),
+              BlocProvider(
+                create:
+                    (context) =>
+                        FlashcardBloc(repository: flashcardRepository)
+                          ..add(const LoadDecksRequested()),
+              ),
+            ],
+            child: const AppContent(),
+          );
+        },
       ),
     );
   }
