@@ -49,10 +49,14 @@ class _ChatBotPageState extends State<ChatBotPage>
   // Lắng nghe thay đổi về bàn phím
   @override
   void didChangeMetrics() {
-    final bottomInset = WidgetsBinding.instance.window.viewInsets.bottom;
-    setState(() {
-      _isKeyboardVisible = bottomInset > 0;
-    });
+    final bottomInset = WidgetsBinding.instance.platformDispatcher.views.first.viewInsets.bottom;
+    final isVisible = bottomInset > 0.0;
+
+    if (isVisible != _isKeyboardVisible) {
+      setState(() {
+        _isKeyboardVisible = isVisible;
+      });
+    }
   }
 
   @override
