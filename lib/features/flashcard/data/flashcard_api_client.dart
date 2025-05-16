@@ -68,8 +68,6 @@ class FlashcardApiClient {
       );
 
       final response = await dio.get('/tag', options: options);
-      print('Response status: ${response.statusCode}');
-      print('Response data: ${response.data}');
 
       final responseData = response.data as Map<String, dynamic>;
       final tagData = responseData['data'] as Map<String, dynamic>;
@@ -78,6 +76,42 @@ class FlashcardApiClient {
       return tagList
           .map((json) => CreateTagResponseDto.fromJson(json))
           .toList();
+    } on DioException catch (e) {
+      if (e.response != null) {
+        throw Exception(e.response!.data['message']);
+      } else {
+        throw Exception(e.message);
+      }
+    }
+  }
+
+  Future<CreateTagResponseDto> createTag(CreateTagDto tagDto) async {
+    try {
+      final token = await authLocalDataSource.getToken();
+
+      final options = Options(
+        headers: {if (token != null) 'Authorization': 'Bearer $token'},
+      );
+
+      final response = await dio.post(
+        '/tag',
+        data: tagDto.toJson(),
+        options: options,
+      );
+
+      final responseData = response.data as Map<String, dynamic>;
+      if (responseData['success'] != true) {
+        throw Exception(
+          'Failed to create tag: ${responseData['message'] ?? 'Unknown error'}',
+        );
+      }
+
+      final tagData = responseData['data'] as Map<String, dynamic>?;
+      if (tagData == null) {
+        throw Exception('Tag data is missing in API response');
+      }
+
+      return CreateTagResponseDto.fromJson(tagData);
     } on DioException catch (e) {
       if (e.response != null) {
         throw Exception(e.response!.data['message']);

@@ -1,25 +1,21 @@
 class CreateTagDto {
   final String name;
-  final String description;
 
-  CreateTagDto({required this.name, required this.description});
+  CreateTagDto({required this.name});
 
   Map<String, dynamic> toJson() {
-    return {'name': name, 'description': description};
+    return {'name': name};
   }
 
   factory CreateTagDto.fromJson(Map<String, dynamic> json) {
-    return CreateTagDto(
-      name: json['name'] as String,
-      description: json['description'] as String,
-    );
+    return CreateTagDto(name: json['name'] as String);
   }
 }
 
 class CreateTagResponseDto {
   final String id;
   final String name;
-  final String description;
+  final String description; // Giữ required, nhưng sẽ có giá trị mặc định
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -32,15 +28,15 @@ class CreateTagResponseDto {
   });
 
   factory CreateTagResponseDto.fromJson(Map<String, dynamic> json) {
-    final id = json['_id'] as String? ?? '';
-    if (id.isEmpty) {
+    final id = json['_id'] as String?;
+    if (id == null || id.isEmpty) {
       throw Exception('Tag ID (_id) is missing or empty in JSON');
     }
 
     return CreateTagResponseDto(
       id: id,
       name: json['name'] as String? ?? '',
-      description: json['description'] as String? ?? '',
+      description: json['description'] as String? ?? 'No description',
       createdAt: DateTime.parse(
         json['createdAt'] as String? ?? '1970-01-01T00:00:00Z',
       ),

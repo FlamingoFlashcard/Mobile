@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lacquer/features/flashcard/dtos/create_tag_dto.dart';
 import '../data/flashcard_repository.dart';
 import 'flashcard_event.dart';
 import 'flashcard_state.dart';
@@ -10,6 +11,7 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
     on<CreateDeckRequested>(_onCreateDeckRequested);
     on<LoadDecksRequested>(_onLoadDecksRequested);
     on<LoadTagsRequested>(_onLoadTagsRequested);
+    on<CreateTagRequested>(_onCreateTagRequested);
     // on<LoadDeckByIdRequested>(_onLoadDeckByIdRequested);
     // on<DeleteDeckRequested>(_onDeleteDeckRequested);
     // on<UpdateDeckRequested>(_onUpdateDeckRequested);
@@ -78,6 +80,33 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
       emit(
         state.copyWith(
           status: FlashcardStatus.failure,
+          errorMessage: e.toString(),
+        ),
+      );
+    }
+  }
+
+  Future<void> _onCreateTagRequested(
+    CreateTagRequested event,
+    Emitter<FlashcardState> emit,
+  ) async {
+    emit(state.copyWith(createTagStatus: FlashcardStatus.loading));
+
+    try {
+      final newTag = await repository.createTag(name: event.name);
+      final updatedTags = List<CreateTagResponseDto>.from(state.tags)
+        ..add(newTag);
+
+      emit(
+        state.copyWith(
+          createTagStatus: FlashcardStatus.success,
+          tags: updatedTags,
+        ),
+      );
+    } catch (e) {
+      emit(
+        state.copyWith(
+          createTagStatus: FlashcardStatus.failure,
           errorMessage: e.toString(),
         ),
       );

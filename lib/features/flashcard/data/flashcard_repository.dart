@@ -56,6 +56,12 @@ class FlashcardRepository {
     return apiClient.getTags();
   }
 
+  Future<CreateTagResponseDto> createTag({required String name}) async {
+    final tagDto = CreateTagDto(name: name);
+
+    return apiClient.createTag(tagDto);
+  }
+
   // Future<CreateDeckResponseDto> getDeckById(String deckId) async {
   //   return apiClient.getDeckById(deckId);
   // }
