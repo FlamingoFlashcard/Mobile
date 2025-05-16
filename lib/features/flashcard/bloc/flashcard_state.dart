@@ -6,6 +6,7 @@ enum FlashcardStatus { initial, loading, success, failure }
 
 class FlashcardState extends Equatable {
   final FlashcardStatus status;
+  final FlashcardStatus createTagStatus;
   final List<CreateDeckResponseDto> decks;
   final CreateDeckResponseDto? selectedDeck;
   final List<CreateTagResponseDto> tags;
@@ -13,6 +14,7 @@ class FlashcardState extends Equatable {
 
   const FlashcardState({
     this.status = FlashcardStatus.initial,
+    this.createTagStatus = FlashcardStatus.initial,
     this.decks = const [],
     this.selectedDeck,
     this.tags = const [],
@@ -21,6 +23,7 @@ class FlashcardState extends Equatable {
 
   FlashcardState copyWith({
     FlashcardStatus? status,
+    FlashcardStatus? createTagStatus,
     List<CreateDeckResponseDto>? decks,
     CreateDeckResponseDto? selectedDeck,
     List<CreateTagResponseDto>? tags,
@@ -28,6 +31,7 @@ class FlashcardState extends Equatable {
   }) {
     return FlashcardState(
       status: status ?? this.status,
+      createTagStatus: createTagStatus ?? this.createTagStatus,
       decks: decks ?? this.decks,
       selectedDeck: selectedDeck ?? this.selectedDeck,
       tags: tags ?? this.tags,
@@ -36,5 +40,12 @@ class FlashcardState extends Equatable {
   }
 
   @override
-  List<Object?> get props => [status, decks, selectedDeck, tags, errorMessage];
+  List<Object?> get props => [
+    status,
+    createTagStatus,
+    decks,
+    selectedDeck,
+    tags,
+    errorMessage,
+  ];
 }

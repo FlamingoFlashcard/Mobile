@@ -32,6 +32,15 @@ class LoadTagsRequested extends FlashcardEvent {
   const LoadTagsRequested();
 }
 
+class CreateTagRequested extends FlashcardEvent {
+  final String name;
+
+  const CreateTagRequested({required this.name});
+
+  @override
+  List<Object> get props => [name];
+}
+
 // class LoadDeckByIdRequested extends FlashcardEvent {
 //   final String deckId;
 
