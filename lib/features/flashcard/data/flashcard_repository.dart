@@ -1,6 +1,6 @@
+import 'package:dio/dio.dart';
 import 'package:lacquer/features/flashcard/dtos/create_tag_dto.dart';
-import 'package:lacquer/presentation/pages/home/widgets/flashcard_tag.dart';
-import 'package:lacquer/presentation/utils/default_tag_list.dart';
+import 'package:lacquer/features/flashcard/dtos/grouped_decks_dto.dart';
 
 import '../dtos/create_deck_dto.dart';
 import 'flashcard_api_client.dart';
@@ -26,30 +26,24 @@ class FlashcardRepository {
     return apiClient.createDeck(deckDto);
   }
 
-  Future<List<CreateDeckResponseDto>> getDecks() async {
-    return apiClient.getDecks();
-  }
+  Future<GroupedDecksResponseDto> getDecks() async {
+    try {
+      final response = await apiClient.getDecks();
+      final responseData = response as Map<String, dynamic>;
+      if (responseData['success'] != true) {
+        throw Exception(
+          'Failed to load decks: ${responseData['message'] ?? 'Unknown error'}',
+        );
+      }
 
-  Future<List<FlashcardTag>> mapDecksToTags(
-    List<CreateDeckResponseDto> decks,
-  ) async {
-    final tagMap = <String, FlashcardTag>{};
-
-    for (var tag in defaultTagList) {
-      tagMap[tag.title.toLowerCase()] = FlashcardTag(
-        title: tag.title,
-        decks: [],
-      );
-    }
-
-    for (var deck in decks) {
-      final tagKey = deck.tag.toLowerCase();
-      if (tagMap.containsKey(tagKey)) {
-        tagMap[tagKey]!.decks.add(deck);
+      return GroupedDecksResponseDto.fromJson(responseData);
+    } on DioException catch (e) {
+      if (e.response != null) {
+        throw Exception(e.response!.data['message']);
+      } else {
+        throw Exception(e.message);
       }
     }
-
-    return tagMap.values.where((tag) => tag.decks.isNotEmpty).toList();
   }
 
   Future<List<CreateTagResponseDto>> getTags() async {

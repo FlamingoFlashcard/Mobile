@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:lacquer/config/theme.dart';
-import 'package:lacquer/presentation/pages/home/widgets/horizontal_learning_card_list.dart';
 
 class LearningFlashcardPage extends StatelessWidget {
   final String title;
