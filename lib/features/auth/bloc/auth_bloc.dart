@@ -13,6 +13,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthEventLogout>(_onLogoutStarted);
     on<AuthEventSendMailVerify>(_onSendMailVerify);
     on<AuthEventGoogleSignIn>(_onGoogleSignIn);
+    on<AuthEventDeleteProfile>(_onDeleteProfile);
   }
 
   final AuthRepository authRepository;
@@ -88,6 +89,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       Success(data: final token) when token != null => emit(AuthLoginSuccess()),
       Success() => emit(AuthAuthenticatedUnknown()),
       Failure() => emit(AuthLoginFailure(result.message)),
+    });
+  }
+
+  void _onDeleteProfile(
+    AuthEventDeleteProfile event,
+    Emitter<AuthState> emit,
+  ) async {
+    final result = await authRepository.deleteprofile(event.token);
+    return (switch (result) {
+      Success() => emit(AuthDeleteProfileSuccess()),
+      Failure() => emit(AuthDeleteProfileFailure(result.message)),
     });
   }
 }

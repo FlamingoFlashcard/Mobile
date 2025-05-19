@@ -9,6 +9,7 @@ import 'package:lacquer/presentation/pages/auth/login_page.dart';
 import 'package:lacquer/presentation/pages/auth/verify_page.dart';
 import 'package:lacquer/presentation/pages/camera/camera_page.dart';
 import 'package:lacquer/presentation/pages/camera/about_screen.dart';
+import 'package:lacquer/presentation/pages/profile/profile_page.dart';
 
 import 'package:lacquer/presentation/pages/mainscreen.dart';
 import 'package:flutter/widgets.dart';
@@ -21,6 +22,7 @@ class RouteName {
   static const String register = '/register';
   static const String camera = '/camera';
   static const String about = '/about';
+  static const String profile = '/profile';
 
   static const publicRoutes = [login, forgotPassword, verify, register];
 }
@@ -43,16 +45,25 @@ final router = GoRouter(
     if (RouteName.publicRoutes.contains(state.fullPath)) {
       return null;
     }
-    if(context.read<AuthBloc>().state is AuthAuthenticatedSuccess){
-      userId = (context.read<AuthBloc>().state as AuthAuthenticatedSuccess).userId;      
-      context.read<ChatbotBloc>().add(ChatbotEventGetHistory(userId: userId ?? ''));
+    if (context.read<AuthBloc>().state is AuthAuthenticatedSuccess) {
+      userId =
+          (context.read<AuthBloc>().state as AuthAuthenticatedSuccess).userId;
+      context.read<ChatbotBloc>().add(
+        ChatbotEventGetHistory(userId: userId ?? ''),
+      );
       return null;
     }
     return RouteName.login;
   },
   routes: [
-    noTransitionRoute(path: RouteName.home, builder: (context, state) => MainScreen(userId: userId ?? '')),
-    noTransitionRoute(path: RouteName.login, builder: (context, state) => LoginPage()),
+    noTransitionRoute(
+      path: RouteName.home,
+      builder: (context, state) => MainScreen(userId: userId ?? ''),
+    ),
+    noTransitionRoute(
+      path: RouteName.login,
+      builder: (context, state) => LoginPage(),
+    ),
     noTransitionRoute(
       path: RouteName.forgotPassword,
       builder: (context, state) => ForgotPasswordPage(),
@@ -71,6 +82,10 @@ final router = GoRouter(
         final imagePath = state.extra as String;
         return AboutScreen(imagePath: imagePath);
       },
+    ),
+    noTransitionRoute(
+      path: RouteName.profile,
+      builder: (context, state) => const ProfilePage(),
     ),
   ],
 );
