@@ -31,11 +31,13 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
         cardIds: event.cardIds,
       );
 
+      final groupedDecks = await repository.getDecks();
+
       emit(
         state.copyWith(
           status: FlashcardStatus.success,
           selectedDeck: deck,
-          decks: [...state.decks, deck],
+          groupedDecks: groupedDecks,
         ),
       );
     } catch (e) {
@@ -55,8 +57,13 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
     emit(state.copyWith(status: FlashcardStatus.loading));
 
     try {
-      final decks = await repository.getDecks();
-      emit(state.copyWith(status: FlashcardStatus.success, decks: decks));
+      final groupedDecks = await repository.getDecks();
+      emit(
+        state.copyWith(
+          status: FlashcardStatus.success,
+          groupedDecks: groupedDecks,
+        ),
+      );
     } catch (e) {
       emit(
         state.copyWith(

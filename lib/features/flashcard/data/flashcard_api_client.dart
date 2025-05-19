@@ -33,7 +33,7 @@ class FlashcardApiClient {
     }
   }
 
-  Future<List<CreateDeckResponseDto>> getDecks() async {
+  Future<dynamic> getDecks() async {
     try {
       final token = await authLocalDataSource.getToken();
 
@@ -41,16 +41,17 @@ class FlashcardApiClient {
         headers: {if (token != null) 'Authorization': 'Bearer $token'},
       );
 
-      final response = await dio.get('/deck', options: options);
+      final response = await dio.get('/deck/tag', options: options);
 
       final responseData = response.data as Map<String, dynamic>;
-      final deckData = responseData['data'] as Map<String, dynamic>;
-      final deckList = deckData['data'] as List;
+      print('API Response (getDecks): $responseData'); // Log the raw response
+      if (responseData['success'] != true) {
+        throw Exception(responseData['message'] ?? 'Failed to load decks');
+      }
 
-      return deckList
-          .map((json) => CreateDeckResponseDto.fromJson(json))
-          .toList();
+      return responseData;
     } on DioException catch (e) {
+      print('DioException in getDecks: $e'); // Log any Dio errors
       if (e.response != null) {
         throw Exception(e.response!.data['message']);
       } else {

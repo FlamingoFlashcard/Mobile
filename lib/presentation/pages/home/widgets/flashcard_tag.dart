@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:lacquer/features/flashcard/dtos/create_deck_dto.dart';
+import 'package:lacquer/features/flashcard/dtos/get_deck_dto.dart';
 import 'package:lacquer/presentation/pages/home/widgets/flashcard_topic.dart';
 
 class FlashcardTag extends StatelessWidget {
   final String title;
-  final List<CreateDeckResponseDto> decks;
+  final List<GetDeckDto> decks;
 
   const FlashcardTag({super.key, required this.title, required this.decks});
 
@@ -30,8 +30,9 @@ class FlashcardTag extends StatelessWidget {
             itemBuilder: (context, index) {
               return FlashcardTopic(
                 title: decks[index].title,
-                cardCount: decks[index].cardIds.length,
-                imagePath: decks[index].imageUrl,
+                cardCount: decks[index].cards?.length ?? 0,
+                imagePath:
+                    decks[index].img ?? 'assets/images/default_topic_image.JPG',
               );
             },
           ),

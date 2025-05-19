@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lacquer/config/theme.dart';
-import 'package:lacquer/presentation/pages/home/widgets/flashcard_options.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:lacquer/presentation/pages/home/widgets/flashcard_options.dart';
 
 class FlashcardTopic extends StatefulWidget {
   final String title;
@@ -31,7 +31,6 @@ class FlashcardTopicState extends State<FlashcardTopic> {
           builder: (context) => const FlashcardOptionDialog(),
         );
       },
-
       onTapDown: (_) => setState(() => _isPressed = true),
       onTapUp: (_) => setState(() => _isPressed = false),
       onTapCancel: () => setState(() => _isPressed = false),
@@ -122,12 +121,7 @@ class FlashcardTopicState extends State<FlashcardTopic> {
                       ).createShader(bounds);
                     },
                     blendMode: BlendMode.dstIn,
-                    child: Image.asset(
-                      widget.imagePath,
-                      width: 190,
-                      height: 180,
-                      fit: BoxFit.cover,
-                    ),
+                    child: _buildImage(), // Thay Image.asset bằng _buildImage
                   ),
                 ),
               ],
@@ -136,5 +130,50 @@ class FlashcardTopicState extends State<FlashcardTopic> {
         ),
       ),
     );
+  }
+
+  Widget _buildImage() {
+    // Kiểm tra xem imagePath có phải là URL không
+    if (widget.imagePath.startsWith('http')) {
+      return SizedBox(
+        width: 190,
+        height: 180,
+        child: Image.network(
+          widget.imagePath,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            print('Error loading network image: $error'); // Log lỗi tải hình
+            return Image.asset(
+              'assets/default_image.png', // Hình mặc định nếu lỗi
+              fit: BoxFit.cover,
+              width: 190,
+              height: 180,
+            );
+          },
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) return child;
+            return const Center(child: CircularProgressIndicator());
+          },
+        ),
+      );
+    } else {
+      return SizedBox(
+        width: 190,
+        height: 180,
+        child: Image.asset(
+          widget.imagePath,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            print('Error loading asset: $error');
+            return Image.asset(
+              'assets/default_image.png', // Hình mặc định nếu lỗi
+              fit: BoxFit.cover,
+              width: 190,
+              height: 180,
+            );
+          },
+        ),
+      );
+    }
   }
 }

@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:lacquer/features/flashcard/dtos/create_tag_dto.dart';
+import 'package:lacquer/features/flashcard/dtos/grouped_decks_dto.dart';
 import '../dtos/create_deck_dto.dart';
 
 enum FlashcardStatus { initial, loading, success, failure }
@@ -7,7 +8,7 @@ enum FlashcardStatus { initial, loading, success, failure }
 class FlashcardState extends Equatable {
   final FlashcardStatus status;
   final FlashcardStatus createTagStatus;
-  final List<CreateDeckResponseDto> decks;
+  final GroupedDecksResponseDto? groupedDecks;
   final CreateDeckResponseDto? selectedDeck;
   final List<CreateTagResponseDto> tags;
   final String? errorMessage;
@@ -15,7 +16,7 @@ class FlashcardState extends Equatable {
   const FlashcardState({
     this.status = FlashcardStatus.initial,
     this.createTagStatus = FlashcardStatus.initial,
-    this.decks = const [],
+    this.groupedDecks,
     this.selectedDeck,
     this.tags = const [],
     this.errorMessage,
@@ -24,7 +25,7 @@ class FlashcardState extends Equatable {
   FlashcardState copyWith({
     FlashcardStatus? status,
     FlashcardStatus? createTagStatus,
-    List<CreateDeckResponseDto>? decks,
+    GroupedDecksResponseDto? groupedDecks,
     CreateDeckResponseDto? selectedDeck,
     List<CreateTagResponseDto>? tags,
     String? errorMessage,
@@ -32,7 +33,7 @@ class FlashcardState extends Equatable {
     return FlashcardState(
       status: status ?? this.status,
       createTagStatus: createTagStatus ?? this.createTagStatus,
-      decks: decks ?? this.decks,
+      groupedDecks: groupedDecks ?? this.groupedDecks,
       selectedDeck: selectedDeck ?? this.selectedDeck,
       tags: tags ?? this.tags,
       errorMessage: errorMessage ?? this.errorMessage,
@@ -43,7 +44,7 @@ class FlashcardState extends Equatable {
   List<Object?> get props => [
     status,
     createTagStatus,
-    decks,
+    groupedDecks,
     selectedDeck,
     tags,
     errorMessage,

@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -6,15 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'package:lacquer/config/theme.dart';
 import 'package:lacquer/features/flashcard/bloc/flashcard_bloc.dart';
 import 'package:lacquer/features/flashcard/bloc/flashcard_state.dart';
-import 'package:lacquer/features/flashcard/dtos/create_deck_dto.dart';
 import 'package:lacquer/presentation/pages/home/widgets/flashcard_tag.dart';
 import 'package:lacquer/presentation/pages/home/widgets/flashcard_topic_create.dart';
-
-Map<String, List<CreateDeckResponseDto>> mapDecksToTags(
-  List<CreateDeckResponseDto> decks,
-) {
-  return groupBy(decks, (deck) => deck.tag);
-}
 
 class FlashcardPage extends StatelessWidget {
   const FlashcardPage({super.key});
@@ -39,17 +31,25 @@ class FlashcardPage extends StatelessWidget {
                 if (state.status == FlashcardStatus.loading) {
                   return const Center(child: CircularProgressIndicator());
                 } else if (state.status == FlashcardStatus.failure) {
-                  return Center(child: Text('Error: ${state.errorMessage}'));
+                  return Center(
+                    child: Text(
+                      'Error: ${state.errorMessage ?? 'Unknown error'}',
+                    ),
+                  );
                 } else if (state.status == FlashcardStatus.success) {
-                  final grouped = mapDecksToTags(state.decks);
+                  final groupedDecks = state.groupedDecks;
+                  if (groupedDecks == null || groupedDecks.data.isEmpty) {
+                    return const Center(child: Text('No decks available'));
+                  }
+
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children:
-                        grouped.entries.map((entry) {
+                        groupedDecks.data.map((group) {
                           return FlashcardTag(
-                            key: ValueKey(entry.key),
-                            title: entry.key,
-                            decks: entry.value,
+                            key: ValueKey(group.tag.id),
+                            title: group.tag.name,
+                            decks: group.decks,
                           );
                         }).toList(),
                   );
