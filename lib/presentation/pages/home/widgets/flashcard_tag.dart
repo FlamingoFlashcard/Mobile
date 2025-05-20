@@ -29,6 +29,7 @@ class FlashcardTag extends StatelessWidget {
             itemCount: decks.length,
             itemBuilder: (context, index) {
               return FlashcardTopic(
+                id: decks[index].id,
                 title: decks[index].title,
                 cardCount: decks[index].cards?.length ?? 0,
                 imagePath:

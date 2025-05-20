@@ -196,26 +196,23 @@ class FlashcardApiClient {
   //   }
   // }
 
-  // Future<void> deleteDeck(String deckId) async {
-  //   try {
-  //     final token = await authLocalDataSource.getToken();
+  Future<void> deleteDeck(String deckId) async {
+    try {
+      final token = await authLocalDataSource.getToken();
 
-  //     final options = Options(headers: {
-  //       if (token != null) 'Authorization': 'Bearer $token',
-  //     });
+      final options = Options(
+        headers: {if (token != null) 'Authorization': 'Bearer $token'},
+      );
 
-  //     await dio.delete(
-  //       '/decks/$deckId',
-  //       options: options,
-  //     );
-  //   } on DioException catch (e) {
-  //     if (e.response != null) {
-  //       throw Exception(e.response!.data['message']);
-  //     } else {
-  //       throw Exception(e.message);
-  //     }
-  //   }
-  // }
+      await dio.delete('/deck/$deckId', options: options);
+    } on DioException catch (e) {
+      if (e.response != null) {
+        throw Exception(e.response!.data['message']);
+      } else {
+        throw Exception(e.message);
+      }
+    }
+  }
 
   // Future<CreateDeckResponseDto> updateDeck(String deckId, CreateDeckDto deckDto) async {
   //   try {

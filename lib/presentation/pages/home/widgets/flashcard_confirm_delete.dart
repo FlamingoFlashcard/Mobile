@@ -1,7 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lacquer/features/flashcard/bloc/flashcard_bloc.dart';
+import 'package:lacquer/features/flashcard/bloc/flashcard_event.dart';
 
 class FlashcardConfirmDelete extends StatefulWidget {
-  const FlashcardConfirmDelete({super.key});
+  final String id;
+  final String title;
+  const FlashcardConfirmDelete({
+    super.key,
+    required this.id,
+    required this.title,
+  });
 
   @override
   State<FlashcardConfirmDelete> createState() => _FlashcardConfirmDeleteState();
@@ -17,9 +26,21 @@ class _FlashcardConfirmDeleteState extends State<FlashcardConfirmDelete> {
       ),
       content: SizedBox(
         width: 300,
-        child: const Text(
-          'Are you sure want to delete topic...?',
-          style: TextStyle(fontSize: 16),
+        child: RichText(
+          text: TextSpan(
+            style: TextStyle(
+              fontSize: 16,
+              color: DefaultTextStyle.of(context).style.color,
+            ),
+            children: <TextSpan>[
+              TextSpan(text: 'Are you sure want to delete topic "'),
+              TextSpan(
+                text: widget.title,
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              TextSpan(text: '"?'),
+            ],
+          ),
         ),
       ),
       actions: <Widget>[
@@ -38,6 +59,7 @@ class _FlashcardConfirmDeleteState extends State<FlashcardConfirmDelete> {
           ),
           child: const Text('Yes'),
           onPressed: () {
+            context.read<FlashcardBloc>().add(DeleteDeckRequested(widget.id));
             Navigator.of(context).pop();
           },
         ),
