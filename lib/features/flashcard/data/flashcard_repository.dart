@@ -62,9 +62,9 @@ class FlashcardRepository {
   //   return apiClient.getDeckById(deckId);
   // }
 
-  // Future<void> deleteDeck(String deckId) async {
-  //   return apiClient.deleteDeck(deckId);
-  // }
+  Future<void> deleteDeck(String deckId) async {
+    return apiClient.deleteDeck(deckId);
+  }
 
   // Future<CreateDeckResponseDto> updateDeck({
   //   required String deckId,

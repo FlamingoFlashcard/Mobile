@@ -4,12 +4,14 @@ import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:lacquer/presentation/pages/home/widgets/flashcard_options.dart';
 
 class FlashcardTopic extends StatefulWidget {
+  final String id;
   final String title;
   final int cardCount;
   final String imagePath;
 
   const FlashcardTopic({
     super.key,
+    required this.id,
     required this.title,
     required this.cardCount,
     required this.imagePath,
@@ -28,7 +30,9 @@ class FlashcardTopicState extends State<FlashcardTopic> {
       onTap: () {
         showDialog(
           context: context,
-          builder: (context) => const FlashcardOptionDialog(),
+          builder:
+              (context) =>
+                  FlashcardOptionDialog(id: widget.id, title: widget.title),
         );
       },
       onTapDown: (_) => setState(() => _isPressed = true),

@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lacquer/features/flashcard/dtos/create_tag_dto.dart';
+import 'package:lacquer/features/flashcard/dtos/grouped_decks_dto.dart';
 import '../data/flashcard_repository.dart';
 import 'flashcard_event.dart';
 import 'flashcard_state.dart';
@@ -13,7 +14,7 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
     on<LoadTagsRequested>(_onLoadTagsRequested);
     on<CreateTagRequested>(_onCreateTagRequested);
     // on<LoadDeckByIdRequested>(_onLoadDeckByIdRequested);
-    // on<DeleteDeckRequested>(_onDeleteDeckRequested);
+    on<DeleteDeckRequested>(_onDeleteDeckRequested);
     // on<UpdateDeckRequested>(_onUpdateDeckRequested);
   }
 
@@ -141,31 +142,54 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
   //   }
   // }
 
-  // Future<void> _onDeleteDeckRequested(
-  //   DeleteDeckRequested event,
-  //   Emitter<FlashcardState> emit,
-  // ) async {
-  //   emit(state.copyWith(status: FlashcardStatus.loading));
+  Future<void> _onDeleteDeckRequested(
+    DeleteDeckRequested event,
+    Emitter<FlashcardState> emit,
+  ) async {
+    emit(state.copyWith(status: FlashcardStatus.loading));
 
-  //   try {
-  //     await repository.deleteDeck(event.deckId);
+    try {
+      await repository.deleteDeck(event.deckId);
 
-  //     // Remove the deleted deck from the list
-  //     final updatedDecks = state.decks.where((deck) => deck.id != event.deckId).toList();
+      GroupedDecksResponseDto? updatedGroupedDecks;
+      if (state.groupedDecks != null) {
+        final updatedItems =
+            state.groupedDecks!.data.map((item) {
+              final updatedDecks =
+                  item.decks.where((deck) => deck.id != event.deckId).toList();
+              return GroupedDeckItem(tag: item.tag, decks: updatedDecks);
+            }).toList();
 
-  //     emit(state.copyWith(
-  //       status: FlashcardStatus.success,
-  //       decks: updatedDecks,
-  //       // Clear selected deck if it was the one deleted
-  //       selectedDeck: state.selectedDeck?.id == event.deckId ? null : state.selectedDeck,
-  //     ));
-  //   } catch (e) {
-  //     emit(state.copyWith(
-  //       status: FlashcardStatus.failure,
-  //       errorMessage: e.toString(),
-  //     ));
-  //   }
-  // }
+        final newCount = updatedItems.fold<int>(
+          0,
+          (sum, item) => sum + item.decks.length,
+        );
+
+        updatedGroupedDecks = GroupedDecksResponseDto(
+          count: newCount,
+          data: updatedItems,
+        );
+      }
+
+      emit(
+        state.copyWith(
+          status: FlashcardStatus.success,
+          groupedDecks: updatedGroupedDecks,
+          selectedDeck:
+              state.selectedDeck?.id == event.deckId
+                  ? null
+                  : state.selectedDeck,
+        ),
+      );
+    } catch (e) {
+      emit(
+        state.copyWith(
+          status: FlashcardStatus.failure,
+          errorMessage: e.toString(),
+        ),
+      );
+    }
+  }
 
   // Future<void> _onUpdateDeckRequested(
   //   UpdateDeckRequested event,

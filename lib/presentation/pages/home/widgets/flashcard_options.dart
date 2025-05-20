@@ -5,7 +5,13 @@ import 'package:lacquer/presentation/pages/home/widgets/flashcard_confirm_delete
 import 'package:lacquer/presentation/pages/home/widgets/flashcard_topic_edit.dart';
 
 class FlashcardOptionDialog extends StatefulWidget {
-  const FlashcardOptionDialog({super.key});
+  final String id;
+  final String title;
+  const FlashcardOptionDialog({
+    super.key,
+    required this.id,
+    required this.title,
+  });
 
   @override
   State<FlashcardOptionDialog> createState() => _FlashcardOptionDialogState();
@@ -131,7 +137,11 @@ class _FlashcardOptionDialogState extends State<FlashcardOptionDialog> {
                       Navigator.pop(context);
                       showDialog(
                         context: context,
-                        builder: (context) => const FlashcardConfirmDelete(),
+                        builder:
+                            (context) => FlashcardConfirmDelete(
+                              id: widget.id,
+                              title: widget.title,
+                            ),
                       );
                     },
                   ),

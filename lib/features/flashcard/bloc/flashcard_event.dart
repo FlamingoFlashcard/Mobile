@@ -59,14 +59,14 @@ class CreateTagRequested extends FlashcardEvent {
 //   List<Object> get props => [deckId];
 // }
 
-// class DeleteDeckRequested extends FlashcardEvent {
-//   final String deckId;
+class DeleteDeckRequested extends FlashcardEvent {
+  final String deckId;
 
-//   const DeleteDeckRequested(this.deckId);
+  const DeleteDeckRequested(this.deckId);
 
-//   @override
-//   List<Object> get props => [deckId];
-// }
+  @override
+  List<Object> get props => [deckId];
+}
 
 // class UpdateDeckRequested extends FlashcardEvent {
 //   final String deckId;
