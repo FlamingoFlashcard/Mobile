@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'dart:io';
 import 'package:lacquer/features/flashcard/dtos/create_tag_dto.dart';
 import 'package:lacquer/features/flashcard/dtos/grouped_decks_dto.dart';
 
@@ -13,17 +14,18 @@ class FlashcardRepository {
   Future<CreateDeckResponseDto> createDeck({
     required String title,
     required String description,
-    required String imageUrl,
+    required List<String> tags,
     required List<String> cardIds,
+    File? imageFile,
   }) async {
     final deckDto = CreateDeckDto(
       title: title,
       description: description,
-      imageUrl: imageUrl,
+      tags: tags,
       cardIds: cardIds,
     );
 
-    return apiClient.createDeck(deckDto);
+    return apiClient.createDeck(deckDto, imageFile);
   }
 
   Future<GroupedDecksResponseDto> getDecks() async {

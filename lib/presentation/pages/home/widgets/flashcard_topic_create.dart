@@ -17,7 +17,7 @@ class FlashcardTopicCreate extends StatefulWidget {
 
 class _FlashcardTopicCreateState extends State<FlashcardTopicCreate> {
   File? _selectedImage;
-  String? _selectedTag;
+  String? _selectedTagId;
   final TextEditingController _titleController = TextEditingController();
 
   @override
@@ -33,6 +33,27 @@ class _FlashcardTopicCreateState extends State<FlashcardTopicCreate> {
         _selectedImage = File(picked.path);
       });
     }
+  }
+
+  void _createDeck() {
+    if (_titleController.text.isEmpty || _selectedTagId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter title and select a tag')),
+      );
+      return;
+    }
+
+    final bloc = context.read<FlashcardBloc>();
+    bloc.add(
+      CreateDeckRequested(
+        title: _titleController.text,
+        description: 'Description here',
+        tags: [_selectedTagId!],
+        cardIds: [],
+        imageFile: _selectedImage,
+      ),
+    );
+    Navigator.of(context).pop();
   }
 
   @override
@@ -130,7 +151,7 @@ class _FlashcardTopicCreateState extends State<FlashcardTopicCreate> {
                         ),
                       );
                     }
-                    final tags = state.tags.map((tag) => tag.name).toList();
+                    final tags = state.tags;
                     return Padding(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 8,
@@ -147,17 +168,18 @@ class _FlashcardTopicCreateState extends State<FlashcardTopicCreate> {
                                 tags.isEmpty
                                     ? [const Text('No tags available')]
                                     : tags.map((tag) {
-                                      final isSelected = _selectedTag == tag;
+                                      final isSelected =
+                                          _selectedTagId == tag.id;
                                       return ChoiceChip(
                                         showCheckmark: false,
-                                        label: Text(tag),
+                                        label: Text(tag.name),
                                         selected: isSelected,
                                         onSelected: (selected) {
                                           setState(() {
                                             if (selected) {
-                                              _selectedTag = tag;
+                                              _selectedTagId = tag.id;
                                             } else {
-                                              _selectedTag = null;
+                                              _selectedTagId = null;
                                             }
                                           });
                                         },
@@ -237,10 +259,8 @@ class _FlashcardTopicCreateState extends State<FlashcardTopicCreate> {
             foregroundColor: CustomTheme.primaryColor,
             textStyle: Theme.of(context).textTheme.labelLarge,
           ),
+          onPressed: _createDeck,
           child: const Text('OK'),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
         ),
       ],
     );
