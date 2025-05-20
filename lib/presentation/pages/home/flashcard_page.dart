@@ -13,53 +13,62 @@ class FlashcardPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: CustomTheme.lightbeige,
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildAppBar(context),
-            const SizedBox(height: 16),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-              child: _buildSearchBar(),
-            ),
-            const SizedBox(height: 16),
-            BlocBuilder<FlashcardBloc, FlashcardState>(
-              builder: (context, state) {
-                if (state.status == FlashcardStatus.loading) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (state.status == FlashcardStatus.failure) {
-                  return Center(
-                    child: Text(
-                      'Error: ${state.errorMessage ?? 'Unknown error'}',
-                    ),
-                  );
-                } else if (state.status == FlashcardStatus.success) {
-                  final groupedDecks = state.groupedDecks;
-                  if (groupedDecks == null || groupedDecks.data.isEmpty) {
-                    return const Center(child: Text('No decks available'));
-                  }
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        context.go('/');
+      },
+      child: Scaffold(
+        backgroundColor: CustomTheme.lightbeige,
+        body: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildAppBar(context),
+              const SizedBox(height: 16),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                child: _buildSearchBar(),
+              ),
+              const SizedBox(height: 16),
+              BlocBuilder<FlashcardBloc, FlashcardState>(
+                builder: (context, state) {
+                  if (state.status == FlashcardStatus.loading) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (state.status == FlashcardStatus.failure) {
+                    return Center(
+                      child: Text(
+                        'Error: ${state.errorMessage ?? 'Unknown error'}',
+                      ),
+                    );
+                  } else if (state.status == FlashcardStatus.success) {
+                    final groupedDecks = state.groupedDecks;
+                    if (groupedDecks == null || groupedDecks.data.isEmpty) {
+                      return const Center(child: Text('No decks available'));
+                    }
 
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children:
-                        groupedDecks.data.map((group) {
-                          return FlashcardTag(
-                            key: ValueKey(group.tag.id),
-                            title: group.tag.name,
-                            decks: group.decks,
-                          );
-                        }).toList(),
-                  );
-                } else {
-                  return const SizedBox.shrink();
-                }
-              },
-            ),
-            const SizedBox(height: 20),
-          ],
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children:
+                          groupedDecks.data.map((group) {
+                            return group.decks.isNotEmpty
+                                ? FlashcardTag(
+                                  key: ValueKey(group.tag.id),
+                                  title: group.tag.name,
+                                  decks: group.decks,
+                                )
+                                : SizedBox.shrink();
+                          }).toList(),
+                    );
+                  } else {
+                    return const SizedBox.shrink();
+                  }
+                },
+              ),
+              const SizedBox(height: 20),
+            ],
+          ),
         ),
       ),
     );
