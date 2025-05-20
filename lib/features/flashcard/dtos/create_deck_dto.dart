@@ -34,8 +34,8 @@ class CreateDeckResponseDto {
   final String? id;
   final String? title;
   final String? description;
-  final String? image;
-  final String? tag;
+  final String? img;
+  final List<String>? tags;
   final List<String>? cardIds;
   final String? userId;
   final DateTime? createdAt;
@@ -44,8 +44,8 @@ class CreateDeckResponseDto {
     this.id,
     this.title,
     this.description,
-    this.image,
-    this.tag,
+    this.img,
+    this.tags,
     this.cardIds,
     this.userId,
     this.createdAt,
@@ -56,8 +56,8 @@ class CreateDeckResponseDto {
       id: json['id'] as String?,
       title: json['title'] as String?,
       description: json['description'] as String?,
-      image: json['image'] as String?,
-      tag: json['tag'] as String?,
+      img: json['img'] as String?,
+      tags: (json['tags'] as List<dynamic>?)?.map((e) => e as String).toList(),
       cardIds:
           (json['cards'] as List<dynamic>?)?.map((e) => e as String).toList(),
       userId: json['userId'] as String?,
