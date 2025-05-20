@@ -13,6 +13,10 @@ import 'package:lacquer/features/chatbot/bloc/chatbot_bloc.dart';
 import 'package:lacquer/features/chatbot/bloc/chatbot_event.dart';
 import 'package:lacquer/features/chatbot/data/chatbot_api_client.dart';
 import 'package:lacquer/features/chatbot/data/chatbot_repository.dart';
+import 'package:lacquer/features/flashcard/bloc/flashcard_bloc.dart';
+import 'package:lacquer/features/flashcard/bloc/flashcard_event.dart';
+import 'package:lacquer/features/flashcard/data/flashcard_api_client.dart';
+import 'package:lacquer/features/flashcard/data/flashcard_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
@@ -41,9 +45,13 @@ class MyApp extends StatelessWidget {
         ),
         RepositoryProvider(
           create:
-              (context) => ChatbotRepository(
-                chatbotApiClient: ChatbotApiClient(dio),
-              ),
+              (context) =>
+                  ChatbotRepository(chatbotApiClient: ChatbotApiClient(dio)),
+        ),
+        RepositoryProvider(
+          create: (context) => FlashcardRepository(
+            FlashcardApiClient(dio, AuthLocalDataSource(sharedPreferences)),
+          ),
         ),
       ],
       child: MultiBlocProvider(
@@ -53,6 +61,11 @@ class MyApp extends StatelessWidget {
           ),
           BlocProvider(
             create: (context) => ChatbotBloc(context.read<ChatbotRepository>()),
+          ),
+          BlocProvider(
+            create: (context) => FlashcardBloc(
+              repository: context.read<FlashcardRepository>(),
+            )..add(LoadDecksRequested()),
           ),
         ],
         child: AppContent(),
@@ -74,6 +87,7 @@ class _AppContentState extends State<AppContent> {
     super.initState();
     context.read<AuthBloc>().add(AuthAuthenticateStarted());
     context.read<ChatbotBloc>().add(ChatbotEventStarted());
+    context.read<FlashcardBloc>().add(LoadDecksRequested());
   }
 
   @override
