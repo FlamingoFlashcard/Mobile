@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
+import 'package:http_parser/http_parser.dart';
 import 'dart:io';
+import 'package:mime/mime.dart';
 import 'package:lacquer/features/flashcard/dtos/create_tag_dto.dart';
 import '../dtos/create_deck_dto.dart';
 import 'package:lacquer/features/auth/data/auth_local_data_source.dart';
@@ -16,6 +18,7 @@ class FlashcardApiClient {
   ) async {
     print('FlashcardApiClient: Starting createDeck');
     print('DeckDto: ${deckDto.toJson()}, ImageFile: ${imageFile?.path}');
+
     try {
       final token = await authLocalDataSource.getToken();
       print('FlashcardApiClient: Token: $token');
@@ -34,15 +37,24 @@ class FlashcardApiClient {
           );
           throw Exception('Image file does not exist');
         }
-        final fileName =
-            imageFile.path.split('/').last; // Use original filename
+
+        final fileName = imageFile.path.split('/').last;
+        final mimeType = lookupMimeType(imageFile.path);
+
         formData.files.add(
           MapEntry(
-            'image', // Changed from 'img' to 'image'
-            await MultipartFile.fromFile(imageFile.path, filename: fileName),
+            'image',
+            await MultipartFile.fromFile(
+              imageFile.path,
+              filename: fileName,
+              contentType: mimeType != null ? MediaType.parse(mimeType) : null,
+            ),
           ),
         );
-        print('FlashcardApiClient: Added image to FormData: $fileName');
+
+        print(
+          'FlashcardApiClient: Added image to FormData: $fileName, MIME: $mimeType',
+        );
       } else {
         print('FlashcardApiClient: No image provided');
       }
@@ -59,6 +71,7 @@ class FlashcardApiClient {
         data: formData,
         options: options,
       );
+
       print('FlashcardApiClient: Raw response: $response');
       print('FlashcardApiClient: Response data: ${response.data}');
 

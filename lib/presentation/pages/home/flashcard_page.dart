@@ -72,9 +72,9 @@ class FlashcardPage extends StatelessWidget {
         bottomRight: Radius.circular(8),
       ),
       child: Container(
-        height: 80,
+        height: 90,
         color: CustomTheme.mainColor1,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.only(top: 30),
         child: Center(
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
