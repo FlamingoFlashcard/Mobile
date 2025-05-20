@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class FadeTransitionPage extends CustomTransitionPage<void> {
-  FadeTransitionPage({required Widget child, required String key})
+  FadeTransitionPage({required super.child, required String key})
     : super(
-        child: child,
         key: ValueKey(key),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return FadeTransition(opacity: animation, child: child);
@@ -13,9 +12,8 @@ class FadeTransitionPage extends CustomTransitionPage<void> {
 }
 
 class SlideUpTransitionPage extends CustomTransitionPage<void> {
-  SlideUpTransitionPage({required Widget child, required String key})
+  SlideUpTransitionPage({required super.child, required String key})
     : super(
-        child: child,
         key: ValueKey(key),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           const begin = Offset(0.0, 1.0);
@@ -34,9 +32,8 @@ class SlideUpTransitionPage extends CustomTransitionPage<void> {
 }
 
 class SlideDownTransitionPage extends CustomTransitionPage<void> {
-  SlideDownTransitionPage({required Widget child, required String key})
+  SlideDownTransitionPage({required super.child, required String key})
     : super(
-        child: child,
         key: ValueKey(key),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           const begin = Offset(0.0, -1.0);
@@ -55,9 +52,8 @@ class SlideDownTransitionPage extends CustomTransitionPage<void> {
 }
 
 class ScaleTransitionPage extends CustomTransitionPage<void> {
-  ScaleTransitionPage({required Widget child, required String key})
+  ScaleTransitionPage({required super.child, required String key})
     : super(
-        child: child,
         key: ValueKey(key),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           const begin = 0.0;
