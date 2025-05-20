@@ -27,7 +27,6 @@ class _CameraPageState extends State<CameraPage> {
   double _minAvailableZoom = 1.0;
   double _maxAvailableZoom = 10.0;
   double _currentZoom = 1.0;
-  double _baseScale = 1.0;
   bool _isUltrawideAvailable = false;
 
   // Camera type tracking
@@ -55,7 +54,7 @@ class _CameraPageState extends State<CameraPage> {
     if (_cameras == null || _cameras!.isEmpty) return;
 
     // Find main camera and ultrawide camera
-    if (_cameras!.length > 0) {
+    if (_cameras!.isNotEmpty) {
       // Main camera is typically the first back camera
       _mainCamera = _cameras!.firstWhere(
         (camera) => camera.lensDirection == CameraLensDirection.back,
@@ -188,7 +187,6 @@ class _CameraPageState extends State<CameraPage> {
   }
 
   void _handleScaleStart(ScaleStartDetails details) {
-    _baseScale = _currentZoom;
     _previousScale = 1.0;
   }
 
@@ -236,8 +234,9 @@ class _CameraPageState extends State<CameraPage> {
   void _toggleZoom() {
     if (_controller == null ||
         !_controller!.value.isInitialized ||
-        _controller!.description.lensDirection == CameraLensDirection.front)
+        _controller!.description.lensDirection == CameraLensDirection.front) {
       return;
+    }
 
     // If using ultrawide, switch to main camera at 1x
     if (_isUsingUltrawide && _mainCamera != null) {
@@ -378,7 +377,7 @@ class _CameraPageState extends State<CameraPage> {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.5),
+                        color: Colors.black.withAlpha(128),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
