@@ -27,8 +27,9 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
       final deck = await repository.createDeck(
         title: event.title,
         description: event.description,
-        imageUrl: event.imageUrl,
+        tags: event.tags,
         cardIds: event.cardIds,
+        imageFile: event.imageFile,
       );
 
       final groupedDecks = await repository.getDecks();

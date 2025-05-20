@@ -9,13 +9,9 @@ class GroupedDecksResponseDto {
   factory GroupedDecksResponseDto.fromJson(Map<String, dynamic> json) {
     final data = json['data'] as Map<String, dynamic>?;
     if (data == null) {
-      print('Warning: data field is null in response');
       return GroupedDecksResponseDto(count: 0, data: []);
     }
     final deckList = data['data'] as List<dynamic>? ?? [];
-    print(
-      'Parsing deckList in GroupedDecksResponseDto: $deckList',
-    ); // Log để debug
     return GroupedDecksResponseDto(
       count: data['count'] as int? ?? 0,
       data:

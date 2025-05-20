@@ -15,7 +15,7 @@ class CreateTagDto {
 class CreateTagResponseDto {
   final String id;
   final String name;
-  final String description; // Giữ required, nhưng sẽ có giá trị mặc định
+  final String description;
   final DateTime createdAt;
   final DateTime updatedAt;
 

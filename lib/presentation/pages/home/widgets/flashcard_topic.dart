@@ -121,7 +121,7 @@ class FlashcardTopicState extends State<FlashcardTopic> {
                       ).createShader(bounds);
                     },
                     blendMode: BlendMode.dstIn,
-                    child: _buildImage(), // Thay Image.asset bằng _buildImage
+                    child: _buildImage(),
                   ),
                 ),
               ],
@@ -133,7 +133,6 @@ class FlashcardTopicState extends State<FlashcardTopic> {
   }
 
   Widget _buildImage() {
-    // Kiểm tra xem imagePath có phải là URL không
     if (widget.imagePath.startsWith('http')) {
       return SizedBox(
         width: 190,
@@ -142,9 +141,9 @@ class FlashcardTopicState extends State<FlashcardTopic> {
           widget.imagePath,
           fit: BoxFit.cover,
           errorBuilder: (context, error, stackTrace) {
-            print('Error loading network image: $error'); // Log lỗi tải hình
+            print('Error loading network image: $error');
             return Image.asset(
-              'assets/default_image.png', // Hình mặc định nếu lỗi
+              'assets/default_image.png',
               fit: BoxFit.cover,
               width: 190,
               height: 180,
@@ -166,7 +165,7 @@ class FlashcardTopicState extends State<FlashcardTopic> {
           errorBuilder: (context, error, stackTrace) {
             print('Error loading asset: $error');
             return Image.asset(
-              'assets/default_image.png', // Hình mặc định nếu lỗi
+              'assets/default_image.png',
               fit: BoxFit.cover,
               width: 190,
               height: 180,

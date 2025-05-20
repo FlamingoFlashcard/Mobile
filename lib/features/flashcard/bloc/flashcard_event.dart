@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'dart:io';
 
 abstract class FlashcardEvent extends Equatable {
   const FlashcardEvent();
@@ -10,18 +11,26 @@ abstract class FlashcardEvent extends Equatable {
 class CreateDeckRequested extends FlashcardEvent {
   final String title;
   final String description;
-  final String imageUrl;
+  final List<String> tags;
   final List<String> cardIds;
+  final File? imageFile;
 
   const CreateDeckRequested({
     required this.title,
     required this.description,
-    required this.imageUrl,
+    required this.tags,
     required this.cardIds,
+    this.imageFile,
   });
 
   @override
-  List<Object> get props => [title, description, imageUrl, cardIds];
+  List<Object?> get props => [
+    title,
+    description,
+    tags,
+    cardIds,
+    imageFile?.path,
+  ];
 }
 
 class LoadDecksRequested extends FlashcardEvent {
