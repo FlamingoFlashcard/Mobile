@@ -1,37 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:lacquer/presentation/widgets/snackbar.dart';
-import 'package:lacquer/config/theme.dart';
-import 'package:dio/dio.dart';
-import 'package:path/path.dart' as path;
-import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:lacquer/config/env.dart';
+import 'package:lacquer/features/profile/bloc/profile_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lacquer/features/profile/bloc/profile_state.dart';
+import 'package:lacquer/features/profile/bloc/profile_event.dart';
 
 class EditProfileScreen extends StatefulWidget {
-  final String? token;
-  final String avatarUrl;
-
-  const EditProfileScreen({
-    required this.token,
-    required this.avatarUrl,
-    super.key,
-  });
+  const EditProfileScreen({super.key});
 
   @override
-  EditProfileScreenState createState() => EditProfileScreenState();
+  State<EditProfileScreen> createState() => EditProfileScreenState();
 }
 
 class EditProfileScreenState extends State<EditProfileScreen> {
-  String avatarUrl = '';
-  File? _newAvatarFile;
-
-  bool _isLoading = false;
-  bool _secureText = true;
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool _secureText = true;
+  File? _selectedAvatar;
 
   @override
   void dispose() {
@@ -41,165 +30,120 @@ class EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    avatarUrl = widget.avatarUrl;
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Theme(
-      data: Theme.of(context).copyWith(
-        inputDecorationTheme: InputDecorationTheme(
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(100)),
-          prefixIconColor: Colors.black,
-          floatingLabelStyle: TextStyle(color: Colors.black),
-          focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(width: 2, color: Colors.black),
-          ),
-        ),
-      ),
-      child: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: <Color>[
-              CustomTheme.loginGradientEnd, // Màu dưới
-              CustomTheme.loginGradientStart, // Màu trên
-            ],
-            begin: Alignment.bottomCenter,
-            end: Alignment.topCenter,
-          ),
-        ),
-        child: Scaffold(
-          backgroundColor: Colors.transparent,
-          appBar: AppBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            title: Text(
-              'Edit Profile',
-              style: TextStyle(
-                color: Colors.black87,
-                fontWeight: FontWeight.bold,
+    return BlocConsumer<ProfileBloc, ProfileState>(
+      listener: (context, state) {
+        if (state is ProfileUpdateSuccess) {
+          Navigator.pop(context);
+        } else if (state is ProfileUpdateFailure) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.error)));
+        }
+      },
+      builder: (context, state) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            inputDecorationTheme: InputDecorationTheme(
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(100),
+              ),
+              prefixIconColor: Colors.black,
+              focusedBorder: const OutlineInputBorder(
+                borderSide: BorderSide(width: 2, color: Colors.black),
               ),
             ),
-            centerTitle: true,
           ),
-          body:
-              _isLoading
-                  ? Center(child: CircularProgressIndicator())
-                  : SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        Form(
-                          key: _formKey,
-                          child: Column(
-                            children: [
-                              _buildAvatar(),
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                  top: 40.0,
-                                  bottom: 10.0,
-                                  left: 50.0,
-                                  right: 50.0,
-                                ),
-                                child: TextFormField(
-                                  controller: _usernameController,
-                                  decoration: const InputDecoration(
-                                    label: Text('User Name'),
-                                    prefixIcon: Icon(FontAwesomeIcons.user),
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                  top: 10.0,
-                                  bottom: 20.0,
-                                  left: 50.0,
-                                  right: 50.0,
-                                ),
-                                child: TextFormField(
-                                  controller: _passwordController,
-                                  decoration: InputDecoration(
-                                    label: Text('Password'),
-                                    prefixIcon: Icon(
-                                      FontAwesomeIcons.fingerprint,
-                                    ),
-                                    suffixIcon: IconButton(
-                                      icon: Icon(
-                                        _secureText
-                                            ? FontAwesomeIcons.eye
-                                            : FontAwesomeIcons.eyeSlash,
-                                      ),
-                                      onPressed: () {
-                                        setState(() {
-                                          _secureText = !_secureText;
-                                        });
-                                      },
-                                    ),
-                                  ),
-                                  obscureText: _secureText,
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 50,
-                                ),
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    if (_formKey.currentState!.validate()) {
-                                      updateProfile();
-                                    }
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(24.0),
-                                    ),
-                                    backgroundColor: Colors.deepOrange,
-                                    minimumSize: Size.fromHeight(
-                                      50,
-                                    ), // Chiều cao tùy ý
-                                  ),
-                                  child: Text(
-                                    'Save',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+          child: Scaffold(
+            appBar: AppBar(
+              title: const Text('Edit Profile'),
+              centerTitle: true,
+            ),
+            body: _buildBody(state),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildBody(ProfileState state) {
+    if (state is ProfileLoadSuccess || state is ProfileUpdateSuccess) {
+      final currentProfile = state as dynamic;
+      _usernameController.text = currentProfile.username;
+
+      return SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                _buildAvatarSection(currentProfile.avatarUrl),
+                const SizedBox(height: 20),
+                _buildUsernameField(),
+                const SizedBox(height: 10),
+                _buildPasswordField(),
+                const SizedBox(height: 20),
+                _buildSaveButton(),
+              ],
+            ),
+          ),
         ),
+      );
+    }
+
+    if (state is ProfileUpdateInProgress) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    return Container();
+  }
+
+  Widget _buildAvatarSection(String currentAvatarUrl) {
+    return GestureDetector(
+      onTap: _pickImage,
+      child: CircleAvatar(
+        radius: 60,
+        backgroundImage:
+            _selectedAvatar != null
+                ? FileImage(_selectedAvatar!)
+                : (currentAvatarUrl.isNotEmpty
+                        ? NetworkImage(currentAvatarUrl)
+                        : const AssetImage('assets/images/boy.png'))
+                    as ImageProvider,
+        child:
+            _selectedAvatar == null && currentAvatarUrl.isEmpty
+                ? const Icon(Icons.add_a_photo, size: 40)
+                : null,
       ),
     );
   }
 
-  //---------------------------- WIDGETS ----------------------------
-  Widget _buildAvatar() {
-    return Padding(
-      padding: EdgeInsets.all(20),
-      child: GestureDetector(
-        onTap: _pickImage,
-        child: Container(
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(color: Colors.white, width: 2),
+  Widget _buildUsernameField() {
+    return TextFormField(
+      controller: _usernameController,
+      decoration: const InputDecoration(
+        labelText: 'Username',
+        prefixIcon: Icon(FontAwesomeIcons.user),
+        border: OutlineInputBorder(),
+      ),
+    );
+  }
+
+  Widget _buildPasswordField() {
+    return TextFormField(
+      controller: _passwordController,
+      obscureText: _secureText,
+      decoration: InputDecoration(
+        labelText: 'Password',
+        prefixIcon: const Icon(FontAwesomeIcons.fingerprint),
+        suffixIcon: IconButton(
+          icon: Icon(
+            _secureText ? FontAwesomeIcons.eye : FontAwesomeIcons.eyeSlash,
           ),
-          child: CircleAvatar(
-            radius: 60,
-            backgroundImage:
-                _newAvatarFile != null
-                    ? FileImage(_newAvatarFile!)
-                    : (avatarUrl.isNotEmpty
-                        ? NetworkImage(avatarUrl)
-                        : AssetImage('assets/images/boy.png') as ImageProvider),
-          ),
+          onPressed: () => setState(() => _secureText = !_secureText),
         ),
+        border: const OutlineInputBorder(),
       ),
     );
   }
@@ -247,6 +191,26 @@ class EditProfileScreenState extends State<EditProfileScreen> {
         context,
       ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
     }
+  Widget _buildSaveButton() {
+    return ElevatedButton(
+      onPressed: () {
+        if (_formKey.currentState!.validate()) {
+          context.read<ProfileBloc>().add(
+            ProfileUpdateRequested(
+              username: _usernameController.text.trim(),
+              password: _passwordController.text.trim(),
+              avatarFile: _selectedAvatar,
+            ),
+          );
+        }
+      },
+      style: ElevatedButton.styleFrom(
+        minimumSize: const Size(double.infinity, 50),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        backgroundColor: Colors.deepOrange,
+      ),
+      child: const Text('SAVE', style: TextStyle(fontSize: 18)),
+    );
   }
 
   Future<void> _pickImage() async {
@@ -298,6 +262,9 @@ class EditProfileScreenState extends State<EditProfileScreen> {
       if (!mounted) return;
 
       CustomSnackBar(context, const Text('Error occurred while uploading'));
+      setState(() {
+        _selectedAvatar = File(pickedFile.path);
+      });
     }
   }
 }
