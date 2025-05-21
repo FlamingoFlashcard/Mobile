@@ -5,6 +5,7 @@ import 'package:lacquer/features/auth/dtos/login_dto.dart';
 import 'package:lacquer/features/auth/dtos/login_success_dto.dart';
 import 'package:lacquer/features/auth/dtos/register_dto.dart';
 import 'package:lacquer/features/auth/dtos/register_success_dto.dart';
+import 'package:lacquer/features/result_type.dart';
 
 class AuthApiClient {
   AuthApiClient(this.dio);
@@ -71,6 +72,22 @@ class AuthApiClient {
         data: {'idToken': idToken},
       );
       return LoginSuccessDto.fromJson(response.data);
+    } on DioException catch (e) {
+      if (e.response != null) {
+        throw Exception(e.response!.data['message']);
+      } else {
+        throw Exception(e.message);
+      }
+    }
+  }
+
+  Future<Result<void>> deleteprofile(String? token) async {
+    try {
+      await dio.delete(
+        'https://lacquer.up.railway.app/auth/delete',
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+      return Success(null);
     } on DioException catch (e) {
       if (e.response != null) {
         throw Exception(e.response!.data['message']);

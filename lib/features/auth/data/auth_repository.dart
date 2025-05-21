@@ -51,14 +51,11 @@ class AuthRepository {
   }
 
   Future<Result<LocalSource?>> getLocalSource() async {
-    try{
+    try {
       final token = await authLocalDataSource.getToken();
       final userId = await authLocalDataSource.getUserId();
       if (token != null && userId != null) {
-        return Success(LocalSource(
-          token: token,
-          userId: userId,
-        ));
+        return Success(LocalSource(token: token, userId: userId));
       } else {
         return Success(null);
       }
@@ -118,14 +115,20 @@ class AuthRepository {
       return Failure(e.toString());
     }
   }
+
+  Future<Result<void>> deleteprofile(String? token) async {
+    try {
+      await authApiClient.deleteprofile(token);
+      return Success(null);
+    } catch (e) {
+      return Failure(e.toString());
+    }
+  }
 }
 
 class LocalSource {
   final String token;
   final String userId;
 
-  LocalSource({
-    required this.token,
-    required this.userId,
-  });
+  LocalSource({required this.token, required this.userId});
 }

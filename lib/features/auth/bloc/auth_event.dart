@@ -34,3 +34,9 @@ class AuthEventSendMailVerify extends AuthEvent {
 }
 
 class AuthEventGoogleSignIn extends AuthEvent {}
+
+class AuthEventDeleteProfile extends AuthEvent {
+  final String? token;
+
+  AuthEventDeleteProfile({required this.token});
+}

@@ -30,7 +30,7 @@ class AuthAuthenticatedSuccess extends AuthState {
   final String userId;
 
   AuthAuthenticatedSuccess(this.token, this.userId);
- }
+}
 
 class AuthAuthenticatedFailure extends AuthState {
   final String message;
@@ -62,3 +62,12 @@ class AuthVerifyMailSentFailure extends AuthState {
 
 //GOOGLE SIGN IN
 class AuthGoogleSignInInProgress extends AuthState {}
+
+//DELETE PROFILE
+class AuthDeleteProfileSuccess extends AuthState {}
+
+class AuthDeleteProfileFailure extends AuthState {
+  final String message;
+
+  AuthDeleteProfileFailure(this.message);
+}
