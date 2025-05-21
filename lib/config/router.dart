@@ -22,7 +22,6 @@ class RouteName {
   static const String register = '/register';
   static const String camera = '/camera';
   static const String about = '/about';
-  static const String profile = '/profile';
 
   static const publicRoutes = [login, forgotPassword, verify, register];
 }
@@ -82,10 +81,6 @@ final router = GoRouter(
         final imagePath = state.extra as String;
         return AboutScreen(imagePath: imagePath);
       },
-    ),
-    noTransitionRoute(
-      path: RouteName.profile,
-      builder: (context, state) => const ProfilePage(),
     ),
   ],
 );

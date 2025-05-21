@@ -14,6 +14,9 @@ import 'package:lacquer/features/chatbot/bloc/chatbot_event.dart';
 import 'package:lacquer/features/chatbot/data/chatbot_api_client.dart';
 import 'package:lacquer/features/chatbot/data/chatbot_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:lacquer/features/profile/data/profile_repository.dart';
+import 'package:lacquer/features/profile/bloc/profile_bloc.dart';
+import 'package:lacquer/features/profile/bloc/profile_event.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,10 +44,10 @@ class MyApp extends StatelessWidget {
         ),
         RepositoryProvider(
           create:
-              (context) => ChatbotRepository(
-                chatbotApiClient: ChatbotApiClient(dio),
-              ),
+              (context) =>
+                  ChatbotRepository(chatbotApiClient: ChatbotApiClient(dio)),
         ),
+        RepositoryProvider(create: (context) => ProfileRepository(dio: dio)),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -53,6 +56,12 @@ class MyApp extends StatelessWidget {
           ),
           BlocProvider(
             create: (context) => ChatbotBloc(context.read<ChatbotRepository>()),
+          ),
+          BlocProvider(
+            create:
+                (context) =>
+                    ProfileBloc(context.read<ProfileRepository>())
+                      ..add(ProfileLoadRequested()),
           ),
         ],
         child: AppContent(),
