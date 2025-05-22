@@ -4,7 +4,8 @@ import 'package:lacquer/config/theme.dart';
 import 'package:lacquer/presentation/widgets/snackbar.dart';
 
 class ResetPasswordPage extends StatefulWidget {
-  const ResetPasswordPage({super.key});
+  final String? token;
+  const ResetPasswordPage({super.key, required this.token});
 
   @override
   State<ResetPasswordPage> createState() => _ResetPasswordPageState();

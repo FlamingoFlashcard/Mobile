@@ -6,6 +6,7 @@ import 'package:lacquer/features/chatbot/bloc/chatbot_bloc.dart';
 import 'package:lacquer/features/chatbot/bloc/chatbot_event.dart';
 import 'package:lacquer/presentation/pages/auth/forgot_password_page.dart';
 import 'package:lacquer/presentation/pages/auth/login_page.dart';
+import 'package:lacquer/presentation/pages/auth/reset_password_page.dart';
 import 'package:lacquer/presentation/pages/auth/verify_page.dart';
 import 'package:lacquer/presentation/pages/camera/camera_page.dart';
 import 'package:lacquer/presentation/pages/camera/about_screen.dart';
@@ -23,6 +24,7 @@ class RouteName {
   static const String camera = '/camera';
   static const String about = '/about';
   static const String profile = '/profile';
+  static const String resetPassword = '/reset-password';
 
   static const publicRoutes = [login, forgotPassword, verify, register];
 }
@@ -39,8 +41,11 @@ GoRoute noTransitionRoute({
 }
 
 late String? userId;
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 
 final router = GoRouter(
+  navigatorKey: navigatorKey,
   redirect: (context, state) {
     if (RouteName.publicRoutes.contains(state.fullPath)) {
       return null;
@@ -86,6 +91,12 @@ final router = GoRouter(
     noTransitionRoute(
       path: RouteName.profile,
       builder: (context, state) => const ProfilePage(),
+    ),
+    noTransitionRoute(
+      path: RouteName.resetPassword,
+      builder: (context, state) {
+        return ResetPasswordPage(token: state.uri.queryParameters['token']);
+      },
     ),
   ],
 );

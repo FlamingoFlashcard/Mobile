@@ -1,3 +1,4 @@
+import 'package:lacquer/config/deeplink_handler.dart';
 import 'package:lacquer/config/http_client.dart';
 import 'package:lacquer/config/router.dart';
 import 'package:lacquer/features/auth/bloc/auth_bloc.dart';
@@ -72,6 +73,9 @@ class _AppContentState extends State<AppContent> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      DeepLinkHandler.initDeepLinks();
+    });
     context.read<AuthBloc>().add(AuthAuthenticateStarted());
     context.read<ChatbotBloc>().add(ChatbotEventStarted());
   }
