@@ -52,7 +52,7 @@ class AuthApiClient {
   Future<ForgetSuccessDto> forget(ForgetDto forgetDto) async {
     try {
       final response = await dio.post(
-        'auth/forget',
+        'auth/forgot',
         data: {'email': forgetDto.email},
       );
       return ForgetSuccessDto.fromJson(response.data);

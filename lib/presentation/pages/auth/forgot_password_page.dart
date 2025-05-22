@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lacquer/config/router.dart';
 import 'package:lacquer/config/theme.dart';
+import 'package:lacquer/features/auth/bloc/auth_bloc.dart';
+import 'package:lacquer/features/auth/bloc/auth_event.dart';
+import 'package:lacquer/features/auth/bloc/auth_state.dart';
 
 class ForgotPasswordPage extends StatelessWidget {
   //----------------------------- VARIABLES -----------------------------
@@ -13,6 +17,34 @@ class ForgotPasswordPage extends StatelessWidget {
   //----------------------------- INIT -----------------------------
   @override
   Widget build(BuildContext context) {
+    final state = context.watch<AuthBloc>().state;
+    var resultwidget = (switch (state) {
+      AuthVerifyMailSending() => const Center(
+        child: CircularProgressIndicator(color: CustomTheme.mainColor1),
+      ),
+      AuthVerifyMailSentSuccess() => const Center(
+        child: Text(
+          'Verification email sent successfully, please check your inbox.',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: CustomTheme.mainColor1,
+          ),
+        ),
+      ),
+      AuthVerifyMailSentFailure() => Center(
+        child: Text(
+          'Failed to send verification email: ${state.message}',
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: CustomTheme.mainColor1,
+          ),
+        ),
+      ),
+      _ => const SizedBox.shrink(),
+    });
+
     return Scaffold(
       body: Container(
         width: double.infinity,
@@ -27,13 +59,16 @@ class ForgotPasswordPage extends StatelessWidget {
             end: Alignment.bottomRight,
           ),
         ),
-        child: Center(
+        child: Align(
+          alignment: Alignment.topCenter,
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                const SizedBox(height: 150),
                 const Align(
                   alignment: Alignment.centerLeft,
                   child: Padding(
@@ -160,6 +195,9 @@ class ForgotPasswordPage extends StatelessWidget {
                     ),
                   ),
                 ),
+                const SizedBox(height: 20),
+                resultwidget,
+                const SizedBox(height: 20),
               ],
             ),
           ),
@@ -169,5 +207,9 @@ class ForgotPasswordPage extends StatelessWidget {
   }
 
   //----------------------------- FUNCTIONS -----------------------------
-  void _onSendVerify(BuildContext context) {}
+  void _onSendVerify(BuildContext context) {
+    context.read<AuthBloc>().add(
+      AuthEventSendMailVerify(email: emailController.text.trim()),
+    );
+  }
 }
