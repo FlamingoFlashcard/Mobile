@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'dart:io';
 import 'package:lacquer/features/flashcard/dtos/create_tag_dto.dart';
 import 'package:lacquer/features/flashcard/dtos/grouped_decks_dto.dart';
+import 'package:lacquer/features/flashcard/dtos/update_deck_dto.dart';
 
 import '../dtos/create_deck_dto.dart';
 import 'flashcard_api_client.dart';
@@ -66,20 +67,20 @@ class FlashcardRepository {
     return apiClient.deleteDeck(deckId);
   }
 
-  // Future<CreateDeckResponseDto> updateDeck({
-  //   required String deckId,
-  //   required String title,
-  //   required String description,
-  //   required String imageUrl,
-  //   required List<String> cardIds,
-  // }) async {
-  //   final deckDto = CreateDeckDto(
-  //     title: title,
-  //     description: description,
-  //     imageUrl: imageUrl,
-  //     cardIds: cardIds,
-  //   );
+  Future<CreateDeckResponseDto> updateDeck({
+    required String deckId,
+    required String title,
+    required String description,
+    required List<String> tags,
+    File? imageFile,
+  }) async {
+    final deckDto = UpdateDeckDto(
+      id: deckId,
+      title: title,
+      description: description,
+      tags: tags,
+    );
 
-  //   return apiClient.updateDeck(deckId, deckDto);
-  // }
+    return apiClient.updateDeck(deckId, deckDto, imageFile);
+  }
 }

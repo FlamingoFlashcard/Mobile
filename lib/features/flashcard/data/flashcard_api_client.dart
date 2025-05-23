@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:lacquer/features/flashcard/dtos/update_deck_dto.dart';
 import 'dart:io';
 import 'package:mime/mime.dart';
 import 'package:lacquer/features/flashcard/dtos/create_tag_dto.dart';
@@ -16,12 +17,8 @@ class FlashcardApiClient {
     CreateDeckDto deckDto,
     File? imageFile,
   ) async {
-    print('FlashcardApiClient: Starting createDeck');
-    print('DeckDto: ${deckDto.toJson()}, ImageFile: ${imageFile?.path}');
-
     try {
       final token = await authLocalDataSource.getToken();
-      print('FlashcardApiClient: Token: $token');
 
       final formData = FormData.fromMap({
         'title': deckDto.title,
@@ -32,9 +29,6 @@ class FlashcardApiClient {
 
       if (imageFile != null) {
         if (!await imageFile.exists()) {
-          print(
-            'FlashcardApiClient: Image file does not exist: ${imageFile.path}',
-          );
           throw Exception('Image file does not exist');
         }
 
@@ -51,20 +45,10 @@ class FlashcardApiClient {
             ),
           ),
         );
-
-        print(
-          'FlashcardApiClient: Added image to FormData: $fileName, MIME: $mimeType',
-        );
-      } else {
-        print('FlashcardApiClient: No image provided');
       }
 
       final options = Options(
         headers: {if (token != null) 'Authorization': 'Bearer $token'},
-      );
-
-      print(
-        'FlashcardApiClient: Sending request to /deck with FormData: ${formData.fields}',
       );
       final response = await dio.post(
         '/deck',
@@ -72,16 +56,10 @@ class FlashcardApiClient {
         options: options,
       );
 
-      print('FlashcardApiClient: Raw response: $response');
-      print('FlashcardApiClient: Response data: ${response.data}');
-
       return CreateDeckResponseDto.fromJson(response.data);
     } on DioException catch (e) {
-      print('FlashcardApiClient: DioException: $e');
-      print('Response: ${e.response?.data}');
       throw Exception(e.response?.data['message'] ?? e.message);
     } catch (e) {
-      print('FlashcardApiClient: Unexpected error: $e');
       throw Exception(e.toString());
     }
   }
@@ -214,27 +192,57 @@ class FlashcardApiClient {
     }
   }
 
-  // Future<CreateDeckResponseDto> updateDeck(String deckId, CreateDeckDto deckDto) async {
-  //   try {
-  //     final token = await authLocalDataSource.getToken();
+  Future<CreateDeckResponseDto> updateDeck(
+    String deckId,
+    UpdateDeckDto deckDto,
+    File? imageFile,
+  ) async {
+    try {
+      final token = await authLocalDataSource.getToken();
 
-  //     final options = Options(headers: {
-  //       if (token != null) 'Authorization': 'Bearer $token',
-  //     });
+      final formData = FormData.fromMap({
+        'title': deckDto.title,
+        'description': deckDto.description,
+        'tags': deckDto.tags,
+      });
 
-  //     final response = await dio.put(
-  //       '/decks/$deckId',
-  //       data: deckDto.toJson(),
-  //       options: options,
-  //     );
+      if (imageFile != null) {
+        if (!await imageFile.exists()) {
+          throw Exception('Image file does not exist');
+        }
 
-  //     return CreateDeckResponseDto.fromJson(response.data);
-  //   } on DioException catch (e) {
-  //     if (e.response != null) {
-  //       throw Exception(e.response!.data['message']);
-  //     } else {
-  //       throw Exception(e.message);
-  //     }
-  //   }
-  // }
+        final fileName = imageFile.path.split('/').last;
+        final mimeType = lookupMimeType(imageFile.path);
+
+        formData.files.add(
+          MapEntry(
+            'image',
+            await MultipartFile.fromFile(
+              imageFile.path,
+              filename: fileName,
+              contentType: mimeType != null ? MediaType.parse(mimeType) : null,
+            ),
+          ),
+        );
+      }
+
+      final options = Options(
+        headers: {if (token != null) 'Authorization': 'Bearer $token'},
+      );
+
+      final response = await dio.put(
+        '/deck/$deckId',
+        data: formData,
+        options: options,
+      );
+
+      return CreateDeckResponseDto.fromJson(response.data);
+    } on DioException catch (e) {
+      if (e.response != null) {
+        throw Exception(e.response!.data['message']);
+      } else {
+        throw Exception(e.message);
+      }
+    }
+  }
 }

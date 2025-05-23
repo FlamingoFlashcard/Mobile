@@ -7,10 +7,14 @@ import 'package:lacquer/presentation/pages/home/widgets/flashcard_topic_edit.dar
 class FlashcardOptionDialog extends StatefulWidget {
   final String id;
   final String title;
+  final List<String> tags;
+  final String imagePath;
   const FlashcardOptionDialog({
     super.key,
     required this.id,
     required this.title,
+    required this.tags,
+    required this.imagePath,
   });
 
   @override
@@ -123,7 +127,13 @@ class _FlashcardOptionDialogState extends State<FlashcardOptionDialog> {
                       Navigator.pop(context);
                       showDialog(
                         context: context,
-                        builder: (context) => const FlashcardTopicEdit(),
+                        builder:
+                            (context) => FlashcardTopicEdit(
+                              id: widget.id,
+                              title: widget.title,
+                              tags: widget.tags,
+                              imagePath: widget.imagePath,
+                            ),
                       );
                     },
                   ),
