@@ -32,6 +32,7 @@ class FlashcardTag extends StatelessWidget {
                 id: decks[index].id,
                 title: decks[index].title,
                 cardCount: decks[index].cards?.length ?? 0,
+                tags: decks[index].tags,
                 imagePath:
                     decks[index].img ?? 'assets/images/default_topic_image.JPG',
               );

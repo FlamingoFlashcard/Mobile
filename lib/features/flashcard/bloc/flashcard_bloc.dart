@@ -15,7 +15,7 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
     on<CreateTagRequested>(_onCreateTagRequested);
     // on<LoadDeckByIdRequested>(_onLoadDeckByIdRequested);
     on<DeleteDeckRequested>(_onDeleteDeckRequested);
-    // on<UpdateDeckRequested>(_onUpdateDeckRequested);
+    on<UpdateDeckRequested>(_onUpdateDeckRequested);
   }
 
   Future<void> _onCreateDeckRequested(
@@ -191,37 +191,28 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
     }
   }
 
-  // Future<void> _onUpdateDeckRequested(
-  //   UpdateDeckRequested event,
-  //   Emitter<FlashcardState> emit,
-  // ) async {
-  //   emit(state.copyWith(status: FlashcardStatus.loading));
-
-  //   try {
-  //     final updatedDeck = await repository.updateDeck(
-  //       deckId: event.deckId,
-  //       title: event.title,
-  //       description: event.description,
-  //       imageUrl: event.imageUrl,
-  //       cardIds: event.cardIds,
-  //     );
-
-  //     // Update the deck in the list
-  //     final updatedDecks = state.decks.map((deck) {
-  //       return deck.id == event.deckId ? updatedDeck : deck;
-  //     }).toList();
-
-  //     emit(state.copyWith(
-  //       status: FlashcardStatus.success,
-  //       decks: updatedDecks,
-  //       // Update selected deck if it was the one updated
-  //       selectedDeck: state.selectedDeck?.id == event.deckId ? updatedDeck : state.selectedDeck,
-  //     ));
-  //   } catch (e) {
-  //     emit(state.copyWith(
-  //       status: FlashcardStatus.failure,
-  //       errorMessage: e.toString(),
-  //     ));
-  //   }
-  // }
+  Future<void> _onUpdateDeckRequested(
+    UpdateDeckRequested event,
+    Emitter<FlashcardState> emit,
+  ) async {
+    emit(state.copyWith(status: FlashcardStatus.loading));
+    try {
+      await repository.updateDeck(
+        deckId: event.deckId,
+        title: event.title,
+        description: event.description,
+        tags: event.tags,
+        imageFile: event.imageFile,
+      );
+      await _onLoadDecksRequested(LoadDecksRequested(), emit);
+      emit(state.copyWith(status: FlashcardStatus.success));
+    } catch (e) {
+      emit(
+        state.copyWith(
+          status: FlashcardStatus.failure,
+          errorMessage: e.toString(),
+        ),
+      );
+    }
+  }
 }

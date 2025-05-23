@@ -7,6 +7,7 @@ class FlashcardTopic extends StatefulWidget {
   final String id;
   final String title;
   final int cardCount;
+  final List<String> tags;
   final String imagePath;
 
   const FlashcardTopic({
@@ -14,6 +15,7 @@ class FlashcardTopic extends StatefulWidget {
     required this.id,
     required this.title,
     required this.cardCount,
+    required this.tags,
     required this.imagePath,
   });
 
@@ -31,8 +33,12 @@ class FlashcardTopicState extends State<FlashcardTopic> {
         showDialog(
           context: context,
           builder:
-              (context) =>
-                  FlashcardOptionDialog(id: widget.id, title: widget.title),
+              (context) => FlashcardOptionDialog(
+                id: widget.id,
+                title: widget.title,
+                tags: widget.tags,
+                imagePath: widget.imagePath,
+              ),
         );
       },
       onTapDown: (_) => setState(() => _isPressed = true),

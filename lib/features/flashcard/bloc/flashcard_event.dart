@@ -68,21 +68,21 @@ class DeleteDeckRequested extends FlashcardEvent {
   List<Object> get props => [deckId];
 }
 
-// class UpdateDeckRequested extends FlashcardEvent {
-//   final String deckId;
-//   final String title;
-//   final String description;
-//   final String imageUrl;
-//   final List<String> cardIds;
+class UpdateDeckRequested extends FlashcardEvent {
+  final String deckId;
+  final String title;
+  final String description;
+  final List<String> tags;
+  final File? imageFile;
 
-//   const UpdateDeckRequested({
-//     required this.deckId,
-//     required this.title,
-//     required this.description,
-//     required this.imageUrl,
-//     required this.cardIds,
-//   });
+  const UpdateDeckRequested({
+    required this.deckId,
+    required this.title,
+    required this.description,
+    required this.tags,
+    required this.imageFile,
+  });
 
-//   @override
-//   List<Object> get props => [deckId, title, description, imageUrl, cardIds];
-// }
+  @override
+  List<Object?> get props => [deckId, title, description, imageFile?.path];
+}
