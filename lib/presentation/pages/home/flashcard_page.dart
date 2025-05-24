@@ -55,6 +55,7 @@ class FlashcardPage extends StatelessWidget {
                             return group.decks.isNotEmpty
                                 ? FlashcardTag(
                                   key: ValueKey(group.tag.id),
+                                  tagId: group.tag.id,
                                   title: group.tag.name,
                                   decks: group.decks,
                                 )
