@@ -13,6 +13,7 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
     on<LoadDecksRequested>(_onLoadDecksRequested);
     on<LoadTagsRequested>(_onLoadTagsRequested);
     on<CreateTagRequested>(_onCreateTagRequested);
+    on<UpdateTagRequested>(_onUpdateTagRequested);
     // on<LoadDeckByIdRequested>(_onLoadDeckByIdRequested);
     on<DeleteDeckRequested>(_onDeleteDeckRequested);
     on<UpdateDeckRequested>(_onUpdateDeckRequested);
@@ -116,6 +117,26 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
       emit(
         state.copyWith(
           createTagStatus: FlashcardStatus.failure,
+          errorMessage: e.toString(),
+        ),
+      );
+    }
+  }
+
+  Future<void> _onUpdateTagRequested(
+    UpdateTagRequested event,
+    Emitter<FlashcardState> emit,
+  ) async {
+    emit(state.copyWith(updateTagStatus: FlashcardStatus.loading));
+    try {
+      await repository.updateTag(tagId: event.tagId, name: event.title);
+      await _onLoadTagsRequested(LoadTagsRequested(), emit);
+      await _onLoadDecksRequested(LoadDecksRequested(), emit);
+      emit(state.copyWith(updateTagStatus: FlashcardStatus.success));
+    } catch (e) {
+      emit(
+        state.copyWith(
+          updateTagStatus: FlashcardStatus.failure,
           errorMessage: e.toString(),
         ),
       );

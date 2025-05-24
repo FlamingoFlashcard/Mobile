@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:lacquer/features/flashcard/dtos/update_deck_dto.dart';
+import 'package:lacquer/features/flashcard/dtos/update_tag_dto.dart';
 import 'dart:io';
 import 'package:mime/mime.dart';
 import 'package:lacquer/features/flashcard/dtos/create_tag_dto.dart';
@@ -142,6 +143,33 @@ class FlashcardApiClient {
       }
 
       return CreateTagResponseDto.fromJson(tagData);
+    } on DioException catch (e) {
+      if (e.response != null) {
+        throw Exception(e.response!.data['message']);
+      } else {
+        throw Exception(e.message);
+      }
+    }
+  }
+
+  Future<CreateTagResponseDto> updateTag(
+    String tagId,
+    UpdateTagDto tagDto,
+  ) async {
+    try {
+      final token = await authLocalDataSource.getToken();
+
+      final options = Options(
+        headers: {if (token != null) 'Authorization': 'Bearer $token'},
+      );
+
+      final response = await dio.put(
+        '/tag/$tagId',
+        data: tagDto.toJson(),
+        options: options,
+      );
+
+      return CreateTagResponseDto.fromJson(response.data);
     } on DioException catch (e) {
       if (e.response != null) {
         throw Exception(e.response!.data['message']);

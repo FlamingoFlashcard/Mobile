@@ -8,6 +8,7 @@ enum FlashcardStatus { initial, loading, success, failure }
 class FlashcardState extends Equatable {
   final FlashcardStatus status;
   final FlashcardStatus createTagStatus;
+  final FlashcardStatus updateTagStatus;
   final GroupedDecksResponseDto? groupedDecks;
   final CreateDeckResponseDto? selectedDeck;
   final List<CreateTagResponseDto> tags;
@@ -16,6 +17,7 @@ class FlashcardState extends Equatable {
   const FlashcardState({
     this.status = FlashcardStatus.initial,
     this.createTagStatus = FlashcardStatus.initial,
+    this.updateTagStatus = FlashcardStatus.initial,
     this.groupedDecks,
     this.selectedDeck,
     this.tags = const [],
@@ -25,6 +27,7 @@ class FlashcardState extends Equatable {
   FlashcardState copyWith({
     FlashcardStatus? status,
     FlashcardStatus? createTagStatus,
+    FlashcardStatus? updateTagStatus,
     GroupedDecksResponseDto? groupedDecks,
     CreateDeckResponseDto? selectedDeck,
     List<CreateTagResponseDto>? tags,
@@ -33,6 +36,7 @@ class FlashcardState extends Equatable {
     return FlashcardState(
       status: status ?? this.status,
       createTagStatus: createTagStatus ?? this.createTagStatus,
+      updateTagStatus: updateTagStatus ?? this.updateTagStatus,
       groupedDecks: groupedDecks ?? this.groupedDecks,
       selectedDeck: selectedDeck ?? this.selectedDeck,
       tags: tags ?? this.tags,
@@ -44,6 +48,7 @@ class FlashcardState extends Equatable {
   List<Object?> get props => [
     status,
     createTagStatus,
+    updateTagStatus,
     groupedDecks,
     selectedDeck,
     tags,

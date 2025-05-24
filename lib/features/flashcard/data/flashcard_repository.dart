@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:lacquer/features/flashcard/dtos/create_tag_dto.dart';
 import 'package:lacquer/features/flashcard/dtos/grouped_decks_dto.dart';
 import 'package:lacquer/features/flashcard/dtos/update_deck_dto.dart';
+import 'package:lacquer/features/flashcard/dtos/update_tag_dto.dart';
 
 import '../dtos/create_deck_dto.dart';
 import 'flashcard_api_client.dart';
@@ -82,5 +83,18 @@ class FlashcardRepository {
     );
 
     return apiClient.updateDeck(deckId, deckDto, imageFile);
+  }
+
+  Future<CreateTagResponseDto> updateTag({
+    required String tagId,
+    required String name,
+    String? description,
+  }) async {
+    final dto = UpdateTagDto(
+      id: tagId,
+      name: name,
+      description: description ?? '',
+    );
+    return apiClient.updateTag(tagId, dto);
   }
 }

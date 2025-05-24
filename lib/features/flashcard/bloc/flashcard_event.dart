@@ -86,3 +86,13 @@ class UpdateDeckRequested extends FlashcardEvent {
   @override
   List<Object?> get props => [deckId, title, description, imageFile?.path];
 }
+
+class UpdateTagRequested extends FlashcardEvent {
+  final String tagId;
+  final String title;
+
+  const UpdateTagRequested({required this.tagId, required this.title});
+
+  @override
+  List<Object?> get props => [tagId, title];
+}
