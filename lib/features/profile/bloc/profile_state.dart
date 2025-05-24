@@ -1,4 +1,11 @@
-sealed class ProfileState {}
+import 'package:equatable/equatable.dart';
+
+abstract class ProfileState extends Equatable {
+  const ProfileState();
+
+  @override
+  List<Object> get props => [];
+}
 
 class ProfileInitial extends ProfileState {}
 
@@ -9,17 +16,23 @@ class ProfileLoadSuccess extends ProfileState {
   final String email;
   final String avatarUrl;
 
-  ProfileLoadSuccess({
+  const ProfileLoadSuccess({
     required this.username,
     required this.email,
     required this.avatarUrl,
   });
+
+  @override
+  List<Object> get props => [username, email, avatarUrl];
 }
 
 class ProfileLoadFailure extends ProfileState {
   final String error;
 
-  ProfileLoadFailure(this.error);
+  const ProfileLoadFailure(this.error);
+
+  @override
+  List<Object> get props => [error];
 }
 
 class ProfileUpdateInProgress extends ProfileState {}
@@ -29,15 +42,21 @@ class ProfileUpdateSuccess extends ProfileState {
   final String email;
   final String avatarUrl;
 
-  ProfileUpdateSuccess({
+  const ProfileUpdateSuccess({
     required this.username,
     required this.email,
     required this.avatarUrl,
   });
+
+  @override
+  List<Object> get props => [username, email, avatarUrl];
 }
 
 class ProfileUpdateFailure extends ProfileState {
   final String error;
 
-  ProfileUpdateFailure(this.error);
+  const ProfileUpdateFailure(this.error);
+
+  @override
+  List<Object> get props => [error];
 }

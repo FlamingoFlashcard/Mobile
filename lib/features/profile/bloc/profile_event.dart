@@ -1,6 +1,12 @@
 import 'dart:io';
+import 'package:equatable/equatable.dart';
 
-class ProfileEvent {}
+abstract class ProfileEvent extends Equatable {
+  const ProfileEvent();
+
+  @override
+  List<Object> get props => [];
+}
 
 class ProfileLoadRequested extends ProfileEvent {}
 
@@ -9,7 +15,7 @@ class ProfileUpdateRequested extends ProfileEvent {
   final String? password;
   final File? avatarFile;
 
-  ProfileUpdateRequested({this.username, this.password, this.avatarFile});
+  const ProfileUpdateRequested({this.username, this.password, this.avatarFile});
 }
 
 class ProfileDeleteRequested extends ProfileEvent {}
