@@ -158,24 +158,44 @@ class FlashcardApiClient {
   ) async {
     try {
       final token = await authLocalDataSource.getToken();
-
       final options = Options(
         headers: {if (token != null) 'Authorization': 'Bearer $token'},
       );
-
       final response = await dio.put(
         '/tag/$tagId',
         data: tagDto.toJson(),
         options: options,
       );
 
-      return CreateTagResponseDto.fromJson(response.data);
+      final responseData = response.data as Map<String, dynamic>;
+      if (responseData['success'] != true) {
+        throw Exception(responseData['message'] ?? 'Failed to update tag');
+      }
+
+      final tagData = responseData['data'] as Map<String, dynamic>?;
+      if (tagData == null) {
+        throw Exception('Tag data is missing in API response');
+      }
+
+      return CreateTagResponseDto.fromJson(tagData);
     } on DioException catch (e) {
       if (e.response != null) {
-        throw Exception(e.response!.data['message']);
+        throw Exception(e.response!.data['message'] ?? 'Failed to update tag');
       } else {
         throw Exception(e.message);
       }
+    }
+  }
+
+  Future<void> deleteTag(String tagId) async {
+    try {
+      final token = await authLocalDataSource.getToken();
+      final options = Options(
+        headers: {if (token != null) 'Authorization': 'Bearer $token'},
+      );
+      await dio.delete('/tag/$tagId', options: options);
+    } on DioException catch (e) {
+      throw Exception(e.response?.data['message'] ?? e.message);
     }
   }
 

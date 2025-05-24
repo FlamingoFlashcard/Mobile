@@ -97,4 +97,8 @@ class FlashcardRepository {
     );
     return apiClient.updateTag(tagId, dto);
   }
+
+  Future<void> deleteTag(String tagId) async {
+    await apiClient.deleteTag(tagId);
+  }
 }
