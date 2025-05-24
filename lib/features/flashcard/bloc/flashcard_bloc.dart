@@ -17,6 +17,7 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
     // on<LoadDeckByIdRequested>(_onLoadDeckByIdRequested);
     on<DeleteDeckRequested>(_onDeleteDeckRequested);
     on<UpdateDeckRequested>(_onUpdateDeckRequested);
+    on<DeleteTagRequested>(_onDeleteTagRequested);
   }
 
   Future<void> _onCreateDeckRequested(
@@ -225,6 +226,26 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
         tags: event.tags,
         imageFile: event.imageFile,
       );
+      await _onLoadDecksRequested(LoadDecksRequested(), emit);
+      emit(state.copyWith(status: FlashcardStatus.success));
+    } catch (e) {
+      emit(
+        state.copyWith(
+          status: FlashcardStatus.failure,
+          errorMessage: e.toString(),
+        ),
+      );
+    }
+  }
+
+  Future<void> _onDeleteTagRequested(
+    DeleteTagRequested event,
+    Emitter<FlashcardState> emit,
+  ) async {
+    emit(state.copyWith(status: FlashcardStatus.loading));
+
+    try {
+      await repository.deleteTag(event.tagId);
       await _onLoadDecksRequested(LoadDecksRequested(), emit);
       emit(state.copyWith(status: FlashcardStatus.success));
     } catch (e) {

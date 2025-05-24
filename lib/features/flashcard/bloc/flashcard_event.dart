@@ -96,3 +96,12 @@ class UpdateTagRequested extends FlashcardEvent {
   @override
   List<Object?> get props => [tagId, title];
 }
+
+class DeleteTagRequested extends FlashcardEvent {
+  final String tagId;
+
+  const DeleteTagRequested(this.tagId);
+
+  @override
+  List<Object> get props => [tagId];
+}

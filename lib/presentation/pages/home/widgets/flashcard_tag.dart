@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:lacquer/features/flashcard/dtos/get_deck_dto.dart';
+import 'package:lacquer/presentation/pages/home/widgets/flashcard_tag_delete.dart';
 import 'package:lacquer/presentation/pages/home/widgets/flashcard_tag_edit.dart';
 import 'package:lacquer/presentation/pages/home/widgets/flashcard_topic.dart';
 
@@ -96,10 +97,12 @@ class FlashcardTag extends StatelessWidget {
                   ),
                   title: const Text('Delete Tag'),
                   onTap: () {
-                    Navigator.pop(context);
-                    // context.read<FlashcardBloc>().add(
-                    //   DeleteTagRequested(tagId),
-                    // );
+                    showDialog(
+                      context: context,
+                      builder:
+                          (context) =>
+                              FlashcardTagDelete(tagId: tagId, title: title),
+                    );
                   },
                 ),
               ],
