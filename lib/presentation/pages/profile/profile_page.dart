@@ -9,6 +9,7 @@ import 'package:lacquer/features/auth/bloc/auth_state.dart';
 import 'package:dio/dio.dart';
 import 'package:lacquer/features/auth/data/auth_repository.dart';
 import 'package:lacquer/presentation/pages/profile/edit_profile_page.dart';
+import 'package:lacquer/config/env.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -256,7 +257,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
     try {
       final response = await dio.get(
-        'https://lacquer.up.railway.app/auth/profile',
+        '${Env.serverURL}/auth/profile',
         options: Options(headers: {'Authorization': 'Bearer $token'}),
       );
       if (!mounted) return;

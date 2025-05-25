@@ -12,18 +12,15 @@ class UserService {
   // Login
   Future<Map<String, dynamic>> login(String email, String password) async {
     try {
-      final response = await _apiClient.post(
-        '/auth/login',
-        {
-          'email': email,
-          'password': password,
-        },
-      );
+      final response = await _apiClient.post('/auth/login', {
+        'email': email,
+        'password': password,
+      });
 
       // Save token for authenticated requests
       if (response['token'] != null) {
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('auth_token', response['token']);
+        await prefs.setString('token', response['token']);
       }
 
       return response;
@@ -34,17 +31,18 @@ class UserService {
   }
 
   // Register
-  Future<Map<String, dynamic>> register(String username, String email, String password) async {
+  Future<Map<String, dynamic>> register(
+    String username,
+    String email,
+    String password,
+  ) async {
     try {
-      return await _apiClient.post(
-        '/auth/register',
-        {
-          'username': username,
-          'email': email,
-          'password': password,
-          'authProvider': 'local',
-        },
-      );
+      return await _apiClient.post('/auth/register', {
+        'username': username,
+        'email': email,
+        'password': password,
+        'authProvider': 'local',
+      });
     } catch (e) {
       print('Registration error: $e');
       rethrow;
@@ -64,10 +62,7 @@ class UserService {
   // Forgot password
   Future<Map<String, dynamic>> forgotPassword(String email) async {
     try {
-      return await _apiClient.post(
-        '/auth/forgot',
-        {'email': email},
-      );
+      return await _apiClient.post('/auth/forgot', {'email': email});
     } catch (e) {
       print('Forgot password error: $e');
       rethrow;
@@ -75,12 +70,14 @@ class UserService {
   }
 
   // Reset password
-  Future<Map<String, dynamic>> resetPassword(String token, String newPassword) async {
+  Future<Map<String, dynamic>> resetPassword(
+    String token,
+    String newPassword,
+  ) async {
     try {
-      return await _apiClient.post(
-        '/redirect/reset?token=$token',
-        {'newPassword': newPassword},
-      );
+      return await _apiClient.post('/redirect/reset?token=$token', {
+        'newPassword': newPassword,
+      });
     } catch (e) {
       print('Reset password error: $e');
       rethrow;
@@ -132,7 +129,7 @@ class UserService {
   Future<void> logout() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.remove('auth_token');
+      await prefs.remove('token');
     } catch (e) {
       print('Logout error: $e');
       rethrow;
@@ -155,10 +152,7 @@ class UserService {
   // Send friend request
   Future<Map<String, dynamic>> sendFriendRequest(String friendId) async {
     try {
-      return await _apiClient.post(
-        '/friend/request',
-        {'friendId': friendId},
-      );
+      return await _apiClient.post('/friend/request', {'friendId': friendId});
     } catch (e) {
       print('Send friend request error: $e');
       rethrow;
@@ -168,10 +162,7 @@ class UserService {
   // Accept friend request
   Future<Map<String, dynamic>> acceptFriendRequest(String friendId) async {
     try {
-      return await _apiClient.post(
-        '/friend/accept',
-        {'friendId': friendId},
-      );
+      return await _apiClient.post('/friend/accept', {'friendId': friendId});
     } catch (e) {
       print('Accept friend request error: $e');
       rethrow;
@@ -181,10 +172,7 @@ class UserService {
   // Reject friend request
   Future<Map<String, dynamic>> rejectFriendRequest(String friendId) async {
     try {
-      return await _apiClient.post(
-        '/friend/reject',
-        {'friendId': friendId},
-      );
+      return await _apiClient.post('/friend/reject', {'friendId': friendId});
     } catch (e) {
       print('Reject friend request error: $e');
       rethrow;

@@ -7,6 +7,7 @@ import 'package:path/path.dart' as path;
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'package:lacquer/config/env.dart';
 
 class EditProfileScreen extends StatefulWidget {
   final String? token;
@@ -218,7 +219,7 @@ class EditProfileScreenState extends State<EditProfileScreen> {
     final dio = Dio();
     try {
       final response = await dio.put(
-        'https://lacquer.up.railway.app/auth/profile',
+        '${Env.serverURL}/auth/profile',
         options: Options(
           headers: {
             'Authorization': 'Bearer ${widget.token}',
@@ -271,7 +272,7 @@ class EditProfileScreenState extends State<EditProfileScreen> {
 
     try {
       final response = await dio.put(
-        'https://lacquer.up.railway.app/auth/avatar',
+        '${Env.serverURL}/auth/avatar',
         data: formData,
         options: Options(headers: {'Authorization': 'Bearer ${widget.token}'}),
       );
