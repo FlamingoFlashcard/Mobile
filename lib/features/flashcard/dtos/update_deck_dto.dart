@@ -16,11 +16,25 @@ class UpdateDeckDto {
   }
 
   factory UpdateDeckDto.fromJson(Map<String, dynamic> json) {
+    // Handle tags parsing - they might be objects or strings
+    List<String> parsedTags = [];
+    final tagsData = json['tags'];
+    if (tagsData is List) {
+      for (var tag in tagsData) {
+        if (tag is String) {
+          parsedTags.add(tag);
+        } else if (tag is Map<String, dynamic>) {
+          // If tag is an object, extract the ID or name
+          parsedTags.add(tag['_id'] as String? ?? tag['id'] as String? ?? '');
+        }
+      }
+    }
+
     return UpdateDeckDto(
       id: json['id'] as String,
       title: json['title'] as String,
       description: json['description'] as String,
-      tags: (json['tags'] as List).map((e) => e as String).toList(),
+      tags: parsedTags,
     );
   }
 }

@@ -21,11 +21,41 @@ class CreateDeckDto {
   }
 
   factory CreateDeckDto.fromJson(Map<String, dynamic> json) {
+    // Handle tags parsing - they might be objects or strings
+    List<String> parsedTags = [];
+    final tagsData = json['tags'];
+    if (tagsData is List) {
+      for (var tag in tagsData) {
+        if (tag is String) {
+          parsedTags.add(tag);
+        } else if (tag is Map<String, dynamic>) {
+          // If tag is an object, extract the ID or name
+          parsedTags.add(tag['_id'] as String? ?? tag['id'] as String? ?? '');
+        }
+      }
+    }
+
+    // Handle cards parsing - they might be objects or strings
+    List<String> parsedCards = [];
+    final cardsData = json['cards'];
+    if (cardsData is List) {
+      for (var card in cardsData) {
+        if (card is String) {
+          parsedCards.add(card);
+        } else if (card is Map<String, dynamic>) {
+          // If card is an object, extract the ID
+          parsedCards.add(
+            card['_id'] as String? ?? card['id'] as String? ?? '',
+          );
+        }
+      }
+    }
+
     return CreateDeckDto(
       title: json['title'] as String,
       description: json['description'] as String,
-      tags: (json['tags'] as List).map((e) => e as String).toList(),
-      cardIds: (json['cards'] as List).map((e) => e as String).toList(),
+      tags: parsedTags,
+      cardIds: parsedCards,
     );
   }
 }
@@ -52,14 +82,45 @@ class CreateDeckResponseDto {
   });
 
   factory CreateDeckResponseDto.fromJson(Map<String, dynamic> json) {
+    // Handle tags parsing - they might be objects or strings
+    List<String>? parsedTags;
+    final tagsData = json['tags'];
+    if (tagsData is List) {
+      parsedTags = [];
+      for (var tag in tagsData) {
+        if (tag is String) {
+          parsedTags.add(tag);
+        } else if (tag is Map<String, dynamic>) {
+          // If tag is an object, extract the ID or name
+          parsedTags.add(tag['_id'] as String? ?? tag['id'] as String? ?? '');
+        }
+      }
+    }
+
+    // Handle cards parsing - they might be objects or strings
+    List<String>? parsedCards;
+    final cardsData = json['cards'];
+    if (cardsData is List) {
+      parsedCards = [];
+      for (var card in cardsData) {
+        if (card is String) {
+          parsedCards.add(card);
+        } else if (card is Map<String, dynamic>) {
+          // If card is an object, extract the ID
+          parsedCards.add(
+            card['_id'] as String? ?? card['id'] as String? ?? '',
+          );
+        }
+      }
+    }
+
     return CreateDeckResponseDto(
       id: json['id'] as String?,
       title: json['title'] as String?,
       description: json['description'] as String?,
       img: json['img'] as String?,
-      tags: (json['tags'] as List<dynamic>?)?.map((e) => e as String).toList(),
-      cardIds:
-          (json['cards'] as List<dynamic>?)?.map((e) => e as String).toList(),
+      tags: parsedTags,
+      cardIds: parsedCards,
       userId: json['userId'] as String?,
       createdAt:
           json['createdAt'] != null
