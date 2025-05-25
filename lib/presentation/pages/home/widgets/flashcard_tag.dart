@@ -119,7 +119,7 @@ class FlashcardTag extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -153,8 +153,7 @@ class FlashcardTag extends StatelessWidget {
                 title: decks[index].title,
                 cardCount: decks[index].cards?.length ?? 0,
                 tags: decks[index].tags,
-                imagePath:
-                    decks[index].img ?? 'assets/images/default_topic_image.JPG',
+                imagePath: decks[index].img ?? 'assets/images/lacquerBlack.png',
               );
             },
           ),

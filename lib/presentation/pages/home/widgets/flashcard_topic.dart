@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lacquer/config/theme.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:lacquer/presentation/pages/home/widgets/flashcard_options.dart';
 
@@ -53,8 +52,15 @@ class FlashcardTopicState extends State<FlashcardTopic> {
             width: 350,
             height: 200,
             decoration: BoxDecoration(
-              color: CustomTheme.mainColor3,
+              color: Colors.white,
               borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color.fromRGBO(0, 0, 0, 0.1),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
             child: Row(
               children: [
@@ -151,9 +157,8 @@ class FlashcardTopicState extends State<FlashcardTopic> {
           widget.imagePath,
           fit: BoxFit.cover,
           errorBuilder: (context, error, stackTrace) {
-            print('Error loading network image: $error');
             return Image.asset(
-              'assets/default_image.png',
+              'assets/images/lacquerBlack.png',
               fit: BoxFit.cover,
               width: 190,
               height: 180,
@@ -175,7 +180,7 @@ class FlashcardTopicState extends State<FlashcardTopic> {
           errorBuilder: (context, error, stackTrace) {
             print('Error loading asset: $error');
             return Image.asset(
-              'assets/default_image.png',
+              'assets/images/lacquerBlack.png',
               fit: BoxFit.cover,
               width: 190,
               height: 180,

@@ -39,10 +39,8 @@ class _FlashcardPageState extends State<FlashcardPage> {
   void _clearSearch() {
     _searchController.clear();
     context.read<FlashcardBloc>().add(const SearchDecksRequested(''));
-    // Only reload decks if the last search had results; otherwise, show "No result"
     final bloc = context.read<FlashcardBloc>();
     if (!bloc.state.searchResult) {
-      // Do not reload decks; keep the original list and show "No result"
     } else {
       context.read<FlashcardBloc>().add(const LoadDecksRequested());
     }
