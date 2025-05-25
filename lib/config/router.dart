@@ -10,6 +10,8 @@ import 'package:lacquer/presentation/pages/auth/verify_page.dart';
 import 'package:lacquer/presentation/pages/camera/camera_page.dart';
 import 'package:lacquer/presentation/pages/camera/about_screen.dart';
 import 'package:lacquer/presentation/pages/profile/profile_page.dart';
+import 'package:lacquer/presentation/pages/home/flashcard_page.dart';
+import 'package:lacquer/presentation/pages/home/learning_flashcard_page.dart';
 
 import 'package:lacquer/presentation/pages/mainscreen.dart';
 import 'package:flutter/widgets.dart';
@@ -23,6 +25,7 @@ class RouteName {
   static const String camera = '/camera';
   static const String about = '/about';
   static const String profile = '/profile';
+  static const String flashcards = '/flashcards';
 
   static const publicRoutes = [login, forgotPassword, verify, register];
 }
@@ -86,6 +89,20 @@ final router = GoRouter(
     noTransitionRoute(
       path: RouteName.profile,
       builder: (context, state) => const ProfilePage(),
+    ),
+    noTransitionRoute(
+      path: RouteName.flashcards,
+      builder: (context, state) => const FlashcardPage(),
+    ),
+    noTransitionRoute(
+      path: '/learn',
+      builder: (context, state) {
+        final data = state.extra as Map<String, dynamic>;
+        final cards = data['cards'] as List<String>;
+        final title = data['title'] as String;
+
+        return LearningFlashcardPage(title: title, cards: cards);
+      },
     ),
   ],
 );

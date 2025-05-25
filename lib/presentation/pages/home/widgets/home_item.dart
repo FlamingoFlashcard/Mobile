@@ -5,12 +5,14 @@ class HomeItem extends StatefulWidget {
   final String imagePath;
   final String title;
   final Color backgroundColor;
+  final VoidCallback onTap;
 
   const HomeItem({
     super.key,
     required this.imagePath,
     required this.title,
     required this.backgroundColor,
+    required this.onTap,
   });
 
   @override
@@ -23,6 +25,7 @@ class _HomeItemState extends State<HomeItem> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      onTap: widget.onTap,
       onTapDown: (_) => setState(() => _isPressed = true),
       onTapUp: (_) => setState(() => _isPressed = false),
       onTapCancel: () => setState(() => _isPressed = false),
