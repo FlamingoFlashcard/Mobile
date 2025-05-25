@@ -13,11 +13,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../features/post/bloc/post_bloc.dart';
 import '../../../features/post/bloc/post_event.dart';
 import '../../../features/post/bloc/post_state.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../../features/auth/bloc/auth_bloc.dart';
-import '../../../features/auth/bloc/auth_state.dart';
 import '../../../services/user_service.dart';
-import '../../../services/post_service.dart';
 
 class CameraPage extends StatefulWidget {
   const CameraPage({super.key});

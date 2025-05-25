@@ -4,7 +4,6 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http_parser/http_parser.dart';
 import 'env.dart';
-import 'dart:math' as math;
 
 class ApiClient {
   static String get baseUrl =>
