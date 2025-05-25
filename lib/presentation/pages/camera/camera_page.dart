@@ -8,7 +8,7 @@ import 'dart:io';
 import 'package:intl/intl.dart';
 import '../../../services/location_weather_service.dart';
 import 'dart:async';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:gal/gal.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../features/post/bloc/post_bloc.dart';
 import '../../../features/post/bloc/post_event.dart';
@@ -469,7 +469,6 @@ class _CameraPageState extends State<CameraPage> with TickerProviderStateMixin {
       return;
     }
 
-
     String? caption;
 
     // Prepare caption based on selected option
@@ -513,7 +512,7 @@ class _CameraPageState extends State<CameraPage> with TickerProviderStateMixin {
     if (_image != null) {
       try {
         final bytes = await _image!.readAsBytes();
-        await ImageGallerySaver.saveImage(bytes);
+        await Gal.putImageBytes(bytes);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(

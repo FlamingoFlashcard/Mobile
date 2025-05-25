@@ -36,7 +36,7 @@ dependencies:
     geolocator: ^13.0.1
     geocoding: ^3.0.0
   # Image saving
-    image_gallery_saver: ^2.0.3
+    gal: ^2.3.0
     mime: ^2.0.0
 dev_dependencies:
     flutter_test:
