@@ -18,6 +18,7 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
     on<DeleteDeckRequested>(_onDeleteDeckRequested);
     on<UpdateDeckRequested>(_onUpdateDeckRequested);
     on<DeleteTagRequested>(_onDeleteTagRequested);
+    on<SearchDecksRequested>(_onSearchDecksRequested);
   }
 
   Future<void> _onCreateDeckRequested(
@@ -66,6 +67,7 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
         state.copyWith(
           status: FlashcardStatus.success,
           groupedDecks: groupedDecks,
+          searchResult: true,
         ),
       );
     } catch (e) {
@@ -256,5 +258,61 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
         ),
       );
     }
+  }
+
+  void _onSearchDecksRequested(
+    SearchDecksRequested event,
+    Emitter<FlashcardState> emit,
+  ) {
+    emit(
+      state.copyWith(status: FlashcardStatus.loading, searchQuery: event.query),
+    );
+
+    if (state.groupedDecks == null) {
+      emit(state.copyWith(status: FlashcardStatus.success, groupedDecks: null));
+      return;
+    }
+
+    final filteredDecks = filterDecksByName(state.groupedDecks!, event.query);
+    emit(
+      state.copyWith(
+        status: FlashcardStatus.success,
+        groupedDecks: filteredDecks,
+        searchResult: filteredDecks != null,
+      ),
+    );
+  }
+
+  GroupedDecksResponseDto? filterDecksByName(
+    GroupedDecksResponseDto groupedDecks,
+    String query,
+  ) {
+    if (query.isEmpty) return groupedDecks;
+
+    final lowerCaseQuery = query.toLowerCase();
+    final filteredItems =
+        groupedDecks.data
+            .map((group) {
+              final filteredDecks =
+                  group.decks
+                      .where(
+                        (deck) =>
+                            deck.title.toLowerCase().contains(lowerCaseQuery),
+                      )
+                      .toList();
+              return filteredDecks.isNotEmpty
+                  ? GroupedDeckItem(tag: group.tag, decks: filteredDecks)
+                  : null;
+            })
+            .whereType<GroupedDeckItem>()
+            .toList();
+
+    if (filteredItems.isEmpty) return null;
+
+    final newCount = filteredItems.fold<int>(
+      0,
+      (sum, item) => sum + item.decks.length,
+    );
+    return GroupedDecksResponseDto(count: newCount, data: filteredItems);
   }
 }

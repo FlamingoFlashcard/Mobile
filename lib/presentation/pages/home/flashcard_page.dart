@@ -4,12 +4,49 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lacquer/config/theme.dart';
 import 'package:lacquer/features/flashcard/bloc/flashcard_bloc.dart';
+import 'package:lacquer/features/flashcard/bloc/flashcard_event.dart';
 import 'package:lacquer/features/flashcard/bloc/flashcard_state.dart';
 import 'package:lacquer/presentation/pages/home/widgets/flashcard_tag.dart';
 import 'package:lacquer/presentation/pages/home/widgets/flashcard_topic_create.dart';
 
-class FlashcardPage extends StatelessWidget {
+class FlashcardPage extends StatefulWidget {
   const FlashcardPage({super.key});
+
+  @override
+  State<FlashcardPage> createState() => _FlashcardPageState();
+}
+
+class _FlashcardPageState extends State<FlashcardPage> {
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<FlashcardBloc>().add(const LoadDecksRequested());
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _searchDecks() {
+    final query = _searchController.text.trim();
+    context.read<FlashcardBloc>().add(SearchDecksRequested(query));
+  }
+
+  void _clearSearch() {
+    _searchController.clear();
+    context.read<FlashcardBloc>().add(const SearchDecksRequested(''));
+    // Only reload decks if the last search had results; otherwise, show "No result"
+    final bloc = context.read<FlashcardBloc>();
+    if (!bloc.state.searchResult) {
+      // Do not reload decks; keep the original list and show "No result"
+    } else {
+      context.read<FlashcardBloc>().add(const LoadDecksRequested());
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,11 +68,13 @@ class FlashcardPage extends StatelessWidget {
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                 child: _buildSearchBar(),
               ),
-              const SizedBox(height: 16),
               BlocBuilder<FlashcardBloc, FlashcardState>(
                 builder: (context, state) {
                   if (state.status == FlashcardStatus.loading) {
-                    return const Center(child: CircularProgressIndicator());
+                    return const Padding(
+                      padding: EdgeInsets.only(top: 16.0),
+                      child: Center(child: CircularProgressIndicator()),
+                    );
                   } else if (state.status == FlashcardStatus.failure) {
                     return Center(
                       child: Text(
@@ -43,24 +82,44 @@ class FlashcardPage extends StatelessWidget {
                       ),
                     );
                   } else if (state.status == FlashcardStatus.success) {
-                    final groupedDecks = state.groupedDecks;
-                    if (groupedDecks == null || groupedDecks.data.isEmpty) {
-                      return const Center(child: Text('No decks available'));
-                    }
-
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children:
-                          groupedDecks.data.map((group) {
-                            return group.decks.isNotEmpty
-                                ? FlashcardTag(
-                                  key: ValueKey(group.tag.id),
-                                  tagId: group.tag.id,
-                                  title: group.tag.name,
-                                  decks: group.decks,
-                                )
-                                : SizedBox.shrink();
-                          }).toList(),
+                      children: [
+                        if (!state.searchResult)
+                          SizedBox(
+                            height: 30,
+                            child: Center(
+                              child: Text(
+                                'No result',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.grey.shade600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        if (state.groupedDecks != null &&
+                            state.groupedDecks!.data.isNotEmpty)
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children:
+                                state.groupedDecks!.data.map((group) {
+                                  return group.decks.isNotEmpty
+                                      ? FlashcardTag(
+                                        key: ValueKey(group.tag.id),
+                                        tagId: group.tag.id,
+                                        title: group.tag.name,
+                                        decks: group.decks,
+                                      )
+                                      : const SizedBox.shrink();
+                                }).toList(),
+                          )
+                        else if (state.groupedDecks == null)
+                          const Padding(
+                            padding: EdgeInsets.only(left: 16.0, top: 8.0),
+                            child: Text('No decks available'),
+                          ),
+                      ],
                     );
                   } else {
                     return const SizedBox.shrink();
@@ -147,26 +206,51 @@ class FlashcardPage extends StatelessWidget {
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
             ),
             const SizedBox(height: 8),
-            TextField(
-              decoration: InputDecoration(
-                hintText: "Search topic you want",
-                hintStyle: const TextStyle(color: Colors.black),
-                prefixIcon: const Icon(
-                  FontAwesomeIcons.magnifyingGlass,
-                  color: Colors.grey,
-                  size: 20,
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      hintText: "Search topic you want",
+                      hintStyle: const TextStyle(color: Colors.black),
+                      prefixIcon: const Icon(
+                        FontAwesomeIcons.magnifyingGlass,
+                        color: Colors.grey,
+                        size: 20,
+                      ),
+                      suffixIcon: IconButton(
+                        icon: const Icon(
+                          FontAwesomeIcons.check,
+                          color: Colors.grey,
+                          size: 20,
+                        ),
+                        onPressed: _searchDecks,
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(color: Colors.grey),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                    ),
+                    onSubmitted: (value) => _searchDecks(),
+                    onTap: () {
+                      print("Search field tapped");
+                    },
+                  ),
                 ),
-                filled: true,
-                fillColor: Colors.white,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: const BorderSide(color: Colors.grey),
+                const SizedBox(width: 8),
+                IconButton(
+                  icon: const Icon(
+                    FontAwesomeIcons.xmark,
+                    color: Colors.grey,
+                    size: 20,
+                  ),
+                  onPressed: _clearSearch,
                 ),
-                contentPadding: const EdgeInsets.symmetric(vertical: 10),
-              ),
-              onTap: () {
-                print("Search field tapped");
-              },
+              ],
             ),
           ],
         ),

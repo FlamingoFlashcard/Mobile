@@ -13,6 +13,8 @@ class FlashcardState extends Equatable {
   final CreateDeckResponseDto? selectedDeck;
   final List<CreateTagResponseDto> tags;
   final String? errorMessage;
+  final String searchQuery;
+  final bool searchResult;
 
   const FlashcardState({
     this.status = FlashcardStatus.initial,
@@ -22,6 +24,8 @@ class FlashcardState extends Equatable {
     this.selectedDeck,
     this.tags = const [],
     this.errorMessage,
+    this.searchQuery = '',
+    this.searchResult = true,
   });
 
   FlashcardState copyWith({
@@ -32,6 +36,8 @@ class FlashcardState extends Equatable {
     CreateDeckResponseDto? selectedDeck,
     List<CreateTagResponseDto>? tags,
     String? errorMessage,
+    String? searchQuery,
+    bool? searchResult,
   }) {
     return FlashcardState(
       status: status ?? this.status,
@@ -41,6 +47,8 @@ class FlashcardState extends Equatable {
       selectedDeck: selectedDeck ?? this.selectedDeck,
       tags: tags ?? this.tags,
       errorMessage: errorMessage ?? this.errorMessage,
+      searchQuery: searchQuery ?? this.searchQuery,
+      searchResult: searchResult ?? this.searchResult,
     );
   }
 
@@ -53,5 +61,7 @@ class FlashcardState extends Equatable {
     selectedDeck,
     tags,
     errorMessage,
+    searchQuery,
+    searchResult,
   ];
 }
