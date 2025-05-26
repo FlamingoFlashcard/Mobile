@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:go_router/go_router.dart';
+import 'package:lacquer/config/router.dart';
 import 'package:lacquer/config/theme.dart';
 import 'package:lacquer/presentation/pages/home/widgets/flashcard_confirm_delete.dart';
 import 'package:lacquer/presentation/pages/home/widgets/flashcard_topic_edit.dart';
@@ -23,41 +25,47 @@ class FlashcardOptionDialog extends StatefulWidget {
 
 class _FlashcardOptionDialogState extends State<FlashcardOptionDialog> {
   int selectedIndex = -1;
+  late final List<Map<String, dynamic>> options;
 
-  final List<Map<String, dynamic>> options = [
-    {
-      "icon": FontAwesomeIcons.play,
-      "title": "Explore",
-      "subtitle": "10 new cards",
-      "action": () {
-        print("revise");
+  @override
+  void initState() {
+    super.initState();
+
+    options = [
+      {
+        "icon": FontAwesomeIcons.play,
+        "title": "Explore",
+        "subtitle": "10 new cards",
+        "action": () {
+          context.go(RouteName.learn(widget.id));
+        },
       },
-    },
-    {
-      "icon": FontAwesomeIcons.rotateRight,
-      "title": "Revise",
-      "subtitle": "Repeat 10 cards",
-      "action": () {
-        print("revise");
+      {
+        "icon": FontAwesomeIcons.rotateRight,
+        "title": "Revise",
+        "subtitle": "Repeat 10 cards",
+        "action": () {
+          print("Revise clicked");
+        },
       },
-    },
-    {
-      "icon": FontAwesomeIcons.question,
-      "title": "Multi-choice Questions",
-      "subtitle": "",
-      "action": () {
-        print("revise");
+      {
+        "icon": FontAwesomeIcons.question,
+        "title": "Multi-choice Questions",
+        "subtitle": "",
+        "action": () {
+          print("Multi-choice Questions clicked");
+        },
       },
-    },
-    {
-      "icon": FontAwesomeIcons.penToSquare,
-      "title": "Fill In Game",
-      "subtitle": "",
-      "action": () {
-        print("revise");
+      {
+        "icon": FontAwesomeIcons.penToSquare,
+        "title": "Fill In Game",
+        "subtitle": "",
+        "action": () {
+          print("Fill In Game clicked");
+        },
       },
-    },
-  ];
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {

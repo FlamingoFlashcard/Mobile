@@ -60,9 +60,9 @@ class FlashcardRepository {
     return apiClient.createTag(tagDto);
   }
 
-  // Future<CreateDeckResponseDto> getDeckById(String deckId) async {
-  //   return apiClient.getDeckById(deckId);
-  // }
+  Future<CreateDeckResponseDto> getDeckById(String deckId) async {
+    return apiClient.getDeckById(deckId);
+  }
 
   Future<void> deleteDeck(String deckId) async {
     return apiClient.deleteDeck(deckId);
