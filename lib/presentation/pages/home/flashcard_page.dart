@@ -22,7 +22,10 @@ class _FlashcardPageState extends State<FlashcardPage> {
   @override
   void initState() {
     super.initState();
-    context.read<FlashcardBloc>().add(const LoadDecksRequested());
+    final flashcardState = context.read<FlashcardBloc>().state;
+    if (flashcardState.groupedDecks == null) {
+      context.read<FlashcardBloc>().add(LoadDecksRequested());
+    }
   }
 
   @override

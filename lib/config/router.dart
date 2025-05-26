@@ -32,12 +32,15 @@ class RouteName {
   static const String camera = '/camera';
   static const String about = '/about';
   static const String flashcards = '/flashcards';
+
   static const String dictionary = '/dictionary';
   static const String translator = '/translator';
   static const String friends = '/friends';
   static const String quiz = '/quiz';
   static const String chat = '/chat';
   static const String history = '/history';
+
+  static String learn(String deckId) => '/learn/$deckId';
 
   static const publicRoutes = [login, forgotPassword, verify, register];
 }
@@ -116,13 +119,10 @@ final router = GoRouter(
       builder: (context, state) => const QuizPage(),
     ),
     noTransitionRoute(
-      path: '/learn',
+      path: '/learn/:deckId',
       builder: (context, state) {
-        final data = state.extra as Map<String, dynamic>;
-        final cards = data['cards'] as List<String>;
-        final title = data['title'] as String;
-
-        return LearningFlashcardPage(title: title, cards: cards);
+        final deckId = state.pathParameters['deckId']!;
+        return LearningFlashcardPage(deckId: deckId);
       },
     ),
     noTransitionRoute(
