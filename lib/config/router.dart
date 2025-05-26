@@ -37,6 +37,7 @@ class RouteName {
   static const String dictionary = '/dictionary';
   static const String translator = '/translator';
   static const String friends = '/friends';
+  static String learn(String deckId) => '/learn/$deckId';
 
   static const publicRoutes = [login, forgotPassword, verify, register];
 }
@@ -123,10 +124,17 @@ final router = GoRouter(
     ),
     noTransitionRoute(
       path: '/edit/:deckId',
+      path: '/learn/:deckId',
       builder: (context, state) {
         final deckId = state.pathParameters['deckId']!;
         return EditCardListPage(deckId: deckId);
+        final deckId = state.pathParameters['deckId']!;
+        return LearningFlashcardPage(deckId: deckId);
       },
+    ),
+    noTransitionRoute(
+      path: RouteName.translator,
+      builder: (context, state) => const TranslatorScreen(),
     ),
     noTransitionRoute(
       path: RouteName.translator,
