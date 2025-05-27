@@ -32,7 +32,7 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
         title: event.title,
         description: event.description,
         tags: event.tags,
-        cardIds: event.cardIds,
+        cards: event.cards,
         imageFile: event.imageFile,
       );
 

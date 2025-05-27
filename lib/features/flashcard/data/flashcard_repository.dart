@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:lacquer/features/flashcard/dtos/card_dto.dart';
 import 'dart:io';
 import 'package:lacquer/features/flashcard/dtos/create_tag_dto.dart';
 import 'package:lacquer/features/flashcard/dtos/grouped_decks_dto.dart';
@@ -17,14 +18,14 @@ class FlashcardRepository {
     required String title,
     required String description,
     required List<String> tags,
-    required List<String> cardIds,
+    required List<CardDto> cards,
     File? imageFile,
   }) async {
     final deckDto = CreateDeckDto(
       title: title,
       description: description,
       tags: tags,
-      cardIds: cardIds,
+      cards: cards,
     );
 
     return apiClient.createDeck(deckDto, imageFile);
@@ -61,7 +62,13 @@ class FlashcardRepository {
   }
 
   Future<CreateDeckResponseDto> getDeckById(String deckId) async {
-    return apiClient.getDeckById(deckId);
+    final response = await apiClient.getDeckById(deckId);
+    final responseData = response;
+    if (responseData['success'] == true) {
+      return CreateDeckResponseDto.fromJson(responseData['data']);
+    } else {
+      throw Exception(responseData['message'] ?? 'Failed to retrieve deck');
+    }
   }
 
   Future<void> deleteDeck(String deckId) async {

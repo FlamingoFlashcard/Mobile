@@ -1,6 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'dart:io';
 
+import 'package:lacquer/features/flashcard/dtos/card_dto.dart';
+
 abstract class FlashcardEvent extends Equatable {
   const FlashcardEvent();
 
@@ -12,25 +14,19 @@ class CreateDeckRequested extends FlashcardEvent {
   final String title;
   final String description;
   final List<String> tags;
-  final List<String> cardIds;
+  final List<CardDto> cards;
   final File? imageFile;
 
   const CreateDeckRequested({
     required this.title,
     required this.description,
     required this.tags,
-    required this.cardIds,
+    required this.cards,
     this.imageFile,
   });
 
   @override
-  List<Object?> get props => [
-    title,
-    description,
-    tags,
-    cardIds,
-    imageFile?.path,
-  ];
+  List<Object?> get props => [title, description, tags, cards, imageFile?.path];
 }
 
 class LoadDecksRequested extends FlashcardEvent {

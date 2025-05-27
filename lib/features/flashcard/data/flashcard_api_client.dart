@@ -25,7 +25,7 @@ class FlashcardApiClient {
         'title': deckDto.title,
         'description': deckDto.description,
         'tags': deckDto.tags,
-        'cards': deckDto.cardIds,
+        'cards': deckDto.cards,
       });
 
       if (imageFile != null) {
@@ -81,6 +81,26 @@ class FlashcardApiClient {
       }
 
       return responseData;
+    } on DioException catch (e) {
+      if (e.response != null) {
+        throw Exception(e.response!.data['message']);
+      } else {
+        throw Exception(e.message);
+      }
+    }
+  }
+
+  Future<Map<String, dynamic>> getDeckById(String deckId) async {
+    try {
+      final token = await authLocalDataSource.getToken();
+
+      final options = Options(
+        headers: {if (token != null) 'Authorization': 'Bearer $token'},
+      );
+
+      final response = await dio.get('/deck/$deckId', options: options);
+
+      return response.data as Map<String, dynamic>;
     } on DioException catch (e) {
       if (e.response != null) {
         throw Exception(e.response!.data['message']);
@@ -196,26 +216,6 @@ class FlashcardApiClient {
       await dio.delete('/tag/$tagId', options: options);
     } on DioException catch (e) {
       throw Exception(e.response?.data['message'] ?? e.message);
-    }
-  }
-
-  Future<CreateDeckResponseDto> getDeckById(String deckId) async {
-    try {
-      final token = await authLocalDataSource.getToken();
-
-      final options = Options(
-        headers: {if (token != null) 'Authorization': 'Bearer $token'},
-      );
-
-      final response = await dio.get('/deck/$deckId', options: options);
-
-      return CreateDeckResponseDto.fromJson(response.data);
-    } on DioException catch (e) {
-      if (e.response != null) {
-        throw Exception(e.response!.data['message']);
-      } else {
-        throw Exception(e.message);
-      }
     }
   }
 

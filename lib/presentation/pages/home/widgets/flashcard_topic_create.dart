@@ -49,7 +49,7 @@ class _FlashcardTopicCreateState extends State<FlashcardTopicCreate> {
         title: _titleController.text,
         description: 'Description here',
         tags: [_selectedTagId!],
-        cardIds: [],
+        cards: [],
         imageFile: _selectedImage,
       ),
     );

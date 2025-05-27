@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lacquer/config/router.dart';
 import 'package:lacquer/config/theme.dart';
+import 'package:lacquer/features/flashcard/bloc/flashcard_bloc.dart';
+import 'package:lacquer/features/flashcard/bloc/flashcard_event.dart';
+import 'package:lacquer/features/flashcard/bloc/flashcard_state.dart';
 
 class LearningFlashcardPage extends StatefulWidget {
   final String deckId;
@@ -15,22 +19,66 @@ class LearningFlashcardPage extends StatefulWidget {
 
 class _LearningFlashcardPageState extends State<LearningFlashcardPage> {
   @override
+  void initState() {
+    super.initState();
+    context.read<FlashcardBloc>().add(LoadDeckByIdRequested(widget.deckId));
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: CustomTheme.lightbeige,
-      body: Stack(
-        children: [
-          _buildAppBar(context),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: const [Text('something')],
-          ),
-        ],
+      body: BlocBuilder<FlashcardBloc, FlashcardState>(
+        builder: (context, state) {
+          if (state.status == FlashcardStatus.loading) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (state.status == FlashcardStatus.failure) {
+            return Center(
+              child: Text('Error: ${state.errorMessage ?? 'Unknown error'}'),
+            );
+          } else if (state.status == FlashcardStatus.success &&
+              state.selectedDeck != null) {
+            print('fetch success');
+            final deck = state.selectedDeck!;
+            return Stack(
+              children: [
+                _buildAppBar(context, deck.title),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Deck: ${deck.title}',
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    if (deck.cards != null && deck.cards!.isNotEmpty)
+                      ...deck.cards!
+                          .map(
+                            (card) => Padding(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 8.0,
+                              ),
+                              child: Text(card.word ?? ''),
+                            ),
+                          )
+                          .toList()
+                    else
+                      const Text('No cards available in this deck'),
+                  ],
+                ),
+              ],
+            );
+          }
+          return const Center(child: Text('No deck data available'));
+        },
       ),
     );
   }
 
-  Widget _buildAppBar(BuildContext context) {
+  Widget _buildAppBar(BuildContext context, String? title) {
     return ClipRRect(
       borderRadius: const BorderRadius.only(
         bottomLeft: Radius.circular(8),
@@ -57,7 +105,7 @@ class _LearningFlashcardPageState extends State<LearningFlashcardPage> {
               Expanded(
                 child: Center(
                   child: Text(
-                    'Flashcards',
+                    title ?? '',
                     style: const TextStyle(
                       fontSize: 24,
                       color: Colors.white,
