@@ -31,6 +31,11 @@ class ProfileRepository {
     return Profile.fromJson(response.data['data']);
   }
 
+  Future<String> updateAbout(String token, String? about) async {
+    final response = await _profileApiClient.updateAbout(token, about: about);
+    return response.data['data']['about'];
+  }
+
   Future<String> uploadAvatar(String token, File avatarFile) async {
     final response = await _profileApiClient.uploadAvatar(token, avatarFile);
     return response.data['data']['avatar'];

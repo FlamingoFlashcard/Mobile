@@ -15,11 +15,13 @@ class ProfileLoadSuccess extends ProfileState {
   final String username;
   final String email;
   final String avatarUrl;
+  final String about;
 
   const ProfileLoadSuccess({
     required this.username,
     required this.email,
     required this.avatarUrl,
+    required this.about,
   });
 
   @override
@@ -41,11 +43,13 @@ class ProfileUpdateSuccess extends ProfileState {
   final String username;
   final String email;
   final String avatarUrl;
+  final String about;
 
   const ProfileUpdateSuccess({
     required this.username,
     required this.email,
     required this.avatarUrl,
+    required this.about,
   });
 
   @override

@@ -31,6 +31,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           username: profile.username,
           email: profile.email,
           avatarUrl: profile.avatarUrl,
+          about: profile.about,
         ),
       );
     } catch (e) {
@@ -60,6 +61,12 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         );
       }
 
+      // Handle about update if present
+      String? newAbout;
+      if (event.about != null) {
+        newAbout = await _profileRepository.updateAbout(token, event.about);
+      }
+
       // Handle profile update
       final updatedProfile = await _profileRepository.updateProfile(
         token,
@@ -72,6 +79,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           username: event.username ?? updatedProfile.username,
           email: updatedProfile.email,
           avatarUrl: newAvatarUrl ?? updatedProfile.avatarUrl,
+          about: newAbout ?? updatedProfile.about,
         ),
       );
     } catch (e) {
