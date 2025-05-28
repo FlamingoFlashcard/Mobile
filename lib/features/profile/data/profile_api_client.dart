@@ -30,6 +30,14 @@ class ProfileApiClient {
     );
   }
 
+  Future<Response> updateAbout(String token, {String? about}) async {
+    return _dio.put(
+      '/auth/about',
+      data: {if (about != null) 'about': about},
+      options: Options(headers: {'Authorization': 'Bearer $token'}),
+    );
+  }
+
   Future<Response> uploadAvatar(String token, File avatarFile) async {
     try {
       // Kiểm tra kích thước file (ví dụ: max 5MB)

@@ -23,6 +23,8 @@ class _ProfilePageState extends State<ProfilePage>
     with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
+  String aboutyou =
+      'Every employer seeks to hire people who enjoy their work, but the word "passion" evokes feelings of dedication and loyalty. When people are passionate about their work, they\'re naturally committed to quality and positive outcomes.';
 
   @override
   Widget build(BuildContext context) {
@@ -87,9 +89,37 @@ class _ProfilePageState extends State<ProfilePage>
       ],
       child: BlocBuilder<ProfileBloc, ProfileState>(
         builder: (context, profileState) {
-          return Scaffold(
-            appBar: AppBar(title: const Text('Profile')),
-            body: _buildContent(profileState),
+          return Container(
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: <Color>[
+                  CustomTheme.loginGradientStart,
+                  CustomTheme.loginGradientEnd,
+                ],
+                begin: FractionalOffset(0.5, 0.0),
+                end: FractionalOffset(0.5, 1.0),
+                stops: <double>[0.0, 1.0],
+                tileMode: TileMode.clamp,
+              ),
+            ),
+            child: Scaffold(
+              backgroundColor: Colors.transparent,
+              appBar: AppBar(
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                title: Text(
+                  'Profile',
+                  style: TextStyle(
+                    color: Colors.black87,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                centerTitle: true,
+              ),
+              body: _buildContent(profileState),
+            ),
           );
         },
       ),
@@ -114,6 +144,7 @@ class _ProfilePageState extends State<ProfilePage>
               _buildAvatar(profileData.avatarUrl),
               _buildInfo(profileData.username, profileData.email),
               _buildEditButton(),
+              _about(profileData.about),
               _logoutButton(),
               _deleteButton(),
             ],
@@ -167,8 +198,15 @@ class _ProfilePageState extends State<ProfilePage>
                 builder: (context) => const EditProfileScreen(),
               ),
             ),
-        icon: const Icon(Icons.person, size: 18),
-        label: const Text('Edit Profile', style: TextStyle(fontSize: 18)),
+        icon: const Icon(Icons.person, size: 18, color: Colors.black87),
+        label: const Text(
+          'Edit Profile',
+          style: TextStyle(
+            fontSize: 18,
+            color: Colors.black87,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         style: ElevatedButton.styleFrom(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24.0),
@@ -182,14 +220,21 @@ class _ProfilePageState extends State<ProfilePage>
 
   Widget _logoutButton() {
     return Padding(
-      padding: const EdgeInsets.only(top: 20, bottom: 5, left: 16, right: 16),
+      padding: const EdgeInsets.only(top: 20, bottom: 5, left: 20, right: 20),
       child: Card(
-        color: CustomTheme.loginGradientStart,
+        color: Color(0xFFFFFBEA),
         elevation: 4,
         child: ListTile(
-          leading: const Icon(Icons.logout),
-          title: const Text('Logout'),
-          trailing: const Icon(Icons.chevron_right),
+          leading: const Icon(Icons.logout, color: Colors.black87),
+          title: const Text(
+            'Logout',
+            style: TextStyle(
+              color: Colors.black87,
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            ),
+          ),
+          trailing: const Icon(Icons.chevron_right, color: Colors.black87),
           onTap: () => context.read<AuthBloc>().add(AuthEventLogout()),
         ),
       ),
@@ -198,15 +243,61 @@ class _ProfilePageState extends State<ProfilePage>
 
   Widget _deleteButton() {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 5, left: 16, right: 16),
+      padding: const EdgeInsets.only(bottom: 5, left: 20, right: 20),
       child: Card(
-        color: CustomTheme.loginGradientStart,
+        color: Color(0xFFFFFBEA),
         elevation: 4,
         child: ListTile(
-          leading: const Icon(Icons.delete),
-          title: const Text('Delete profile'),
-          trailing: const Icon(Icons.chevron_right),
+          leading: const Icon(Icons.delete, color: Colors.black87),
+          title: const Text(
+            'Delete profile',
+            style: TextStyle(
+              color: Colors.black87,
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            ),
+          ),
+          trailing: const Icon(Icons.chevron_right, color: Colors.black87),
           onTap: () => _showDeleteConfirmationDialog(context),
+        ),
+      ),
+    );
+  }
+
+  Widget _about(String about) {
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(minHeight: 200),
+        child: Card(
+          color: Color(0xFFFFFBEA),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          elevation: 4,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'About You',
+                  style: TextStyle(
+                    color: Colors.deepOrange,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Divider(color: Colors.black87, thickness: 1),
+                SizedBox(height: 8),
+                Text(
+                  about.isNotEmpty ? about : aboutyou,
+                  style: TextStyle(color: Colors.black87, fontSize: 14),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
