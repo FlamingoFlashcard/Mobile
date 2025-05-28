@@ -7,6 +7,7 @@ import 'package:lacquer/config/theme.dart';
 import 'package:lacquer/features/flashcard/bloc/flashcard_bloc.dart';
 import 'package:lacquer/features/flashcard/bloc/flashcard_event.dart';
 import 'package:lacquer/features/flashcard/bloc/flashcard_state.dart';
+import 'package:lacquer/presentation/pages/home/widgets/learning_card.dart';
 
 class LearningFlashcardPage extends StatefulWidget {
   final String deckId;
@@ -38,7 +39,6 @@ class _LearningFlashcardPageState extends State<LearningFlashcardPage> {
             );
           } else if (state.status == FlashcardStatus.success &&
               state.selectedDeck != null) {
-            print('fetch success');
             final deck = state.selectedDeck!;
             return Stack(
               children: [
@@ -46,26 +46,9 @@ class _LearningFlashcardPageState extends State<LearningFlashcardPage> {
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      'Deck: ${deck.title}',
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    LearningCard(card: deck.cards![0]),
                     const SizedBox(height: 20),
-                    if (deck.cards != null && deck.cards!.isNotEmpty)
-                      ...deck.cards!
-                          .map(
-                            (card) => Padding(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 8.0,
-                              ),
-                              child: Text(card.word ?? ''),
-                            ),
-                          )
-                          .toList()
-                    else
+                    if (deck.cards == null && deck.cards!.isEmpty)
                       const Text('No cards available in this deck'),
                   ],
                 ),
