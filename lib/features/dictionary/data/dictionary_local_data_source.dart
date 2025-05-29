@@ -25,9 +25,9 @@ class DictionaryLocalDataSource {
     await sf.setStringList(key, recentSearches);
   }
 
-  List<String> getRecentSearches(String lang) {
+  Future<List<String>?> getRecentSearches(String lang) async {
     final key = lang == 'eng' ? _recentEngSearchesKey : _recentVieSearchesKey;
-    return sf.getStringList(key) ?? [];
+    return sf.getStringList(key);
   }
 
   Future<void> clearRecentSearches(String lang) async {
@@ -62,9 +62,9 @@ class DictionaryLocalDataSource {
     await sf.setStringList(key, favorites);
   }
 
-  List<String> getFavorites(String lang) {
+  Future<List<String>?> getFavorites(String lang) async {
     final key = lang == 'eng' ? 'favorite_eng_words' : 'favorite_vie_words';
-    return sf.getStringList(key) ?? [];
+    return sf.getStringList(key);
   }
 
   Future<void> clearFavorites(String lang) async {
