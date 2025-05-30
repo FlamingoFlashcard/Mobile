@@ -30,6 +30,7 @@ final List<HomeItemModel> homeItems = [
     imagePath: "assets/images/dictionaryLogo.png",
     title: "Dictionary",
     backgroundColor: Color(0xFFFBBC05),
+    route: '/dictionary',
   ),
   HomeItemModel(
     imagePath: "assets/images/flashcardLogo.png",
