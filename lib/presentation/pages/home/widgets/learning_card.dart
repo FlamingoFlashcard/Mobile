@@ -1,7 +1,9 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:lacquer/config/theme.dart';
 import 'package:lacquer/features/flashcard/dtos/card_dto.dart';
+import 'package:lacquer/presentation/utils/wave_clipper.dart';
 
 class LearningCard extends StatefulWidget {
   final CardDto card;
@@ -76,48 +78,174 @@ class _LearningCardState extends State<LearningCard>
 
   Widget _buildFront(CardDto card) {
     final size = MediaQuery.of(context).size;
+
     return Container(
-      width: (size.width - 50),
-      height: (size.height - 180),
+      width: size.width - 50,
+      height: size.height - 180,
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        color: CustomTheme.flashcardColor,
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: const Color.fromRGBO(0, 0, 0, 0.1),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
+            color: const Color.fromRGBO(0, 0, 0, 0.2),
+            blurRadius: 10,
+            offset: Offset(0, 6),
           ),
         ],
       ),
-      alignment: Alignment.center,
-      child: Text(
-        card.word ?? '',
-        style: TextStyle(fontSize: 24, color: Colors.black),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            card.word ?? '',
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 36,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+          if ((card.pronunciation ?? '').isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Text(
+              '[${card.pronunciation}]',
+              style: const TextStyle(
+                fontSize: 20,
+                fontStyle: FontStyle.italic,
+                color: Colors.white70,
+              ),
+            ),
+          ],
+          const SizedBox(height: 16),
+          Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: Colors.white24,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildBack(CardDto card) {
     final size = MediaQuery.of(context).size;
+
     return Container(
-      width: (size.width - 50),
-      height: (size.height - 200),
+      width: size.width - 50,
+      height: size.height - 180,
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        color: CustomTheme.flashcardColor,
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: const Color.fromRGBO(0, 0, 0, 0.1),
-            blurRadius: 12,
+            color: const Color.fromRGBO(0, 0, 0, 0.2),
+            blurRadius: 10,
             offset: const Offset(0, 6),
           ),
         ],
       ),
-      alignment: Alignment.center,
-      child: const Text(
-        'Back',
-        style: TextStyle(fontSize: 24, color: Colors.black),
+      child: Column(
+        children: [
+          ClipPath(
+            clipper: WaveClipper(),
+            child: Container(
+              height: (size.height - 180) / 2,
+              width: double.infinity,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+              ),
+              child: Stack(
+                children: [
+                  Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          card.word ?? '',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 36,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        if ((card.pronunciation ?? '').isNotEmpty) ...[
+                          const SizedBox(height: 12),
+                          Text(
+                            '[${card.pronunciation}]',
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontStyle: FontStyle.italic,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 24,
+                    right: 12,
+                    child: IconButton(
+                      onPressed: () {},
+                      icon: const Icon(
+                        FontAwesomeIcons.volumeHigh,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Expanded(
+            child: Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: CustomTheme.flashcardColor,
+                borderRadius: const BorderRadius.vertical(
+                  bottom: Radius.circular(16),
+                ),
+              ),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 16,
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    if (card.meaning?.type?.isNotEmpty ?? false) ...[
+                      Text(
+                        card.meaning!.type!,
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                    ],
+                    if (card.meaning?.definition?.isNotEmpty ?? false)
+                      Text(
+                        card.meaning!.definition!,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          color: Colors.white,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

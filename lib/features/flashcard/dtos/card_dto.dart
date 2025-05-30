@@ -1,17 +1,15 @@
 class CardDto {
   final String? id;
   final String? word;
-  final List<String>? pronunciations;
-  final List<String>? img;
-  final List<String>? meanings;
+  final String? pronunciation;
+  final CardMeaningDto? meaning;
   final String? description;
 
   CardDto({
     this.id,
     this.word,
-    this.pronunciations,
-    this.img,
-    this.meanings,
+    this.pronunciation,
+    this.meaning,
     this.description,
   });
 
@@ -19,9 +17,11 @@ class CardDto {
     return CardDto(
       id: json['_id'] as String?,
       word: json['word'] as String?,
-      pronunciations: (json['pronunciations'] as List?)?.cast<String>(),
-      img: (json['img'] as List?)?.cast<String>(),
-      meanings: (json['meanings'] as List?)?.cast<String>(),
+      pronunciation: json['pronunciation'] as String?,
+      meaning:
+          json['meaning'] != null
+              ? CardMeaningDto.fromJson(json['meaning'] as Map<String, dynamic>)
+              : null,
       description: json['description'] as String?,
     );
   }
@@ -30,9 +30,27 @@ class CardDto {
     return {
       '_id': id,
       'word': word,
-      'pronunciations': pronunciations,
-      'img': img,
-      'meanings': meanings,
+      'pronunciation': pronunciation,
+      'meaning': meaning?.toJson(),
+      'description': description,
     };
+  }
+}
+
+class CardMeaningDto {
+  final String? type;
+  final String? definition;
+
+  CardMeaningDto({this.type, this.definition});
+
+  factory CardMeaningDto.fromJson(Map<String, dynamic> json) {
+    return CardMeaningDto(
+      type: json['type'] as String?,
+      definition: json['definition'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'type': type, 'definition': definition};
   }
 }

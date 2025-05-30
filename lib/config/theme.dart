@@ -14,6 +14,7 @@ class CustomTheme {
   static const Color mainColor1 = Color(0xFF6D2323);
   static const Color mainColor2 = Color(0xFFE5D0AC);
   static const Color mainColor3 = Color(0xFFFEF9E1);
+  static const Color flashcardColor = Color.fromARGB(255, 224, 78, 78);
   static const Color chatbotprimary = Colors.purple;
   static const Color chatbotsecondary = Colors.blue;
 
