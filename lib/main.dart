@@ -24,6 +24,9 @@ import 'package:lacquer/features/post/bloc/post_bloc.dart';
 import 'package:lacquer/features/post/bloc/post_event.dart';
 import 'package:lacquer/features/post/data/post_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:lacquer/features/profile/data/profile_repository.dart';
+import 'package:lacquer/features/profile/bloc/profile_bloc.dart';
+import 'package:lacquer/features/profile/bloc/profile_event.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -61,6 +64,7 @@ class MyApp extends StatelessWidget {
         ),
         RepositoryProvider(create: (context) => FriendshipRepository()),
         RepositoryProvider(create: (context) => PostRepository()),
+        RepositoryProvider(create: (context) => ProfileRepository(dio: dio)),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -82,6 +86,11 @@ class MyApp extends StatelessWidget {
             create: (context) => FlashcardBloc(
               repository: context.read<FlashcardRepository>(),
             )..add(LoadDecksRequested()),
+          BlocProvider(
+            create:
+                (context) =>
+                    ProfileBloc(context.read<ProfileRepository>())
+                      ..add(ProfileLoadRequested()),
           ),
         ],
         child: AppContent(),
