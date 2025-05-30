@@ -67,4 +67,10 @@ class DictionaryStateWordDetailsSuccess extends DictionaryState {
   DictionaryStateWordDetailsSuccess({required this.vocabulary});
 }
 
+class DictionaryStateWordDetailsFailure extends DictionaryState {
+  final String message;
+
+  DictionaryStateWordDetailsFailure(this.message);
+}
+
 

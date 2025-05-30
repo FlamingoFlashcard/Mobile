@@ -64,7 +64,7 @@ class DictionaryBloc extends Bloc<DictionaryEvent, DictionaryState> {
           lang: language,
         ),
       ),
-      Failure() => emit(DictionaryStateSearchFailure(result.message)),
+      Failure() => {},
     });
   }
 
@@ -104,7 +104,7 @@ class DictionaryBloc extends Bloc<DictionaryEvent, DictionaryState> {
       Success(data: final vocabulary) => emit(
         DictionaryStateWordDetailsSuccess(vocabulary: vocabulary),
       ),
-      Failure() => emit(DictionaryStateSearchFailure(result.message)),
+      Failure() => emit(DictionaryStateWordDetailsFailure(result.message)),
     });
   }
 

@@ -13,6 +13,11 @@ import 'package:lacquer/features/chatbot/bloc/chatbot_bloc.dart';
 import 'package:lacquer/features/chatbot/bloc/chatbot_event.dart';
 import 'package:lacquer/features/chatbot/data/chatbot_api_client.dart';
 import 'package:lacquer/features/chatbot/data/chatbot_repository.dart';
+import 'package:lacquer/features/dictionary/bloc/dictionary_bloc.dart';
+import 'package:lacquer/features/dictionary/bloc/dictionary_event.dart';
+import 'package:lacquer/features/dictionary/data/dictionary_api_clients.dart';
+import 'package:lacquer/features/dictionary/data/dictionary_local_data_source.dart';
+import 'package:lacquer/features/dictionary/data/dictionary_repository.dart';
 import 'package:lacquer/features/flashcard/bloc/flashcard_bloc.dart';
 import 'package:lacquer/features/flashcard/bloc/flashcard_event.dart';
 import 'package:lacquer/features/flashcard/data/flashcard_api_client.dart';
@@ -59,6 +64,13 @@ class MyApp extends StatelessWidget {
         ),
         RepositoryProvider(
           create:
+              (context) => DictionaryRepository(
+                dictionaryApiClients: DictionaryApiClients(dio),
+                dictionaryLocalDataSource: DictionaryLocalDataSource(sharedPreferences),
+              ), 
+        ),
+        RepositoryProvider(
+          create:
               (context) => FlashcardRepository(
                 FlashcardApiClient(dio, AuthLocalDataSource(sharedPreferences)),
               ),
@@ -77,6 +89,10 @@ class MyApp extends StatelessWidget {
           ),
           BlocProvider(
             create: (context) => ChatbotBloc(context.read<ChatbotRepository>()),
+          ),
+          BlocProvider(
+            create: (context) =>
+                DictionaryBloc(context.read<DictionaryRepository>()),
           ),
           BlocProvider(
             create:
@@ -122,6 +138,7 @@ class _AppContentState extends State<AppContent> {
     super.initState();
     context.read<AuthBloc>().add(AuthAuthenticateStarted());
     context.read<ChatbotBloc>().add(ChatbotEventStarted());
+    context.read<DictionaryBloc>().add(DictionaryEventStarted());
     context.read<FriendshipBloc>().add(FriendshipEventStarted());
     context.read<PostBloc>().add(PostEventStarted());
     context.read<FlashcardBloc>().add(LoadDecksRequested());
