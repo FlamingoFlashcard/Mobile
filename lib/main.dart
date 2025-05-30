@@ -58,9 +58,10 @@ class MyApp extends StatelessWidget {
                   ChatbotRepository(chatbotApiClient: ChatbotApiClient(dio)),
         ),
         RepositoryProvider(
-          create: (context) => FlashcardRepository(
-            FlashcardApiClient(dio, AuthLocalDataSource(sharedPreferences)),
-          ),
+          create:
+              (context) => FlashcardRepository(
+                FlashcardApiClient(dio, AuthLocalDataSource(sharedPreferences)),
+              ),
         ),
         RepositoryProvider(create: (context) => FriendshipRepository()),
         RepositoryProvider(create: (context) => PostRepository()),
@@ -89,6 +90,11 @@ class MyApp extends StatelessWidget {
             create: (context) => FlashcardBloc(
               repository: context.read<FlashcardRepository>(),
             )..add(LoadDecksRequested()),
+          ),
+            create:
+                (context) => FlashcardBloc(
+                  repository: context.read<FlashcardRepository>(),
+                )..add(LoadDecksRequested()),
           ),
           BlocProvider(
             create:
