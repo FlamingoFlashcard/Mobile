@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:lacquer/presentation/pages/home/widgets/flashcard_options.dart';
 
 class FlashcardTopic extends StatefulWidget {
-  final Color backgroundColor;
+  final String id;
   final String title;
   final int cardCount;
+  final List<String> tags;
   final String imagePath;
 
   const FlashcardTopic({
     super.key,
-    required this.backgroundColor,
+    required this.id,
     required this.title,
     required this.cardCount,
+    required this.tags,
     required this.imagePath,
   });
 
@@ -26,9 +29,16 @@ class FlashcardTopicState extends State<FlashcardTopic> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('${widget.title} clicked!')));
+        showDialog(
+          context: context,
+          builder:
+              (context) => FlashcardOptionDialog(
+                id: widget.id,
+                title: widget.title,
+                tags: widget.tags,
+                imagePath: widget.imagePath,
+              ),
+        );
       },
       onTapDown: (_) => setState(() => _isPressed = true),
       onTapUp: (_) => setState(() => _isPressed = false),
@@ -42,8 +52,15 @@ class FlashcardTopicState extends State<FlashcardTopic> {
             width: 350,
             height: 200,
             decoration: BoxDecoration(
-              color: widget.backgroundColor,
+              color: Colors.white,
               borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color.fromRGBO(0, 0, 0, 0.1),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
             child: Row(
               children: [
@@ -120,12 +137,7 @@ class FlashcardTopicState extends State<FlashcardTopic> {
                       ).createShader(bounds);
                     },
                     blendMode: BlendMode.dstIn,
-                    child: Image.asset(
-                      widget.imagePath,
-                      width: 190,
-                      height: 180,
-                      fit: BoxFit.cover,
-                    ),
+                    child: _buildImage(),
                   ),
                 ),
               ],
@@ -134,5 +146,48 @@ class FlashcardTopicState extends State<FlashcardTopic> {
         ),
       ),
     );
+  }
+
+  Widget _buildImage() {
+    if (widget.imagePath.startsWith('http')) {
+      return SizedBox(
+        width: 190,
+        height: 180,
+        child: Image.network(
+          widget.imagePath,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return Image.asset(
+              'assets/images/lacquerBlack.png',
+              fit: BoxFit.cover,
+              width: 190,
+              height: 180,
+            );
+          },
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) return child;
+            return const Center(child: CircularProgressIndicator());
+          },
+        ),
+      );
+    } else {
+      return SizedBox(
+        width: 190,
+        height: 180,
+        child: Image.asset(
+          widget.imagePath,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            print('Error loading asset: $error');
+            return Image.asset(
+              'assets/images/lacquerBlack.png',
+              fit: BoxFit.cover,
+              width: 190,
+              height: 180,
+            );
+          },
+        ),
+      );
+    }
   }
 }
