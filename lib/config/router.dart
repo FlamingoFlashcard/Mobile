@@ -9,6 +9,8 @@ import 'package:lacquer/presentation/pages/auth/login_page.dart';
 import 'package:lacquer/presentation/pages/auth/verify_page.dart';
 import 'package:lacquer/presentation/pages/camera/camera_page.dart';
 import 'package:lacquer/presentation/pages/camera/about_screen.dart';
+import 'package:lacquer/features/profile/bloc/profile_bloc.dart';
+import 'package:lacquer/features/profile/bloc/profile_event.dart';
 
 import 'package:lacquer/presentation/pages/mainscreen.dart';
 import 'package:flutter/widgets.dart';
@@ -49,6 +51,7 @@ final router = GoRouter(
       context.read<ChatbotBloc>().add(
         ChatbotEventGetHistory(userId: userId ?? ''),
       );
+      context.read<ProfileBloc>().add(ProfileLoadRequested());
       return null;
     }
     return RouteName.login;
