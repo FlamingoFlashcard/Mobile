@@ -14,6 +14,7 @@ import 'package:lacquer/presentation/pages/home/flashcard_page.dart';
 import 'package:lacquer/presentation/pages/home/learning_flashcard_page.dart';
 import 'package:lacquer/features/profile/bloc/profile_bloc.dart';
 import 'package:lacquer/features/profile/bloc/profile_event.dart';
+import 'package:lacquer/presentation/pages/home/translator_page.dart';
 
 import 'package:lacquer/presentation/pages/mainscreen.dart';
 import 'package:flutter/widgets.dart';
@@ -28,6 +29,7 @@ class RouteName {
   static const String about = '/about';
   static const String flashcards = '/flashcards';
   static const String dictionary = '/dictionary';
+  static const String translator = '/translator';
 
   static const publicRoutes = [login, forgotPassword, verify, register];
 }
@@ -106,6 +108,10 @@ final router = GoRouter(
 
         return LearningFlashcardPage(title: title, cards: cards);
       },
+    ),
+    noTransitionRoute(
+      path: RouteName.translator,
+      builder: (context, state) => const TranslatorScreen(),
     ),
   ],
 );
