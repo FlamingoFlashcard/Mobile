@@ -11,6 +11,7 @@ import 'package:lacquer/features/profile/bloc/profile_state.dart';
 import 'package:lacquer/features/auth/bloc/auth_state.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lacquer/config/router.dart';
+import 'package:lacquer/presentation/widgets/qr_code_dialog.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -278,7 +279,13 @@ class _ProfilePageState extends State<ProfilePage>
           SizedBox(height: 4),
           Text(email, style: TextStyle(fontSize: 16, color: Colors.black54)),
           SizedBox(height: 20),
-          _buildEditProfileButton(),
+          Row(
+            children: [
+              Expanded(flex: 3, child: _buildEditProfileButton()),
+              SizedBox(width: 12),
+              Expanded(flex: 1, child: _buildQRButton()),
+            ],
+          ),
         ],
       ),
     );
@@ -286,7 +293,6 @@ class _ProfilePageState extends State<ProfilePage>
 
   Widget _buildEditProfileButton() {
     return Container(
-      width: double.infinity,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
         gradient: LinearGradient(
@@ -686,5 +692,51 @@ class _ProfilePageState extends State<ProfilePage>
         context,
       ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
     }
+  }
+}
+
+class _buildQRButton extends StatelessWidget {
+  const _buildQRButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        gradient: LinearGradient(
+          colors: [Colors.blue.shade500, Colors.blue.shade600],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Color.fromRGBO(33, 150, 243, 0.4),
+            blurRadius: 15,
+            offset: Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () async {
+            final prefs = await SharedPreferences.getInstance();
+            final token = prefs.getString('token');
+
+            if (!context.mounted) return;
+
+            showDialog(
+              context: context,
+              builder: (context) => QRCodeDialog(token: token),
+            );
+          },
+          borderRadius: BorderRadius.circular(20),
+          child: Container(
+            padding: EdgeInsets.all(16),
+            child: Icon(Icons.qr_code_2, color: Colors.white, size: 24),
+          ),
+        ),
+      ),
+    );
   }
 }
