@@ -20,42 +20,17 @@ class _DicitionarypageState extends State<Dictionarypage> {
   bool isEngToVie = true; // true for Eng->Vie, false for Vie->Eng
   final FocusNode _focusNode = FocusNode();
   final TextEditingController _searchController = TextEditingController();
-  List<String> recentSearches = [
-    'hello',
-    'world',
-    'flutter',
-    'dictionary',
-    'example',
-    'search',
-    'language',
-    'translation',
-    'mobile app',
-    'development',
-  ];
-  List<String> favoriteWords = [
-    'flutter',
-    'dictionary',
-    'example',
-    'search',
-    'language',
-    'translation',
-    'mobile app',
-    'development',
-  ];
-  List<String> searchResults = [];
-  List<String> suggestions = ['hello', 'world', 'flutter', 'dictionary'];
-  bool _showSuggestions = false;
+  List<String> recentSearches = [];
+  List<String> favoriteWords = [];
+  List<SearchResultItem> searchResults = [];
+  List<String> suggestions = [];
   bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
     _onLoadingMainScreen();
-    _focusNode.addListener(() {
-      setState(() {
-        _showSuggestions = _focusNode.hasFocus;
-      });
-    });
+    _focusNode.addListener(() {});
   }
 
   @override
@@ -73,16 +48,19 @@ class _DicitionarypageState extends State<Dictionarypage> {
       DictionaryStateMainScreenLoading() => _buildMainScreenWidget(),
       DictionaryStateMainScreenSuccess() => _buildMainScreenWidget(),
       DictionaryStateMainScreenFailure() => _buildErrorWidget(
-        'Error loading main screen',
+        'Error loading main screen: ${dictionaryState.message}',
       ),
       DictionaryStateSearchInProgress() => _buildSearchingWidget(),
       DictionaryStateSearchSuggestions() => _buildSearchingWidget(),
-      DictionaryStateSearchSuccess() => _buildSearchingWidget(),
-      DictionaryStateSearchFailure() => _buildErrorWidget('Error searching'),
+      DictionaryStateSearchSuccess() => _buildSearchResults(),
+      DictionaryStateSearchFailure() => _buildErrorWidget('Error searching: ${dictionaryState.message}'),
       DictionaryStateWordDetailsLoading() => _buildSearchingWidget(),
       DictionaryStateWordDetailsSuccess() => DictionaryWordWidget(
         word: dictionaryState.vocabulary,
         onFavoriteToggle: (word, isFavorite) {},
+        onBack: () {
+          _onLoadingMainScreen();
+        },
       ),
       DictionaryStateWordDetailsFailure() => _buildErrorWidget(
         'Error loading word details',
@@ -97,6 +75,24 @@ class _DicitionarypageState extends State<Dictionarypage> {
           case DictionaryStateWordDetailsLoading():
             setState(() {
               _isLoading = true;
+            });
+            break;
+          case DictionaryStateMainScreenSuccess():
+            recentSearches = state.recentSearches ?? [];
+            favoriteWords = state.favorites ?? [];
+            setState(() {
+              _isLoading = false;
+            });
+          case DictionaryStateSearchSuggestions():
+            suggestions = state.suggestions;
+            setState(() {
+              _isLoading = false;
+            });
+            break;
+          case DictionaryStateSearchSuccess():
+            searchResults = state.searchResults;
+            setState(() {
+              _isLoading = false;
             });
             break;
           default:
@@ -128,60 +124,45 @@ class _DicitionarypageState extends State<Dictionarypage> {
   }
 
   Widget _buildSearchBar() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: TextField(
-        focusNode: _focusNode,
-        controller: _searchController,
-        decoration: InputDecoration(
-          hintText:
-          isEngToVie
-          ? 'Search English words...'
-          : 'Tìm kiếm từ tiếng Việt...',
-          prefixIcon: const Icon(Icons.search),
-          suffixIcon:
-          _showSuggestions
-          ? IconButton(
-            icon: const Icon(Icons.clear),
-            onPressed: () {
-              _searchController.clear();
-              _focusNode.unfocus();
-            },
-          )
-          : IconButton(
-            icon: const Icon(Icons.check),
-            onPressed: () {
-              _onSearch(_searchController.text.trim());
-            },
-          ),
-          border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
-        borderSide: const BorderSide(color: Colors.grey, width: 1.5),
-          ),
-          enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
-        borderSide: const BorderSide(color: Colors.grey, width: 1.5),
-          ),
-          focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
-        borderSide: const BorderSide(color: Colors.blue, width: 2),
-          ),
-          filled: true,
-          fillColor: Colors.white,
-        ),
-        onChanged: (value) {
-          setState(() {});
-          _onSuggestions(value.trim());
-        },
-        onSubmitted: (value) {
-          _onSearch(value.trim());
-        },
-        textInputAction: TextInputAction.search,
+    return TextField(
+      controller: _searchController,
+      focusNode: _focusNode,
+      decoration: InputDecoration(
+        hintText: isEngToVie ? 'Search...' : 'Tìm kiếm...',
+        prefixIcon: const Icon(Icons.search),
+        suffixIcon:
+            _searchController.text.isNotEmpty
+                ? IconButton(
+                  icon: const Icon(Icons.clear),
+                  onPressed: () {
+                    setState(() {
+                      _searchController.clear();
+                      suggestions.clear();
+                    });
+                  },
+                )
+                : null,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
       ),
+      onChanged: (value) {
+        setState(() {
+          if (value.isNotEmpty) {
+            _onSuggestions(value); // Call your suggestion method
+          } else {
+            suggestions.clear();
+          }
+        });
+      },
+      onSubmitted: (value) {
+        if (value.isNotEmpty) {
+          _focusNode.unfocus();
+          _onSearch(value);
+        }
+      },
     );
   }
 
-  Widget _buildAppBar(BuildContext context) {
+  Widget _buildAppBar(BuildContext context, VoidCallback onBackPressed) {
     return ClipRRect(
       borderRadius: const BorderRadius.only(
         bottomLeft: Radius.circular(8),
@@ -202,7 +183,7 @@ class _DicitionarypageState extends State<Dictionarypage> {
                   color: Colors.white,
                 ),
                 onPressed: () {
-                  context.go('/');
+                  onBackPressed();
                 },
               ),
               Expanded(
@@ -390,6 +371,7 @@ class _DicitionarypageState extends State<Dictionarypage> {
     );
   }
 
+  //------------------------------ WIDGETS -----------------------------
   Widget _buildSwitchLoadingScreenWidget() {
     return Stack(
       children: [
@@ -402,11 +384,18 @@ class _DicitionarypageState extends State<Dictionarypage> {
   Widget _buildMainScreenWidget() {
     return Column(
       children: [
-        _buildAppBar(context),
+        _buildAppBar(context, () {
+          context.go('/');
+        }),
         const SizedBox(height: 10),
         Row(
           children: [
-            Expanded(child: _buildSearchBar()),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: _buildSearchBar(),
+              ),
+            ),
             DictionaryLanguageSwitch(
               onLanguageChanged: (isEngToVie) {
                 setState(() {
@@ -414,6 +403,7 @@ class _DicitionarypageState extends State<Dictionarypage> {
                   _searchController.clear(); // Clear search when switching
                 });
               },
+              isEngToVie: isEngToVie,
             ),
           ],
         ),
@@ -443,70 +433,68 @@ class _DicitionarypageState extends State<Dictionarypage> {
 
   Widget _buildSearchingWidget() {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        _buildSearchBar(),
+        _buildAppBar(context, () {
+          _onLoadingMainScreen();
+        }),
+        const SizedBox(height: 10),
+        Padding(padding: const EdgeInsets.all(8.0), child: _buildSearchBar()),
         const SizedBox(height: 20),
-        _buildTitle(
-          isEngToVie ? 'Searching...' : 'Đang tìm kiếm...',
-          icon: FontAwesomeIcons.spinner,
-        ),
-        const SizedBox(height: 20),
-        Expanded(
+        Flexible(
           child:
-              suggestions.isEmpty
-                  ? Center(
-                    child: Text(
-                      isEngToVie
-                          ? 'No suggestions found'
-                          : 'Không có gợi ý nào',
-                      style: const TextStyle(fontSize: 16, color: Colors.grey),
-                    ),
-                  )
-                  : ListView.separated(
-                    itemCount: suggestions.length,
-                    separatorBuilder: (_, __) => const Divider(height: 1),
-                    itemBuilder: (context, index) {
-                      final suggestion = suggestions[index];
-                      return ListTile(
-                        title: Text(suggestion),
-                        onTap: () {
-                          _searchController.text = suggestion;
-                          _focusNode.unfocus();
-                          _onGetWord(suggestion);
-                        },
-                        trailing: IconButton(
-                          icon: Icon(
-                            favoriteWords.contains(suggestion)
-                                ? Icons.favorite
-                                : Icons.favorite_border,
-                            color:
-                                favoriteWords.contains(suggestion)
-                                    ? Colors.red
-                                    : Colors.grey,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              if (favoriteWords.contains(suggestion)) {
-                                favoriteWords.remove(suggestion);
-                              } else {
-                                favoriteWords.add(suggestion);
-                                _onSaveFavorite(suggestion);
-                              }
-                            });
-                          },
-                        ),
-                      );
-                    },
-                  ),
+              _focusNode.hasFocus && suggestions.isNotEmpty
+                  ? _buildSuggestionsList()
+                  : _buildEmptyState(),
         ),
       ],
+    );
+  }
+
+  Widget _buildSuggestionsList() {
+    return ListView.separated(
+      shrinkWrap: true,
+      itemCount: suggestions.length,
+      separatorBuilder: (_, __) => const Divider(height: 1),
+      itemBuilder: (context, index) {
+        final suggestion = suggestions[index];
+        return ListTile(
+          title: Text(suggestion, style: const TextStyle(fontSize: 16)),
+          onTap: () {
+            _searchController.text = suggestion;
+            _focusNode.unfocus();
+            _onSearch(suggestion);
+          },
+          trailing: IconButton(
+            icon: Icon(
+              favoriteWords.contains(suggestion)
+                  ? Icons.favorite
+                  : Icons.favorite_border,
+              color:
+                  favoriteWords.contains(suggestion) ? Colors.red : Colors.grey,
+            ),
+            onPressed: () {
+              setState(() {
+                if (favoriteWords.contains(suggestion)) {
+                  favoriteWords.remove(suggestion);
+                } else {
+                  favoriteWords.add(suggestion);
+                  _onSaveFavorite(suggestion);
+                }
+              });
+            },
+          ),
+        );
+      },
     );
   }
 
   Widget _buildErrorWidget(String message) {
     return Column(
       children: [
-        _buildAppBar(context),
+        _buildAppBar(context, () {
+          _onLoadingMainScreen();
+        }),
         const SizedBox(height: 20),
         Center(
           child: Text(
@@ -518,10 +506,109 @@ class _DicitionarypageState extends State<Dictionarypage> {
     );
   }
 
+  Widget _buildEmptyState() {
+    if (_focusNode.hasFocus && suggestions.isEmpty) {
+      return Center(
+        child: Text(
+          isEngToVie ? 'No suggestions found' : 'Không có gợi ý nào',
+          style: const TextStyle(fontSize: 16, color: Colors.grey),
+        ),
+      );
+    }
+
+    return Center(
+      child: Text(
+        isEngToVie
+            ? 'Start typing to see suggestions'
+            : 'Bắt đầu nhập để xem gợi ý',
+        style: const TextStyle(fontSize: 16, color: Colors.grey),
+      ),
+    );
+  }
+
+  Widget _buildSearchResults() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _buildAppBar(context, () {
+          _onLoadingMainScreen();
+        }),
+        const SizedBox(height: 10),
+        Padding(padding: const EdgeInsets.all(8.0), child: _buildSearchBar()),
+        const SizedBox(height: 20),
+        Flexible(
+          child: ListView.separated(
+            shrinkWrap: true,
+            itemCount: searchResults.length,
+            separatorBuilder: (_, __) => const Divider(height: 1),
+            itemBuilder: (context, index) {
+              final result = searchResults[index];
+              return ListTile(
+                title: Text(
+                  result.word,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (result.pronunciation.isNotEmpty)
+                      Text(
+                        result.pronunciation,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ...result.meanings.entries.map(
+                      (entry) => Padding(
+                        padding: const EdgeInsets.only(top: 2),
+                        child: Text(
+                          '${entry.key}: ${entry.value.join(", ")}',
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                trailing: IconButton(
+                  icon: Icon(
+                    favoriteWords.contains(result.word)
+                        ? Icons.favorite
+                        : Icons.favorite_border,
+                    color:
+                        favoriteWords.contains(result.word)
+                            ? Colors.red
+                            : Colors.grey,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      if (favoriteWords.contains(result.word)) {
+                        favoriteWords.remove(result.word);
+                      } else {
+                        favoriteWords.add(result.word);
+                        _onSaveFavorite(result.word);
+                      }
+                    });
+                  },
+                ),
+                onTap: () {
+                  _onGetWord(result.word);
+                },
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
   //----------------------------- FUNCTIONS -----------------------------
   void _onLoadingMainScreen() {
     context.read<DictionaryBloc>().add(
-      DictionaryEventLoadMainScreen(lang: isEngToVie ? 'en' : 'vi'),
+      DictionaryEventLoadMainScreen(lang: isEngToVie ? 'en' : 'vn'),
     );
     setState(() {
       _searchController.clear();
@@ -532,14 +619,14 @@ class _DicitionarypageState extends State<Dictionarypage> {
   void _onSearch(String query) {
     if (query.isEmpty) return;
     context.read<DictionaryBloc>().add(
-      DictionaryEventSearch(query: query, lang: isEngToVie ? 'en' : 'vi'),
+      DictionaryEventSearch(query: query, lang: isEngToVie ? 'en' : 'vn'),
     );
   }
 
   void _onGetWord(String word) {
     if (word.isEmpty) return;
     context.read<DictionaryBloc>().add(
-      DictionaryEventGetWord(word: word, lang: isEngToVie ? 'en' : 'vi'),
+      DictionaryEventGetWord(word: word, lang: isEngToVie ? 'en' : 'vn'),
     );
   }
 
@@ -548,7 +635,7 @@ class _DicitionarypageState extends State<Dictionarypage> {
     context.read<DictionaryBloc>().add(
       DictionaryEventSuggestions(
         prefix: prefix,
-        lang: isEngToVie ? 'en' : 'vi',
+        lang: isEngToVie ? 'en' : 'vn',
       ),
     );
   }
@@ -556,7 +643,19 @@ class _DicitionarypageState extends State<Dictionarypage> {
   void _onSaveFavorite(String word) {
     if (word.isEmpty) return;
     context.read<DictionaryBloc>().add(
-      DictionaryEventSaveFavorite(word: word, lang: isEngToVie ? 'en' : 'vi'),
+      DictionaryEventSaveFavorite(word: word, lang: isEngToVie ? 'en' : 'vn'),
     );
   }
+}
+
+class SearchResultItem {
+  final String word;
+  final String pronunciation;
+  final Map<String, List<String>> meanings;
+
+  SearchResultItem({
+    required this.word,
+    required this.pronunciation,
+    required this.meanings,
+  });
 }

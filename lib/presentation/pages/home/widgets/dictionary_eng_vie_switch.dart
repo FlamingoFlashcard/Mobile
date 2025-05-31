@@ -2,9 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:lacquer/config/theme.dart';
 
 class DictionaryLanguageSwitch extends StatefulWidget {
+  final bool isEngToVie;
   final Function(bool isEngToVie) onLanguageChanged;
 
-  const DictionaryLanguageSwitch({super.key, required this.onLanguageChanged});
+  const DictionaryLanguageSwitch({
+    super.key,
+    required this.isEngToVie,
+    required this.onLanguageChanged,
+  });
 
   @override
   State<DictionaryLanguageSwitch> createState() =>
@@ -13,13 +18,14 @@ class DictionaryLanguageSwitch extends StatefulWidget {
 
 class _DictionaryLanguageSwitchState extends State<DictionaryLanguageSwitch>
     with SingleTickerProviderStateMixin {
-  bool isEngToVie = true;
+  late bool isEngToVie;
   late AnimationController _animationController;
   late Animation<double> _rotationAnimation;
 
   @override
   void initState() {
     super.initState();
+    isEngToVie = widget.isEngToVie;
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 400),
       vsync: this,
@@ -27,6 +33,24 @@ class _DictionaryLanguageSwitchState extends State<DictionaryLanguageSwitch>
     _rotationAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
+    if (!isEngToVie) {
+      _animationController.value = 1.0;
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant DictionaryLanguageSwitch oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isEngToVie != isEngToVie) {
+      setState(() {
+        isEngToVie = widget.isEngToVie;
+        if (isEngToVie) {
+          _animationController.reverse();
+        } else {
+          _animationController.forward();
+        }
+      });
+    }
   }
 
   @override
@@ -36,15 +60,9 @@ class _DictionaryLanguageSwitchState extends State<DictionaryLanguageSwitch>
   }
 
   void _toggleLanguage() {
-    setState(() {
-      isEngToVie = !isEngToVie;
-      if (isEngToVie) {
-        _animationController.reverse();
-      } else {
-        _animationController.forward();
-      }
-    });
-    widget.onLanguageChanged(isEngToVie);
+    final newValue = !isEngToVie;
+    widget.onLanguageChanged(newValue);
+    // The state will be updated via didUpdateWidget when parent updates isEngToVie
   }
 
   @override
@@ -67,10 +85,9 @@ class _DictionaryLanguageSwitchState extends State<DictionaryLanguageSwitch>
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(height / 2),
                 gradient: LinearGradient(
-                  colors:
-                      isEngToVie
-                          ? [Colors.blue, Colors.red]
-                          : [Colors.red, Colors.blue],
+                  colors: isEngToVie
+                      ? [Colors.blue, Colors.red]
+                      : [Colors.red, Colors.blue],
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
                 ),
@@ -116,10 +133,9 @@ class _DictionaryLanguageSwitchState extends State<DictionaryLanguageSwitch>
                               child: Icon(
                                 Icons.swap_horiz,
                                 size: iconSize,
-                                color:
-                                    isEngToVie
-                                        ? Colors.blue[600]
-                                        : Colors.red[600],
+                                color: isEngToVie
+                                    ? Colors.blue[600]
+                                    : Colors.red[600],
                               ),
                             ),
                             _buildFlag('🇻🇳', flagSize),

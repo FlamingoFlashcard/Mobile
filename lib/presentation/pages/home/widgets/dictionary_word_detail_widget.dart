@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:lacquer/features/dictionary/dtos/search_result_dto.dart';
 
-
 class DictionaryWordWidget extends StatefulWidget {
   final Vocabulary word;
   final bool isFavorite;
   final Function(Vocabulary word, bool isFavorite) onFavoriteToggle;
+  final VoidCallback? onBack; // <-- Added
 
   const DictionaryWordWidget({
     super.key,
     required this.word,
     this.isFavorite = false,
     required this.onFavoriteToggle,
+    this.onBack, // <-- Added
   });
 
   @override
@@ -51,22 +52,22 @@ class _DictionaryWordWidgetState extends State<DictionaryWordWidget>
     setState(() {
       _isFavorite = !_isFavorite;
     });
-    
+
     // Trigger animation
     _animationController.forward().then((_) {
       _animationController.reverse();
     });
-    
+
     // Call the callback function
     widget.onFavoriteToggle(widget.word, _isFavorite);
-    
+
     // Show feedback
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          _isFavorite 
-            ? '${widget.word.word} added to favorites!' 
-            : '${widget.word.word} removed from favorites!',
+          _isFavorite
+              ? '${widget.word.word} added to favorites!'
+              : '${widget.word.word} removed from favorites!',
         ),
         duration: const Duration(seconds: 2),
         behavior: SnackBarBehavior.floating,
@@ -94,7 +95,7 @@ class _DictionaryWordWidgetState extends State<DictionaryWordWidget>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header with word, difficulty, and favorite button
+          // Header with word, difficulty, favorite button, and back button
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(20),
@@ -118,6 +119,19 @@ class _DictionaryWordWidgetState extends State<DictionaryWordWidget>
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    // Back button
+                    if (widget.onBack != null)
+                      Padding(
+                        padding: const EdgeInsets.only(right: 12),
+                        child: GestureDetector(
+                          onTap: widget.onBack,
+                          child: const Icon(
+                            Icons.arrow_back,
+                            color: Colors.white,
+                            size: 28,
+                          ),
+                        ),
+                      ),
                     Expanded(
                       child: Text(
                         widget.word.word,
@@ -164,9 +178,9 @@ class _DictionaryWordWidgetState extends State<DictionaryWordWidget>
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Icon(
-                                    _isFavorite 
-                                      ? Icons.favorite 
-                                      : Icons.favorite_border,
+                                    _isFavorite
+                                        ? Icons.favorite
+                                        : Icons.favorite_border,
                                     color: Colors.white,
                                     size: 24,
                                   ),
@@ -344,7 +358,7 @@ class _DictionaryWordWidgetState extends State<DictionaryWordWidget>
               ),
             );
           }).toList(),
-          
+
           // Examples for this word type
           if (wordType.examples.isNotEmpty) ...[
             const SizedBox(height: 12),
