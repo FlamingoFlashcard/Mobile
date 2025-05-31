@@ -11,6 +11,14 @@ class DictionaryBloc extends Bloc<DictionaryEvent, DictionaryState> {
     on<DictionaryEventSearch>(_onSearch);
     on<DictionaryEventSuggestions>(_onSuggestions);
     on<DictionaryEventGetWord>(_onGetWord);
+    on<DictionaryEventRemoveRecentSearch>(
+      (event, emit) async {
+        await dictionaryRepository.removeRecentSearch(
+          event.word,
+          event.lang,
+        );
+      },
+    );
   }
   final DictionaryRepository dictionaryRepository;
 
@@ -99,4 +107,6 @@ class DictionaryBloc extends Bloc<DictionaryEvent, DictionaryState> {
       Failure() => emit(DictionaryStateWordDetailsFailure(result.message)),
     });
   }
+
+  
 }

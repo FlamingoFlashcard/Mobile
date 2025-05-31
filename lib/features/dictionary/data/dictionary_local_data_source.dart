@@ -32,11 +32,6 @@ class DictionaryLocalDataSource {
     return sf.getStringList(key);
   }
 
-  Future<void> clearRecentSearches(String lang) async {
-    final key = lang == 'en' ? _recentEngSearchesKey : _recentVieSearchesKey;
-    await sf.remove(key);
-  }
-
   Future<void> removeRecentSearch(String word, String lang) async {
     final key = lang == 'en' ? _recentEngSearchesKey : _recentVieSearchesKey;
     final recentSearches = sf.getStringList(key) ?? [];
@@ -45,11 +40,5 @@ class DictionaryLocalDataSource {
     recentSearches.remove(word);
 
     await sf.setStringList(key, recentSearches);
-  }
-
-  Future<bool> isRecentSearch(String word, String lang) async {
-    final key = lang == 'en' ? _recentEngSearchesKey : _recentVieSearchesKey;
-    final recentSearches = sf.getStringList(key) ?? [];
-    return recentSearches.contains(word);
   }
 }
