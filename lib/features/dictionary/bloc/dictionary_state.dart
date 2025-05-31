@@ -11,12 +11,10 @@ class DictionaryStateMainScreenLoading extends DictionaryState {}
 class DictionaryStateMainScreenSuccess extends DictionaryState {
   final String lang;
   final List<String>? recentSearches;
-  final List<String>? favorites;
 
   DictionaryStateMainScreenSuccess({
     required this.lang,
     this.recentSearches,
-    this.favorites,
   });
 }
 
@@ -76,9 +74,8 @@ class DictionaryStateWordDetailsLoading extends DictionaryState {}
 
 class DictionaryStateWordDetailsSuccess extends DictionaryState {
   final Vocabulary vocabulary;
-  final bool isFavorite;
 
-  DictionaryStateWordDetailsSuccess({required this.vocabulary, required this.isFavorite});
+  DictionaryStateWordDetailsSuccess({required this.vocabulary});
 }
 
 class DictionaryStateWordDetailsFailure extends DictionaryState {

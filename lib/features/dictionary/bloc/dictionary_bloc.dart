@@ -11,7 +11,6 @@ class DictionaryBloc extends Bloc<DictionaryEvent, DictionaryState> {
     on<DictionaryEventSearch>(_onSearch);
     on<DictionaryEventSuggestions>(_onSuggestions);
     on<DictionaryEventGetWord>(_onGetWord);
-    on<DictionaryEventToggleFavorite>(_onToggleFavorite);
   }
   final DictionaryRepository dictionaryRepository;
 
@@ -29,11 +28,9 @@ class DictionaryBloc extends Bloc<DictionaryEvent, DictionaryState> {
       final recentSearches = await dictionaryRepository.getRecentSearches(
         language,
       );
-      final favorites = await dictionaryRepository.getFavorites(language);
       emit(
         DictionaryStateMainScreenSuccess(
           recentSearches: recentSearches,
-          favorites: favorites,
           lang: language,
         ),
       );
@@ -93,31 +90,13 @@ class DictionaryBloc extends Bloc<DictionaryEvent, DictionaryState> {
       event.word,
       event.lang,
     );
-    final check = await dictionaryRepository.isFavorite(event.word, event.lang);
     return (switch (result) {
       Success(data: final vocabulary) => emit(
         DictionaryStateWordDetailsSuccess(
           vocabulary: vocabulary,
-          isFavorite: check,
         ),
       ),
       Failure() => emit(DictionaryStateWordDetailsFailure(result.message)),
     });
-  }
-
-  Future<bool> _onToggleFavorite(
-    DictionaryEventToggleFavorite event,
-    Emitter<DictionaryState> emit,
-  ) async {
-    final String word = event.word;
-    final String lang = event.lang;
-    final bool isFavorite = event.isFavorite;
-
-    if (isFavorite) {
-      await dictionaryRepository.saveFavorite(word, lang);
-    } else {
-      await dictionaryRepository.removeFavorite(word, lang);
-    }
-    return isFavorite;
   }
 }

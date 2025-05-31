@@ -17,7 +17,6 @@ class DictionaryRepository {
   Future<Result<Vocabulary>> searchWord(String word, String lang) async {
     try {
       final reponse = await dictionaryApiClients.searchWord(SearchWordDto(lang, word));
-      await saveRecentSearch(word, lang);
       return Success(reponse.data);
     } catch (e) {
       return Failure(e.toString());
@@ -86,51 +85,6 @@ class DictionaryRepository {
       return Success(isRecent);
     } catch (e) {
       return Failure(e.toString());
-    }
-  }
-
-  Future<Result<void>> saveFavorite(String word, String lang) async {
-    try {
-      await dictionaryLocalDataSource.saveFavorite(word, lang);
-      return Success(null);
-    } catch (e) {
-      return Failure(e.toString());
-    }
-  }
-
-  Future<List<String>> getFavorites(String lang) async {
-    try {
-      final favorites = await dictionaryLocalDataSource.getFavorites(lang);
-      return favorites ?? [];
-    } catch (e) {
-      return [];
-    }
-  }
-
-  Future<Result<void>> removeFavorite(String word, String lang) async {
-    try {
-      await dictionaryLocalDataSource.removeFavorite(word, lang);
-      return Success(null);
-    } catch (e) {
-      return Failure(e.toString());
-    }
-  }
-
-  Future<Result<void>> clearFavorites(String lang) async {
-    try {
-      await dictionaryLocalDataSource.clearFavorites(lang);
-      return Success(null);
-    } catch (e) {
-      return Failure(e.toString());
-    }
-  }
-  
-  Future<bool> isFavorite(String word, String lang) async {
-    try {
-      final isFavorite = await dictionaryLocalDataSource.isFavorite(word, lang);
-      return isFavorite;
-    } catch (e) {
-      return false;
     }
   }
 }
