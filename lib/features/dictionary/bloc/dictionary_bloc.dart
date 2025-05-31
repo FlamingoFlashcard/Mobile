@@ -29,23 +29,25 @@ class DictionaryBloc extends Bloc<DictionaryEvent, DictionaryState> {
       language,
     );
     final favoritesResult = await dictionaryRepository.getFavorites(language);
-    if (recentSearchesResult is Failure) {
-      emit(DictionaryStateMainScreenFailure("Failed to load recent searches"));
-      return;
-    }
-    if (favoritesResult is Failure) {
-      emit(DictionaryStateMainScreenFailure("Failed to load favorites"));
-      return;
-    }
-    final recentSearch = (recentSearchesResult as Success).data;
-    final favorites = (favoritesResult as Success).data;
-    emit(
-      DictionaryStateMainScreenSuccess(
-        lang: language,
-        recentSearches: recentSearch,
-        favorites: favorites,
+    (switch (recentSearchesResult) {
+      Success(data: final recentSearches) => emit(
+        DictionaryStateMainScreenSuccess(
+          recentSearches: recentSearches,
+          lang: language,
+        ),
       ),
-    );
+      Failure() => emit(DictionaryStateMainScreenFailure("Recent search error: ${recentSearchesResult.message}")),
+    });
+    (switch (favoritesResult) {
+      Success(data: final favorites) => emit(
+        DictionaryStateMainScreenSuccess(
+          favorites: favorites,
+          lang: language,
+        ),
+      ),
+      Failure() => emit(DictionaryStateMainScreenFailure("Favorites error: ${favoritesResult.message}")),
+    });
+    return;
   }
 
   void _onSuggestions(
@@ -82,7 +84,6 @@ class DictionaryBloc extends Bloc<DictionaryEvent, DictionaryState> {
       Success(data: final searchResult) => emit(
         DictionaryStateSearchSuccess(
           query: event.query,
-          numberOfResults: searchResult.length,
           results: searchResult,
           lang: language,
         ),

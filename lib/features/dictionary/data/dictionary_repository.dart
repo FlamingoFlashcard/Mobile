@@ -53,8 +53,8 @@ class DictionaryRepository {
 
   Future<Result<List<String>>> getRecentSearches(String lang) async {
     try {
-      final recentSearches = dictionaryLocalDataSource.getRecentSearches(lang);
-      return Success(recentSearches as List<String>);
+      final recentSearches = await dictionaryLocalDataSource.getRecentSearches(lang);
+      return Success(recentSearches ?? []);
     } catch (e) {
       return Failure(e.toString());
     }
@@ -89,8 +89,8 @@ class DictionaryRepository {
 
   Future<Result<List<String>>> getFavorites(String lang) async {
     try {
-      final favorites = dictionaryLocalDataSource.getFavorites(lang);
-      return Success(favorites as List<String>);
+      final favorites = await dictionaryLocalDataSource.getFavorites(lang);
+      return Success(favorites ?? []);
     } catch (e) {
       return Failure(e.toString());
     }
@@ -113,4 +113,5 @@ class DictionaryRepository {
       return Failure(e.toString());
     }
   }
+  
 }
