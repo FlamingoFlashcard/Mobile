@@ -13,6 +13,7 @@ class DictionaryRepository {
     required this.dictionaryLocalDataSource,
   });
 
+  // Api Calls
   Future<Result<Vocabulary>> searchWord(String word, String lang) async {
     try {
       final reponse = await dictionaryApiClients.searchWord(SearchWordDto(lang, word));
@@ -42,6 +43,7 @@ class DictionaryRepository {
     }
   }
 
+  // Recent Searches and Favorites
   Future<Result<void>> saveRecentSearch(String word, String lang) async {
     try {
       await dictionaryLocalDataSource.saveRecentSearch(word, lang);
@@ -51,12 +53,12 @@ class DictionaryRepository {
     }
   }
 
-  Future<Result<List<String>>> getRecentSearches(String lang) async {
+  Future<List<String>> getRecentSearches(String lang) async {
     try {
       final recentSearches = await dictionaryLocalDataSource.getRecentSearches(lang);
-      return Success(recentSearches ?? []);
+      return recentSearches ?? [];
     } catch (e) {
-      return Failure(e.toString());
+      return [];
     }
   }
 
@@ -78,6 +80,15 @@ class DictionaryRepository {
     }
   }
 
+  Future<Result<bool>> isRecentSearch(String word, String lang) async {
+    try {
+      final isRecent = await dictionaryLocalDataSource.isRecentSearch(word, lang);
+      return Success(isRecent);
+    } catch (e) {
+      return Failure(e.toString());
+    }
+  }
+
   Future<Result<void>> saveFavorite(String word, String lang) async {
     try {
       await dictionaryLocalDataSource.saveFavorite(word, lang);
@@ -87,12 +98,12 @@ class DictionaryRepository {
     }
   }
 
-  Future<Result<List<String>>> getFavorites(String lang) async {
+  Future<List<String>> getFavorites(String lang) async {
     try {
       final favorites = await dictionaryLocalDataSource.getFavorites(lang);
-      return Success(favorites ?? []);
+      return favorites ?? [];
     } catch (e) {
-      return Failure(e.toString());
+      return [];
     }
   }
 
@@ -114,4 +125,12 @@ class DictionaryRepository {
     }
   }
   
+  Future<bool> isFavorite(String word, String lang) async {
+    try {
+      final isFavorite = await dictionaryLocalDataSource.isFavorite(word, lang);
+      return isFavorite;
+    } catch (e) {
+      return false;
+    }
+  }
 }

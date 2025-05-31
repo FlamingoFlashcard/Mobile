@@ -76,8 +76,9 @@ class DictionaryStateWordDetailsLoading extends DictionaryState {}
 
 class DictionaryStateWordDetailsSuccess extends DictionaryState {
   final Vocabulary vocabulary;
+  final bool isFavorite;
 
-  DictionaryStateWordDetailsSuccess({required this.vocabulary});
+  DictionaryStateWordDetailsSuccess({required this.vocabulary, required this.isFavorite});
 }
 
 class DictionaryStateWordDetailsFailure extends DictionaryState {

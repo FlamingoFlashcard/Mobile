@@ -53,11 +53,16 @@ class _DicitionarypageState extends State<Dictionarypage> {
       DictionaryStateSearchInProgress() => _buildSearchingWidget(),
       DictionaryStateSearchSuggestions() => _buildSearchingWidget(),
       DictionaryStateSearchSuccess() => _buildSearchResults(),
-      DictionaryStateSearchFailure() => _buildErrorWidget('Error searching: ${dictionaryState.message}'),
+      DictionaryStateSearchFailure() => _buildErrorWidget(
+        'Error searching: ${dictionaryState.message}',
+      ),
       DictionaryStateWordDetailsLoading() => _buildSearchingWidget(),
       DictionaryStateWordDetailsSuccess() => DictionaryWordWidget(
         word: dictionaryState.vocabulary,
-        onFavoriteToggle: (word, isFavorite) {},
+        onFavoriteToggle: (word, isFavorite) {
+          _onToggleFavorite(word.word, isFavorite);
+        },
+        isFavorite: dictionaryState.isFavorite,
         onBack: () {
           _onLoadingMainScreen();
         },
@@ -83,6 +88,7 @@ class _DicitionarypageState extends State<Dictionarypage> {
             setState(() {
               _isLoading = false;
             });
+            break;
           case DictionaryStateSearchSuggestions():
             suggestions = state.suggestions;
             setState(() {
@@ -154,7 +160,7 @@ class _DicitionarypageState extends State<Dictionarypage> {
         });
       },
       onSubmitted: (value) {
-        if (value.isNotEmpty) {
+        if (value.isNotEmpty && suggestions.isNotEmpty) {
           _focusNode.unfocus();
           _onSearch(value);
         }
@@ -398,9 +404,10 @@ class _DicitionarypageState extends State<Dictionarypage> {
             ),
             DictionaryLanguageSwitch(
               onLanguageChanged: (isEngToVie) {
+                _onLoadingMainScreen();
                 setState(() {
                   this.isEngToVie = isEngToVie;
-                  _searchController.clear(); // Clear search when switching
+                  _searchController.clear();
                 });
               },
               isEngToVie: isEngToVie,
@@ -465,25 +472,6 @@ class _DicitionarypageState extends State<Dictionarypage> {
             _focusNode.unfocus();
             _onSearch(suggestion);
           },
-          trailing: IconButton(
-            icon: Icon(
-              favoriteWords.contains(suggestion)
-                  ? Icons.favorite
-                  : Icons.favorite_border,
-              color:
-                  favoriteWords.contains(suggestion) ? Colors.red : Colors.grey,
-            ),
-            onPressed: () {
-              setState(() {
-                if (favoriteWords.contains(suggestion)) {
-                  favoriteWords.remove(suggestion);
-                } else {
-                  favoriteWords.add(suggestion);
-                  _onSaveFavorite(suggestion);
-                }
-              });
-            },
-          ),
         );
       },
     );
@@ -573,27 +561,6 @@ class _DicitionarypageState extends State<Dictionarypage> {
                     ),
                   ],
                 ),
-                trailing: IconButton(
-                  icon: Icon(
-                    favoriteWords.contains(result.word)
-                        ? Icons.favorite
-                        : Icons.favorite_border,
-                    color:
-                        favoriteWords.contains(result.word)
-                            ? Colors.red
-                            : Colors.grey,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      if (favoriteWords.contains(result.word)) {
-                        favoriteWords.remove(result.word);
-                      } else {
-                        favoriteWords.add(result.word);
-                        _onSaveFavorite(result.word);
-                      }
-                    });
-                  },
-                ),
                 onTap: () {
                   _onGetWord(result.word);
                 },
@@ -607,9 +574,12 @@ class _DicitionarypageState extends State<Dictionarypage> {
 
   //----------------------------- FUNCTIONS -----------------------------
   void _onLoadingMainScreen() {
+    recentSearches.clear();
+    favoriteWords.clear();
+    searchResults.clear();
     context.read<DictionaryBloc>().add(
       DictionaryEventLoadMainScreen(lang: isEngToVie ? 'en' : 'vn'),
-    );
+    );    
     setState(() {
       _searchController.clear();
       _focusNode.unfocus();
@@ -640,11 +610,22 @@ class _DicitionarypageState extends State<Dictionarypage> {
     );
   }
 
-  void _onSaveFavorite(String word) {
+  void _onToggleFavorite(String word, bool isFavorite) {
     if (word.isEmpty) return;
     context.read<DictionaryBloc>().add(
-      DictionaryEventSaveFavorite(word: word, lang: isEngToVie ? 'en' : 'vn'),
+      DictionaryEventToggleFavorite(
+        word: word,
+        lang: isEngToVie ? 'en' : 'vn',
+        isFavorite: isFavorite,
+      ),
     );
+    setState(() {
+      if (isFavorite) {
+        favoriteWords.remove(word);
+      } else {
+        favoriteWords.add(word);
+      }
+    });
   }
 }
 
