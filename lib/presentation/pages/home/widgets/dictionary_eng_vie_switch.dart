@@ -74,7 +74,7 @@ class _DictionaryLanguageSwitchState extends State<DictionaryLanguageSwitch>
     const double iconSize = 18;
 
     return Container(
-      padding: const EdgeInsets.all(4),
+      padding: const EdgeInsets.only(top: 20, right: 10, left: 2),
       child: GestureDetector(
         onTap: _toggleLanguage,
         child: Column(
@@ -110,7 +110,7 @@ class _DictionaryLanguageSwitchState extends State<DictionaryLanguageSwitch>
                         height: height - 8,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(height / 2),
-                          color: CustomTheme.white,
+                          color: Colors.white38,
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,

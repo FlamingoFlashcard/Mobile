@@ -8,6 +8,7 @@ import 'package:lacquer/features/dictionary/bloc/dictionary_event.dart';
 import 'package:lacquer/features/dictionary/bloc/dictionary_state.dart';
 import 'package:lacquer/presentation/pages/home/widgets/dictionary_eng_vie_switch.dart';
 import 'package:lacquer/presentation/pages/home/widgets/dictionary_word_detail_widget.dart';
+import 'package:lacquer/presentation/widgets/dictionary_topic_widget.dart';
 
 class Dictionarypage extends StatefulWidget {
   const Dictionarypage({super.key});
@@ -57,7 +58,7 @@ class _DicitionarypageState extends State<Dictionarypage> {
       ),
       DictionaryStateWordDetailsLoading() => _buildSearchingWidget(),
       DictionaryStateWordDetailsSuccess() => DictionaryWordWidget(
-        word: dictionaryState.vocabulary,       
+        word: dictionaryState.vocabulary,
         onBack: () {
           _onLoadingMainScreen();
         },
@@ -128,7 +129,7 @@ class _DicitionarypageState extends State<Dictionarypage> {
       controller: _searchController,
       focusNode: _focusNode,
       decoration: InputDecoration(
-        hintText: isEngToVie ? 'Search...' : 'Tìm kiếm...',
+        hintText: isEngToVie ? 'Search vocabulary' : 'Tìm kiếm từ vựng',
         prefixIcon: const Icon(Icons.search),
         suffixIcon:
             _searchController.text.isNotEmpty
@@ -298,6 +299,7 @@ class _DicitionarypageState extends State<Dictionarypage> {
 
   Widget _buildMainScreenWidget() {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         _buildAppBar(context, () {
           context.go('/');
@@ -307,12 +309,12 @@ class _DicitionarypageState extends State<Dictionarypage> {
           children: [
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.only(top: 10, right: 10, left: 10),
                 child: _buildSearchBar(),
               ),
             ),
             DictionaryLanguageSwitch(
-              onLanguageChanged: (isEngToVie) {                
+              onLanguageChanged: (isEngToVie) {
                 setState(() {
                   this.isEngToVie = isEngToVie;
                   _searchController.clear();
@@ -331,17 +333,16 @@ class _DicitionarypageState extends State<Dictionarypage> {
         _buildRecentSearches(),
         const SizedBox(height: 20),
         _buildTitle(
-          isEngToVie ? 'Favorite Words' : 'Từ yêu thích',
-          icon: FontAwesomeIcons.solidHeart,
+          isEngToVie ? 'Topic' : 'Chủ đề',
+          icon: FontAwesomeIcons.star,
+        ),
+        DictionaryTopicWidget(
+          onWordSearch: (word) {
+            _onGetWord(word);
+          },
+          isEngToVie: isEngToVie,
         ),
         const SizedBox(height: 20),
-        // Placeholder for dictionary content
-        Center(
-          child: Text(
-            'Dictionary content goes here',
-            style: TextStyle(fontSize: 18, color: Colors.grey[700]),
-          ),
-        ),
       ],
     );
   }
@@ -354,13 +355,32 @@ class _DicitionarypageState extends State<Dictionarypage> {
           _onLoadingMainScreen();
         }),
         const SizedBox(height: 10),
-        Padding(padding: const EdgeInsets.all(8.0), child: _buildSearchBar()),
-        const SizedBox(height: 20),
-        Flexible(
-          child:
-              _focusNode.hasFocus && suggestions.isNotEmpty
-                  ? _buildSuggestionsList()
-                  : _buildEmptyState(),
+        Padding(
+          padding: const EdgeInsets.only(top: 10, right: 10, left: 10),
+          child: _buildSearchBar(),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            decoration: BoxDecoration(
+              color: CustomTheme.mainColor3,
+              border: const Border(
+                left: BorderSide(color: Colors.grey, width: 1.0),
+                right: BorderSide(color: Colors.grey, width: 1.0),
+                bottom: BorderSide(color: Colors.grey, width: 1.0),
+                top: BorderSide.none,
+              ),
+              borderRadius: const BorderRadius.only(
+                bottomLeft: Radius.circular(8),
+                bottomRight: Radius.circular(8),
+              ),
+            ),
+            child:
+                _focusNode.hasFocus && suggestions.isNotEmpty
+                    ? _buildSuggestionsList()
+                    : _buildEmptyState(),
+          ),
         ),
       ],
     );
@@ -430,8 +450,10 @@ class _DicitionarypageState extends State<Dictionarypage> {
           _onLoadingMainScreen();
         }),
         const SizedBox(height: 10),
-        Padding(padding: const EdgeInsets.all(8.0), child: _buildSearchBar()),
-        const SizedBox(height: 20),
+        Padding(
+          padding: const EdgeInsets.only(top: 10, right: 10, left: 10),
+          child: _buildSearchBar(),
+        ),
         Flexible(
           child: ListView.separated(
             shrinkWrap: true,
@@ -486,7 +508,7 @@ class _DicitionarypageState extends State<Dictionarypage> {
     searchResults.clear();
     context.read<DictionaryBloc>().add(
       DictionaryEventLoadMainScreen(lang: isEngToVie ? 'en' : 'vn'),
-    );    
+    );
     setState(() {
       _searchController.clear();
       _focusNode.unfocus();
@@ -495,6 +517,8 @@ class _DicitionarypageState extends State<Dictionarypage> {
 
   void _onSearch(String query) {
     if (query.isEmpty) return;
+    _focusNode.unfocus();
+    _searchController.text = query;
     context.read<DictionaryBloc>().add(
       DictionaryEventSearch(query: query, lang: isEngToVie ? 'en' : 'vn'),
     );
@@ -519,7 +543,10 @@ class _DicitionarypageState extends State<Dictionarypage> {
 
   void _onRemoveRecentSearch(String word) {
     context.read<DictionaryBloc>().add(
-      DictionaryEventRemoveRecentSearch(word: word, lang: isEngToVie ? 'en' : 'vn'),
+      DictionaryEventRemoveRecentSearch(
+        word: word,
+        lang: isEngToVie ? 'en' : 'vn',
+      ),
     );
   }
 }
