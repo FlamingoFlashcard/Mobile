@@ -238,6 +238,7 @@ class _DicitionarypageState extends State<Dictionarypage> {
             ),
             deleteIcon: const Icon(Icons.close, size: 18),
             onDeleted: () {
+              _onRemoveRecentSearch(word);
               setState(() {
                 recentSearches.removeAt(index);
               });
@@ -252,7 +253,6 @@ class _DicitionarypageState extends State<Dictionarypage> {
       ),
     );
   }
-
 
   Widget _buildTitle(String title, {IconData? icon}) {
     return Padding(
@@ -312,12 +312,12 @@ class _DicitionarypageState extends State<Dictionarypage> {
               ),
             ),
             DictionaryLanguageSwitch(
-              onLanguageChanged: (isEngToVie) {
-                _onLoadingMainScreen();
+              onLanguageChanged: (isEngToVie) {                
                 setState(() {
                   this.isEngToVie = isEngToVie;
                   _searchController.clear();
                 });
+                _onLoadingMainScreen();
               },
               isEngToVie: isEngToVie,
             ),
@@ -462,7 +462,7 @@ class _DicitionarypageState extends State<Dictionarypage> {
                       (entry) => Padding(
                         padding: const EdgeInsets.only(top: 2),
                         child: Text(
-                          '${entry.key}: ${entry.value.join(", ")}',
+                          '- (${entry.key}) ${entry.value.join(", ")}',
                           style: const TextStyle(fontSize: 14),
                         ),
                       ),
@@ -517,14 +517,9 @@ class _DicitionarypageState extends State<Dictionarypage> {
     );
   }
 
-  void _onToggleFavorite(String word, bool isFavorite) {
-    if (word.isEmpty) return;
+  void _onRemoveRecentSearch(String word) {
     context.read<DictionaryBloc>().add(
-      DictionaryEventToggleFavorite(
-        word: word,
-        lang: isEngToVie ? 'en' : 'vn',
-        isFavorite: isFavorite,
-      ),
+      DictionaryEventRemoveRecentSearch(word: word, lang: isEngToVie ? 'en' : 'vn'),
     );
   }
 }

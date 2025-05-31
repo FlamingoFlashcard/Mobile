@@ -16,7 +16,9 @@ class DictionaryRepository {
   // Api Calls
   Future<Result<Vocabulary>> searchWord(String word, String lang) async {
     try {
-      final reponse = await dictionaryApiClients.searchWord(SearchWordDto(lang, word));
+      final reponse = await dictionaryApiClients.searchWord(
+        SearchWordDto(lang, word),
+      );
       return Success(reponse.data);
     } catch (e) {
       return Failure(e.toString());
@@ -25,16 +27,23 @@ class DictionaryRepository {
 
   Future<Result<List<String>>> searchPrefix(String prefix, String lang) async {
     try {
-      final reponse = await dictionaryApiClients.searchPrefix(SearchPrefixDto(lang, prefix));
+      final reponse = await dictionaryApiClients.searchPrefix(
+        SearchPrefixDto(lang, prefix),
+      );
       return Success(reponse.data);
     } catch (e) {
       return Failure(e.toString());
     }
   }
 
-  Future<Result<List<Vocabulary>>> searchQuery(String query, String lang) async {
+  Future<Result<List<Vocabulary>>> searchQuery(
+    String query,
+    String lang,
+  ) async {
     try {
-      final reponse = await dictionaryApiClients.searchQuery(SearchQueryDto(lang, query));
+      final reponse = await dictionaryApiClients.searchQuery(
+        SearchQueryDto(lang, query),
+      );
       await saveRecentSearch(query, lang);
       return Success(reponse.data.vocabularies);
     } catch (e) {
@@ -54,19 +63,12 @@ class DictionaryRepository {
 
   Future<List<String>> getRecentSearches(String lang) async {
     try {
-      final recentSearches = await dictionaryLocalDataSource.getRecentSearches(lang);
+      final recentSearches = await dictionaryLocalDataSource.getRecentSearches(
+        lang,
+      );
       return recentSearches ?? [];
     } catch (e) {
       return [];
-    }
-  }
-
-  Future<Result<void>> clearRecentSearches(String lang) async {
-    try {
-      await dictionaryLocalDataSource.clearRecentSearches(lang);
-      return Success(null);
-    } catch (e) {
-      return Failure(e.toString());
     }
   }
 
@@ -74,15 +76,6 @@ class DictionaryRepository {
     try {
       await dictionaryLocalDataSource.removeRecentSearch(word, lang);
       return Success(null);
-    } catch (e) {
-      return Failure(e.toString());
-    }
-  }
-
-  Future<Result<bool>> isRecentSearch(String word, String lang) async {
-    try {
-      final isRecent = await dictionaryLocalDataSource.isRecentSearch(word, lang);
-      return Success(isRecent);
     } catch (e) {
       return Failure(e.toString());
     }
