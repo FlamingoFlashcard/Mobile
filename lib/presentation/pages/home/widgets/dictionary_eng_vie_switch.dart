@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lacquer/config/theme.dart';
 
 class DictionaryLanguageSwitch extends StatefulWidget {
   final bool isEngToVie;
