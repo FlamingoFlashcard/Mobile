@@ -8,6 +8,7 @@ import 'package:lacquer/features/flashcard/bloc/flashcard_bloc.dart';
 import 'package:lacquer/features/flashcard/bloc/flashcard_event.dart';
 import 'package:lacquer/features/flashcard/bloc/flashcard_state.dart';
 import 'package:lacquer/presentation/pages/home/widgets/learning_card_list.dart';
+import 'package:lacquer/presentation/pages/home/widgets/speech_adjustment.dart';
 
 class LearningFlashcardPage extends StatefulWidget {
   final String deckId;
@@ -20,6 +21,8 @@ class LearningFlashcardPage extends StatefulWidget {
 
 class _LearningFlashcardPageState extends State<LearningFlashcardPage> {
   double _progress = 0.0;
+  double _speechRate = 0.5;
+  String _selectedAccent = 'en-US';
 
   @override
   void initState() {
@@ -32,6 +35,37 @@ class _LearningFlashcardPageState extends State<LearningFlashcardPage> {
       _progress = progress.clamp(0.0, 1.0);
     });
   }
+
+  void _showTtsSettings() async {
+    final result = await showDialog<Map<String, dynamic>>(
+      context: context,
+      builder:
+          (context) => SpeechAdjustment(
+            initialSpeed: _speechRate,
+            initialAccent:
+                _accents.entries
+                    .firstWhere(
+                      (entry) => entry.value == _selectedAccent,
+                      orElse: () => const MapEntry('US English', 'en-US'),
+                    )
+                    .key,
+          ),
+    );
+
+    if (result != null) {
+      setState(() {
+        _speechRate = result['speed'] as double;
+        _selectedAccent = result['accent'] as String;
+      });
+    }
+  }
+
+  static final Map<String, String> _accents = {
+    'US English': 'en-US',
+    'UK English': 'en-GB',
+    'Australian': 'en-AU',
+    'Indian': 'en-IN',
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -91,6 +125,8 @@ class _LearningFlashcardPageState extends State<LearningFlashcardPage> {
                       child: LearningCardList(
                         cards: deck.cards ?? [],
                         onScrollProgress: _updateProgress,
+                        speechRate: _speechRate,
+                        selectedAccent: _selectedAccent,
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -131,21 +167,24 @@ class _LearningFlashcardPageState extends State<LearningFlashcardPage> {
                   context.go(RouteName.flashcards);
                 },
               ),
-              Expanded(
-                child: Center(
-                  child: Text(
-                    title ?? '',
-                    style: const TextStyle(
-                      fontSize: 24,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+              Text(
+                title ?? '',
+                style: const TextStyle(
+                  fontSize: 24,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(width: 15),
+              const Spacer(),
               IconButton(
-                icon: const Icon(FontAwesomeIcons.plus, color: Colors.white),
+                icon: const Icon(FontAwesomeIcons.gear, color: Colors.white),
+                onPressed: _showTtsSettings,
+              ),
+              IconButton(
+                icon: const Icon(
+                  FontAwesomeIcons.ellipsisVertical,
+                  color: Colors.white,
+                ),
                 onPressed: null,
               ),
               const SizedBox(width: 10),

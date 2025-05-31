@@ -27,6 +27,7 @@ class FlashcardTopicState extends State<FlashcardTopic> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
     return GestureDetector(
       onTap: () {
         showDialog(
@@ -49,7 +50,7 @@ class FlashcardTopicState extends State<FlashcardTopic> {
         child: Material(
           borderRadius: BorderRadius.circular(12),
           child: Container(
-            width: 350,
+            width: size.width - 30,
             height: 200,
             decoration: BoxDecoration(
               color: Colors.white,
