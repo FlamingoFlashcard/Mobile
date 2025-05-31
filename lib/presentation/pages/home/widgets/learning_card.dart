@@ -8,8 +8,15 @@ import 'package:flutter_tts/flutter_tts.dart';
 
 class LearningCard extends StatefulWidget {
   final CardDto card;
+  final double speechRate;
+  final String selectedAccent;
 
-  const LearningCard({super.key, required this.card});
+  const LearningCard({
+    super.key,
+    required this.card,
+    required this.speechRate,
+    required this.selectedAccent,
+  });
 
   @override
   State<LearningCard> createState() => _LearningCardState();
@@ -29,10 +36,18 @@ class _LearningCardState extends State<LearningCard>
       vsync: this,
     );
     flutterTts = FlutterTts();
+    _initializeTts();
+  }
+
+  Future<void> _initializeTts() async {
+    await flutterTts.setLanguage(widget.selectedAccent);
+    await flutterTts.setSpeechRate(widget.speechRate);
+    await flutterTts.setPitch(1.0);
   }
 
   Future<void> _speak(String text) async {
-    await flutterTts.setLanguage("en-US");
+    await flutterTts.setLanguage(widget.selectedAccent);
+    await flutterTts.setSpeechRate(widget.speechRate);
     await flutterTts.setPitch(1.0);
     await flutterTts.speak(text);
   }
@@ -203,16 +218,20 @@ class _LearningCardState extends State<LearningCard>
                   Positioned(
                     bottom: 24,
                     right: 12,
-                    child: IconButton(
-                      onPressed: () {
-                        if ((card.word ?? '').isNotEmpty) {
-                          _speak(card.word!);
-                        }
-                      },
-                      icon: const Icon(
-                        FontAwesomeIcons.volumeHigh,
-                        color: Colors.grey,
-                      ),
+                    child: Row(
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            if ((card.word ?? '').isNotEmpty) {
+                              _speak(card.word!);
+                            }
+                          },
+                          icon: const Icon(
+                            FontAwesomeIcons.volumeHigh,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],

@@ -5,11 +5,15 @@ import 'package:lacquer/presentation/pages/home/widgets/learning_card.dart';
 class LearningCardList extends StatefulWidget {
   final List<CardDto> cards;
   final Function(double)? onScrollProgress;
+  final double speechRate;
+  final String selectedAccent;
 
   const LearningCardList({
     super.key,
     required this.cards,
     this.onScrollProgress,
+    required this.speechRate,
+    required this.selectedAccent,
   });
 
   @override
@@ -48,7 +52,11 @@ class _LearningCardListState extends State<LearningCardList> {
       itemCount: widget.cards.length,
       onPageChanged: _onPageChanged,
       itemBuilder: (context, index) {
-        return LearningCard(card: widget.cards[index]);
+        return LearningCard(
+          card: widget.cards[index],
+          speechRate: widget.speechRate,
+          selectedAccent: widget.selectedAccent,
+        );
       },
     );
   }
