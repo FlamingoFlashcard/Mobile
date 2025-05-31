@@ -19,10 +19,18 @@ class LearningFlashcardPage extends StatefulWidget {
 }
 
 class _LearningFlashcardPageState extends State<LearningFlashcardPage> {
+  double _progress = 0.0;
+
   @override
   void initState() {
     super.initState();
     context.read<FlashcardBloc>().add(LoadDeckByIdRequested(widget.deckId));
+  }
+
+  void _updateProgress(double progress) {
+    setState(() {
+      _progress = progress.clamp(0.0, 1.0);
+    });
   }
 
   @override
@@ -45,7 +53,46 @@ class _LearningFlashcardPageState extends State<LearningFlashcardPage> {
                 _buildAppBar(context, deck.title),
                 Column(
                   children: [
-                    Expanded(child: LearningCardList(cards: deck.cards ?? [])),
+                    const SizedBox(height: 100),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0,
+                        vertical: 8.0,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            width: 200,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(4.0),
+                              child: LinearProgressIndicator(
+                                value: _progress,
+                                backgroundColor: Colors.grey[300],
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  const Color.fromARGB(255, 104, 175, 106),
+                                ),
+                                minHeight: 12.0,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            '${(_progress * 100).toStringAsFixed(0)}%',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: LearningCardList(
+                        cards: deck.cards ?? [],
+                        onScrollProgress: _updateProgress,
+                      ),
+                    ),
                     const SizedBox(height: 20),
                     if (deck.cards == null || deck.cards!.isEmpty)
                       const Text('No cards available in this deck'),

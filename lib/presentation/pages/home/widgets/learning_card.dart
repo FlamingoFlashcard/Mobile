@@ -8,7 +8,9 @@ import 'package:flutter_tts/flutter_tts.dart';
 
 class LearningCard extends StatefulWidget {
   final CardDto card;
+
   const LearningCard({super.key, required this.card});
+
   @override
   State<LearningCard> createState() => _LearningCardState();
 }
@@ -55,7 +57,7 @@ class _LearningCardState extends State<LearningCard>
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.only(top: 90),
+        padding: const EdgeInsets.only(top: 0),
         child: GestureDetector(
           onTap: _flipCard,
           child: AnimatedBuilder(
