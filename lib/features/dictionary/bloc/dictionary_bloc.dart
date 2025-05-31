@@ -11,7 +11,14 @@ class DictionaryBloc extends Bloc<DictionaryEvent, DictionaryState> {
     on<DictionaryEventSearch>(_onSearch);
     on<DictionaryEventSuggestions>(_onSuggestions);
     on<DictionaryEventGetWord>(_onGetWord);
-    on<DictionaryEventSaveFavorite>(_onSaveFavorite);
+    on<DictionaryEventRemoveRecentSearch>(
+      (event, emit) async {
+        await dictionaryRepository.removeRecentSearch(
+          event.word,
+          event.lang,
+        );
+      },
+    );
   }
   final DictionaryRepository dictionaryRepository;
 
@@ -25,27 +32,19 @@ class DictionaryBloc extends Bloc<DictionaryEvent, DictionaryState> {
   ) async {
     emit(DictionaryStateMainScreenLoading());
     final language = event.lang;
-    final recentSearchesResult = await dictionaryRepository.getRecentSearches(
-      language,
-    );
-    final favoritesResult = await dictionaryRepository.getFavorites(language);
-    if (recentSearchesResult is Failure) {
-      emit(DictionaryStateMainScreenFailure("Failed to load recent searches"));
-      return;
+    try {
+      final recentSearches = await dictionaryRepository.getRecentSearches(
+        language,
+      );
+      emit(
+        DictionaryStateMainScreenSuccess(
+          recentSearches: recentSearches,
+          lang: language,
+        ),
+      );
+    } catch (e) {
+      emit(DictionaryStateMainScreenFailure("Error: $e"));
     }
-    if (favoritesResult is Failure) {
-      emit(DictionaryStateMainScreenFailure("Failed to load favorites"));
-      return;
-    }
-    final recentSearch = (recentSearchesResult as Success).data;
-    final favorites = (favoritesResult as Success).data;
-    emit(
-      DictionaryStateMainScreenSuccess(
-        lang: language,
-        recentSearches: recentSearch,
-        favorites: favorites,
-      ),
-    );
   }
 
   void _onSuggestions(
@@ -64,7 +63,7 @@ class DictionaryBloc extends Bloc<DictionaryEvent, DictionaryState> {
           lang: language,
         ),
       ),
-      Failure() => emit(DictionaryStateSearchFailure(result.message)),
+      Failure() => {},
     });
   }
 
@@ -82,7 +81,6 @@ class DictionaryBloc extends Bloc<DictionaryEvent, DictionaryState> {
       Success(data: final searchResult) => emit(
         DictionaryStateSearchSuccess(
           query: event.query,
-          numberOfResults: searchResult.length,
           results: searchResult,
           lang: language,
         ),
@@ -102,25 +100,13 @@ class DictionaryBloc extends Bloc<DictionaryEvent, DictionaryState> {
     );
     return (switch (result) {
       Success(data: final vocabulary) => emit(
-        DictionaryStateWordDetailsSuccess(vocabulary: vocabulary),
+        DictionaryStateWordDetailsSuccess(
+          vocabulary: vocabulary,
+        ),
       ),
-      Failure() => emit(DictionaryStateSearchFailure(result.message)),
+      Failure() => emit(DictionaryStateWordDetailsFailure(result.message)),
     });
   }
 
-  void _onSaveFavorite(
-    DictionaryEventSaveFavorite event,
-    Emitter<DictionaryState> emit,
-  ) async {
-    final result = await dictionaryRepository.saveFavorite(
-      event.word,
-      event.lang,
-    );
-    if (result is Failure) {
-      emit(DictionaryStateMainScreenFailure("Failed to save favorite"));
-      return;
-    }
-    add(DictionaryEventLoadMainScreen(lang: event.lang));
-    return;
-  }
+  
 }

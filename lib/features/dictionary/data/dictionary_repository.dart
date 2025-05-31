@@ -13,10 +13,12 @@ class DictionaryRepository {
     required this.dictionaryLocalDataSource,
   });
 
+  // Api Calls
   Future<Result<Vocabulary>> searchWord(String word, String lang) async {
     try {
-      final reponse = await dictionaryApiClients.searchWord(SearchWordDto(lang, word));
-      await saveRecentSearch(word, lang);
+      final reponse = await dictionaryApiClients.searchWord(
+        SearchWordDto(lang, word),
+      );
       return Success(reponse.data);
     } catch (e) {
       return Failure(e.toString());
@@ -25,16 +27,23 @@ class DictionaryRepository {
 
   Future<Result<List<String>>> searchPrefix(String prefix, String lang) async {
     try {
-      final reponse = await dictionaryApiClients.searchPrefix(SearchPrefixDto(lang, prefix));
+      final reponse = await dictionaryApiClients.searchPrefix(
+        SearchPrefixDto(lang, prefix),
+      );
       return Success(reponse.data);
     } catch (e) {
       return Failure(e.toString());
     }
   }
 
-  Future<Result<List<Vocabulary>>> searchQuery(String query, String lang) async {
+  Future<Result<List<Vocabulary>>> searchQuery(
+    String query,
+    String lang,
+  ) async {
     try {
-      final reponse = await dictionaryApiClients.searchQuery(SearchQueryDto(lang, query));
+      final reponse = await dictionaryApiClients.searchQuery(
+        SearchQueryDto(lang, query),
+      );
       await saveRecentSearch(query, lang);
       return Success(reponse.data.vocabularies);
     } catch (e) {
@@ -42,6 +51,7 @@ class DictionaryRepository {
     }
   }
 
+  // Recent Searches and Favorites
   Future<Result<void>> saveRecentSearch(String word, String lang) async {
     try {
       await dictionaryLocalDataSource.saveRecentSearch(word, lang);
@@ -51,63 +61,20 @@ class DictionaryRepository {
     }
   }
 
-  Future<Result<List<String>>> getRecentSearches(String lang) async {
+  Future<List<String>> getRecentSearches(String lang) async {
     try {
-      final recentSearches = dictionaryLocalDataSource.getRecentSearches(lang);
-      return Success(recentSearches as List<String>);
+      final recentSearches = await dictionaryLocalDataSource.getRecentSearches(
+        lang,
+      );
+      return recentSearches ?? [];
     } catch (e) {
-      return Failure(e.toString());
-    }
-  }
-
-  Future<Result<void>> clearRecentSearches(String lang) async {
-    try {
-      await dictionaryLocalDataSource.clearRecentSearches(lang);
-      return Success(null);
-    } catch (e) {
-      return Failure(e.toString());
+      return [];
     }
   }
 
   Future<Result<void>> removeRecentSearch(String word, String lang) async {
     try {
       await dictionaryLocalDataSource.removeRecentSearch(word, lang);
-      return Success(null);
-    } catch (e) {
-      return Failure(e.toString());
-    }
-  }
-
-  Future<Result<void>> saveFavorite(String word, String lang) async {
-    try {
-      await dictionaryLocalDataSource.saveFavorite(word, lang);
-      return Success(null);
-    } catch (e) {
-      return Failure(e.toString());
-    }
-  }
-
-  Future<Result<List<String>>> getFavorites(String lang) async {
-    try {
-      final favorites = dictionaryLocalDataSource.getFavorites(lang);
-      return Success(favorites as List<String>);
-    } catch (e) {
-      return Failure(e.toString());
-    }
-  }
-
-  Future<Result<void>> removeFavorite(String word, String lang) async {
-    try {
-      await dictionaryLocalDataSource.removeFavorite(word, lang);
-      return Success(null);
-    } catch (e) {
-      return Failure(e.toString());
-    }
-  }
-
-  Future<Result<void>> clearFavorites(String lang) async {
-    try {
-      await dictionaryLocalDataSource.clearFavorites(lang);
       return Success(null);
     } catch (e) {
       return Failure(e.toString());
