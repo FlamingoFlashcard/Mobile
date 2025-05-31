@@ -10,9 +10,10 @@ import 'package:lacquer/presentation/pages/auth/verify_page.dart';
 import 'package:lacquer/presentation/pages/camera/camera_page.dart';
 import 'package:lacquer/presentation/pages/camera/about_screen.dart';
 import 'package:lacquer/presentation/pages/home/dictionary_page.dart';
-import 'package:lacquer/presentation/pages/profile/profile_page.dart';
 import 'package:lacquer/presentation/pages/home/flashcard_page.dart';
 import 'package:lacquer/presentation/pages/home/learning_flashcard_page.dart';
+import 'package:lacquer/features/profile/bloc/profile_bloc.dart';
+import 'package:lacquer/features/profile/bloc/profile_event.dart';
 
 import 'package:lacquer/presentation/pages/mainscreen.dart';
 import 'package:flutter/widgets.dart';
@@ -25,7 +26,6 @@ class RouteName {
   static const String register = '/register';
   static const String camera = '/camera';
   static const String about = '/about';
-  static const String profile = '/profile';
   static const String flashcards = '/flashcards';
   static const String dictionary = '/dictionary';
 
@@ -56,6 +56,7 @@ final router = GoRouter(
       context.read<ChatbotBloc>().add(
         ChatbotEventGetHistory(userId: userId ?? ''),
       );
+      context.read<ProfileBloc>().add(ProfileLoadRequested());
       return null;
     }
     return RouteName.login;
@@ -87,10 +88,6 @@ final router = GoRouter(
         final imagePath = state.extra as String;
         return AboutScreen(imagePath: imagePath);
       },
-    ),
-    noTransitionRoute(
-      path: RouteName.profile,
-      builder: (context, state) => const ProfilePage(),
     ),
     noTransitionRoute(
       path: RouteName.flashcards,
