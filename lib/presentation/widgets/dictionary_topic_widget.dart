@@ -455,8 +455,8 @@ class _DictionaryTopicWidgetState extends State<DictionaryTopicWidget> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: topics[selectedCategoryIndex!].color.withOpacity(
-                        0.1,
+                      color: topics[selectedCategoryIndex!].color.withValues(
+                        alpha: 0.1,
                       ),
                       borderRadius: const BorderRadius.only(
                         topLeft: Radius.circular(12),
@@ -510,7 +510,7 @@ class _DictionaryTopicWidgetState extends State<DictionaryTopicWidget> {
             itemBuilder: (context, index) {
               final topic = topics[index];
               final isSelected = selectedCategoryIndex == index;
-          
+
               return GestureDetector(
                 onTap: () {
                   setState(() {
@@ -522,7 +522,7 @@ class _DictionaryTopicWidgetState extends State<DictionaryTopicWidget> {
                   decoration: BoxDecoration(
                     color:
                         isSelected
-                            ? topic.color.withOpacity(0.2)
+                            ? topic.color.withValues(alpha: 0.2)
                             : Colors.white,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
@@ -531,7 +531,7 @@ class _DictionaryTopicWidgetState extends State<DictionaryTopicWidget> {
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
+                        color: Colors.grey.withValues(alpha: 0.1),
                         spreadRadius: 1,
                         blurRadius: 4,
                         offset: const Offset(0, 2),
@@ -602,7 +602,7 @@ class WordCard extends StatelessWidget {
       child: ListTile(
         onTap: onTap,
         leading: CircleAvatar(
-          backgroundColor: Colors.indigo.withOpacity(0.1),
+          backgroundColor: Colors.indigo.withValues(alpha: 0.1),
           child: Text(
             displayChar,
             style: const TextStyle(

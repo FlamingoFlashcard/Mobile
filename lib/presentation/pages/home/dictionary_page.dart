@@ -291,7 +291,7 @@ class _DicitionarypageState extends State<Dictionarypage> {
   Widget _buildSwitchLoadingScreenWidget() {
     return Stack(
       children: [
-        ModalBarrier(dismissible: false, color: Colors.black.withOpacity(0.3)),
+        ModalBarrier(dismissible: false, color: Colors.black.withValues(alpha: 0.3)),
         Center(child: CircularProgressIndicator()),
       ],
     );
@@ -328,7 +328,7 @@ class _DicitionarypageState extends State<Dictionarypage> {
         const SizedBox(height: 20),
         _buildTitle(
           isEngToVie ? 'Recent Searches' : 'Tìm kiếm gần đây',
-          icon: FontAwesomeIcons.history,
+          icon: Icons.history,
         ),
         _buildRecentSearches(),
         const SizedBox(height: 20),
