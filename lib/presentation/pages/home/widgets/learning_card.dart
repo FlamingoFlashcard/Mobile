@@ -4,6 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:lacquer/config/theme.dart';
 import 'package:lacquer/features/flashcard/dtos/card_dto.dart';
 import 'package:lacquer/presentation/utils/wave_clipper.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 
 class LearningCard extends StatefulWidget {
   final CardDto card;
@@ -16,6 +17,7 @@ class _LearningCardState extends State<LearningCard>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   bool _isFront = true;
+  late FlutterTts flutterTts;
 
   @override
   void initState() {
@@ -24,6 +26,13 @@ class _LearningCardState extends State<LearningCard>
       duration: const Duration(milliseconds: 500),
       vsync: this,
     );
+    flutterTts = FlutterTts();
+  }
+
+  Future<void> _speak(String text) async {
+    await flutterTts.setLanguage("en-US");
+    await flutterTts.setPitch(1.0);
+    await flutterTts.speak(text);
   }
 
   void _flipCard() {
@@ -38,6 +47,7 @@ class _LearningCardState extends State<LearningCard>
   @override
   void dispose() {
     _controller.dispose();
+    flutterTts.stop();
     super.dispose();
   }
 
@@ -192,7 +202,11 @@ class _LearningCardState extends State<LearningCard>
                     bottom: 24,
                     right: 12,
                     child: IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        if ((card.word ?? '').isNotEmpty) {
+                          _speak(card.word!);
+                        }
+                      },
                       icon: const Icon(
                         FontAwesomeIcons.volumeHigh,
                         color: Colors.grey,
