@@ -21,7 +21,6 @@ class _DicitionarypageState extends State<Dictionarypage> {
   final FocusNode _focusNode = FocusNode();
   final TextEditingController _searchController = TextEditingController();
   List<String> recentSearches = [];
-  List<String> favoriteWords = [];
   List<SearchResultItem> searchResults = [];
   List<String> suggestions = [];
   bool _isLoading = false;
@@ -58,11 +57,7 @@ class _DicitionarypageState extends State<Dictionarypage> {
       ),
       DictionaryStateWordDetailsLoading() => _buildSearchingWidget(),
       DictionaryStateWordDetailsSuccess() => DictionaryWordWidget(
-        word: dictionaryState.vocabulary,
-        onFavoriteToggle: (word, isFavorite) {
-          _onToggleFavorite(word.word, isFavorite);
-        },
-        isFavorite: dictionaryState.isFavorite,
+        word: dictionaryState.vocabulary,       
         onBack: () {
           _onLoadingMainScreen();
         },
@@ -84,7 +79,6 @@ class _DicitionarypageState extends State<Dictionarypage> {
             break;
           case DictionaryStateMainScreenSuccess():
             recentSearches = state.recentSearches ?? [];
-            favoriteWords = state.favorites ?? [];
             setState(() {
               _isLoading = false;
             });
@@ -259,91 +253,6 @@ class _DicitionarypageState extends State<Dictionarypage> {
     );
   }
 
-  Widget _buildFavoriteWords() {
-    if (favoriteWords.isEmpty) {
-      return SizedBox(
-        height: 300,
-        child: Center(
-          child: Text(
-            isEngToVie ? 'No favorite words' : 'Không có từ yêu thích',
-            style: const TextStyle(fontSize: 16, color: Colors.grey),
-          ),
-        ),
-      );
-    }
-    return SizedBox(
-      height: 300,
-      child: ListView.separated(
-        shrinkWrap: true,
-        scrollDirection: Axis.vertical,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        itemCount: favoriteWords.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 10),
-        itemBuilder: (context, index) {
-          final word = favoriteWords[index];
-          final isOrange = !isEngToVie;
-          return Card(
-            elevation: 4,
-            shadowColor:
-                isOrange
-                    ? Colors.amber.withOpacity(0.2)
-                    : Colors.blue.withOpacity(0.2),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-              side: BorderSide(
-                color: isOrange ? Colors.amber.shade200 : Colors.blue.shade200,
-                width: 1.5,
-              ),
-            ),
-            color: isOrange ? Colors.yellow[50] : Colors.blue[50],
-            child: ListTile(
-              leading: CircleAvatar(
-                backgroundColor:
-                    isOrange ? Colors.amber.shade100 : Colors.blue.shade100,
-                child: Icon(
-                  FontAwesomeIcons.solidHeart,
-                  color: isOrange ? Colors.deepOrange : Colors.blue,
-                  size: 18,
-                ),
-              ),
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 10,
-              ),
-              title: GestureDetector(
-                onTap: () {
-                  _searchController.text = word;
-                  _focusNode.requestFocus();
-                },
-                child: Text(
-                  word,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                    color: isOrange ? Colors.deepOrange : Colors.blue,
-                  ),
-                ),
-              ),
-              trailing: IconButton(
-                icon: Icon(
-                  Icons.close,
-                  size: 22,
-                  color: isOrange ? Colors.redAccent : Colors.blueAccent,
-                ),
-                tooltip:
-                    isEngToVie ? 'Remove from favorites' : 'Xóa khỏi yêu thích',
-                onPressed: () {
-                  setState(() {
-                    favoriteWords.removeAt(index);
-                  });
-                },
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
 
   Widget _buildTitle(String title, {IconData? icon}) {
     return Padding(
@@ -425,7 +334,6 @@ class _DicitionarypageState extends State<Dictionarypage> {
           isEngToVie ? 'Favorite Words' : 'Từ yêu thích',
           icon: FontAwesomeIcons.solidHeart,
         ),
-        _buildFavoriteWords(),
         const SizedBox(height: 20),
         // Placeholder for dictionary content
         Center(
@@ -575,7 +483,6 @@ class _DicitionarypageState extends State<Dictionarypage> {
   //----------------------------- FUNCTIONS -----------------------------
   void _onLoadingMainScreen() {
     recentSearches.clear();
-    favoriteWords.clear();
     searchResults.clear();
     context.read<DictionaryBloc>().add(
       DictionaryEventLoadMainScreen(lang: isEngToVie ? 'en' : 'vn'),
@@ -619,13 +526,6 @@ class _DicitionarypageState extends State<Dictionarypage> {
         isFavorite: isFavorite,
       ),
     );
-    setState(() {
-      if (isFavorite) {
-        favoriteWords.remove(word);
-      } else {
-        favoriteWords.add(word);
-      }
-    });
   }
 }
 

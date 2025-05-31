@@ -1,80 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:lacquer/features/dictionary/dtos/search_result_dto.dart';
 
-class DictionaryWordWidget extends StatefulWidget {
+class DictionaryWordWidget extends StatelessWidget {
   final Vocabulary word;
-  final bool isFavorite;
-  final Function(Vocabulary word, bool isFavorite) onFavoriteToggle;
   final VoidCallback? onBack; // <-- Added
 
   const DictionaryWordWidget({
     super.key,
     required this.word,
-    this.isFavorite = false,
-    required this.onFavoriteToggle,
     this.onBack, // <-- Added
   });
-
-  @override
-  State<DictionaryWordWidget> createState() => _DictionaryWordWidgetState();
-}
-
-class _DictionaryWordWidgetState extends State<DictionaryWordWidget>
-    with SingleTickerProviderStateMixin {
-  late bool _isFavorite;
-  late AnimationController _animationController;
-  late Animation<double> _scaleAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _isFavorite = widget.isFavorite;
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 200),
-      vsync: this,
-    );
-    _scaleAnimation = Tween<double>(
-      begin: 1.0,
-      end: 1.2,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.elasticOut,
-    ));
-  }
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
-  }
-
-  void _toggleFavorite() {
-    setState(() {
-      _isFavorite = !_isFavorite;
-    });
-
-    // Trigger animation
-    _animationController.forward().then((_) {
-      _animationController.reverse();
-    });
-
-    // Call the callback function
-    widget.onFavoriteToggle(widget.word, _isFavorite);
-
-    // Show feedback
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          _isFavorite
-              ? '${widget.word.word} added to favorites!'
-              : '${widget.word.word} removed from favorites!',
-        ),
-        duration: const Duration(seconds: 2),
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: _isFavorite ? Colors.green : Colors.grey[600],
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -96,15 +31,15 @@ class _DictionaryWordWidgetState extends State<DictionaryWordWidget>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header with word, difficulty, favorite button, and back button
+          // Header with word, difficulty, and back button
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  _getDifficultyColor(widget.word.difficulty).withOpacity(0.8),
-                  _getDifficultyColor(widget.word.difficulty).withOpacity(0.6),
+                  _getDifficultyColor(word.difficulty).withOpacity(0.8),
+                  _getDifficultyColor(word.difficulty).withOpacity(0.6),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -121,11 +56,11 @@ class _DictionaryWordWidgetState extends State<DictionaryWordWidget>
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     // Back button
-                    if (widget.onBack != null)
+                    if (onBack != null)
                       Padding(
                         padding: const EdgeInsets.only(right: 12),
                         child: GestureDetector(
-                          onTap: widget.onBack,
+                          onTap: onBack,
                           child: const Icon(
                             Icons.arrow_back,
                             color: Colors.white,
@@ -135,7 +70,7 @@ class _DictionaryWordWidgetState extends State<DictionaryWordWidget>
                       ),
                     Expanded(
                       child: Text(
-                        widget.word.word,
+                        word.word,
                         style: const TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
@@ -143,58 +78,27 @@ class _DictionaryWordWidgetState extends State<DictionaryWordWidget>
                         ),
                       ),
                     ),
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            widget.word.difficulty.toUpperCase(),
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
-                          ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        word.difficulty.toUpperCase(),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
                         ),
-                        const SizedBox(width: 12),
-                        // Favorite button
-                        AnimatedBuilder(
-                          animation: _scaleAnimation,
-                          builder: (context, child) {
-                            return Transform.scale(
-                              scale: _scaleAnimation.value,
-                              child: GestureDetector(
-                                onTap: _toggleFavorite,
-                                child: Container(
-                                  padding: const EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.2),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Icon(
-                                    _isFavorite
-                                        ? Icons.favorite
-                                        : Icons.favorite_border,
-                                    color: Colors.white,
-                                    size: 24,
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ],
+                      ),
                     ),
                   ],
                 ),
-                if (widget.word.pronunciation.isNotEmpty) ...[
+                if (word.pronunciation.isNotEmpty) ...[
                   const SizedBox(height: 8),
                   Row(
                     children: [
@@ -205,7 +109,7 @@ class _DictionaryWordWidgetState extends State<DictionaryWordWidget>
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        widget.word.pronunciation,
+                        word.pronunciation,
                         style: const TextStyle(
                           fontSize: 16,
                           color: Colors.white70,
@@ -226,12 +130,12 @@ class _DictionaryWordWidgetState extends State<DictionaryWordWidget>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Images section
-                if (widget.word.img.isNotEmpty) ...[
+                if (word.img.isNotEmpty) ...[
                   SizedBox(
                     height: 120,
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
-                      itemCount: widget.word.img.length,
+                      itemCount: word.img.length,
                       itemBuilder: (context, index) {
                         return Container(
                           margin: const EdgeInsets.only(right: 12),
@@ -243,7 +147,7 @@ class _DictionaryWordWidgetState extends State<DictionaryWordWidget>
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(12),
                             child: Image.network(
-                              widget.word.img[index],
+                              word.img[index],
                               fit: BoxFit.cover,
                               errorBuilder: (context, error, stackTrace) {
                                 return Container(
@@ -265,7 +169,7 @@ class _DictionaryWordWidgetState extends State<DictionaryWordWidget>
                 ],
 
                 // Word types and definitions
-                if (widget.word.wordTypes.isNotEmpty) ...[
+                if (word.wordTypes.isNotEmpty) ...[
                   const Text(
                     'Definitions',
                     style: TextStyle(
@@ -275,11 +179,11 @@ class _DictionaryWordWidgetState extends State<DictionaryWordWidget>
                     ),
                   ),
                   const SizedBox(height: 16),
-                  ...widget.word.wordTypes.map((wordType) => _buildWordTypeCard(wordType)),
+                  ...word.wordTypes.map((wordType) => _buildWordTypeCard(wordType)),
                 ],
 
                 // Examples section
-                if (widget.word.examples.isNotEmpty) ...[
+                if (word.examples.isNotEmpty) ...[
                   const SizedBox(height: 24),
                   const Text(
                     'Examples',
@@ -290,7 +194,7 @@ class _DictionaryWordWidgetState extends State<DictionaryWordWidget>
                     ),
                   ),
                   const SizedBox(height: 16),
-                  ...widget.word.examples.map((example) => _buildExampleCard(example)),
+                  ...word.examples.map((example) => _buildExampleCard(example)),
                 ],
               ],
             ),
