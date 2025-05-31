@@ -7,7 +7,7 @@ import 'package:lacquer/config/theme.dart';
 import 'package:lacquer/features/flashcard/bloc/flashcard_bloc.dart';
 import 'package:lacquer/features/flashcard/bloc/flashcard_event.dart';
 import 'package:lacquer/features/flashcard/bloc/flashcard_state.dart';
-import 'package:lacquer/presentation/pages/home/widgets/learning_card.dart';
+import 'package:lacquer/presentation/pages/home/widgets/learning_card_list.dart';
 
 class LearningFlashcardPage extends StatefulWidget {
   final String deckId;
@@ -44,11 +44,10 @@ class _LearningFlashcardPageState extends State<LearningFlashcardPage> {
               children: [
                 _buildAppBar(context, deck.title),
                 Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    LearningCard(card: deck.cards![0]),
+                    Expanded(child: LearningCardList(cards: deck.cards ?? [])),
                     const SizedBox(height: 20),
-                    if (deck.cards == null && deck.cards!.isEmpty)
+                    if (deck.cards == null || deck.cards!.isEmpty)
                       const Text('No cards available in this deck'),
                   ],
                 ),
