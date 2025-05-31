@@ -29,8 +29,22 @@ class DictionaryEventGetWord extends DictionaryEvent {
   final String lang;
 }
 
-class DictionaryEventSaveFavorite extends DictionaryEvent {
-  DictionaryEventSaveFavorite({required this.word, required this.lang});
+class DictionaryEventToggleFavorite extends DictionaryEvent {
+  DictionaryEventToggleFavorite({required this.word, required this.lang, required this.isFavorite});
+
+  final String word;
+  final String lang;
+  final bool isFavorite;
+}
+
+class DictionaryEventSaveRecentSearch extends DictionaryEvent {
+  DictionaryEventSaveRecentSearch({required this.word, required this.lang});
+
+  final String word;
+  final String lang;
+}
+class DictionaryEventRemoveRecentSearch extends DictionaryEvent {
+  DictionaryEventRemoveRecentSearch({required this.word, required this.lang});
 
   final String word;
   final String lang;

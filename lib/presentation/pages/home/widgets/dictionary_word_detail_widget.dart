@@ -80,6 +80,7 @@ class _DictionaryWordWidgetState extends State<DictionaryWordWidget>
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.only(top: 20),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
