@@ -5,39 +5,40 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lacquer/config/theme.dart';
 import 'package:lacquer/presentation/utils/home_item_list.dart';
 import 'package:lacquer/presentation/pages/home/widgets/home_item.dart';
-import 'package:lacquer/presentation/widgets/todayprogress_card.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+  final VoidCallback? onGoToProfile;
+  const HomePage({super.key, this.onGoToProfile});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Stack(
-              clipBehavior: Clip.none,
-              children: [_buildAppBar(), TodayprogressCard()],
-            ),
-            const SizedBox(height: 150),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: const Text(
-                'Recently learn',
-                style: TextStyle(
-                  fontSize: 20,
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.left,
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            CustomTheme.loginGradientStart,
+            CustomTheme.loginGradientEnd,
+          ],
+        ),
+      ),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: CustomScrollView(
+          slivers: [
+            _buildSliverAppBar(context),
+            SliverToBoxAdapter(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 24),
+                  _buildWelcomeSection(context),
+                  const SizedBox(height: 24),
+                  _buildRecentlyLearnSection(context),
+                  const SizedBox(height: 24),
+                ],
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
-              child: _buildGridView(),
             ),
           ],
         ),
@@ -45,47 +46,180 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildAppBar() {
-    return ClipRRect(
-      borderRadius: const BorderRadius.only(
-        bottomLeft: Radius.circular(24),
-        bottomRight: Radius.circular(24),
-      ),
-      child: Container(
-        height: 150,
-        color: CustomTheme.mainColor2,
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-        child: Row(
-          children: [
-            const SizedBox(width: 10),
-            Container(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 2),
-              ),
-              child: const CircleAvatar(
-                backgroundImage: AssetImage('assets/images/avatar.jpg'),
-                radius: 20,
-              ),
+  Widget _buildSliverAppBar(BuildContext context) {
+    return SliverAppBar(
+      expandedHeight: 130,
+      floating: false,
+      pinned: true,
+      backgroundColor: CustomTheme.mainColor2,
+      elevation: 0,
+      flexibleSpace: FlexibleSpaceBar(
+        background: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                CustomTheme.mainColor2,
+                CustomTheme.mainColor2.withAlpha((0.9 * 255).toInt()),
+              ],
             ),
-            const SizedBox(width: 10),
-            Text(
-              'Welcome, Vu Phan !',
-              style: GoogleFonts.montserratAlternates(
-                fontSize: 20,
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-              ),
+            borderRadius: const BorderRadius.only(
+              bottomLeft: Radius.circular(32),
+              bottomRight: Radius.circular(32),
             ),
-            const Spacer(),
-            IconButton(
-              icon: const Icon(FontAwesomeIcons.bell, color: Colors.black),
-              onPressed: () {},
+          ),
+          child: SafeArea(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset(
+                  'assets/images/logoo.png',
+                  width: 360,
+                  height: 100,
+                  fit: BoxFit.contain,
+                ),
+                Text(
+                  'Learn • Practice • Master',
+                  style: GoogleFonts.poppins(
+                    color: const Color.fromRGBO(255, 255, 255, 0.9),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                    letterSpacing: 1.2,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(width: 10),
-          ],
+          ),
         ),
       ),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(32),
+          bottomRight: Radius.circular(32),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWelcomeSection(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Welcome back!',
+            style: GoogleFonts.poppins(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF2D3748),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Continue your learning journey',
+            style: GoogleFonts.poppins(
+              fontSize: 16,
+              color: const Color(0xFF718096),
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+          const SizedBox(height: 20),
+          Material(
+            color: Colors.transparent,
+            borderRadius: BorderRadius.circular(20),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(20),
+              onTap: () {
+                if (onGoToProfile != null) {
+                  onGoToProfile!();
+                }
+              },
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      CustomTheme.mainColor2.withAlpha((0.2 * 255).toInt()),
+                      CustomTheme.mainColor2.withAlpha((0.1 * 255).toInt()),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: CustomTheme.mainColor2.withAlpha(
+                      (0.1 * 255).toInt(),
+                    ),
+                    width: 1,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: CustomTheme.mainColor2.withAlpha(
+                          (0.2 * 255).toInt(),
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        FontAwesomeIcons.penToSquare,
+                        color: CustomTheme.mainColor2,
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Set up your profile',
+                            style: GoogleFonts.poppins(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xFF2D3748),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Tell us more about you!',
+                            style: GoogleFonts.poppins(
+                              fontSize: 14,
+                              color: const Color(0xFF718096),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Icon(
+                      Icons.arrow_forward_ios,
+                      color: CustomTheme.mainColor2,
+                      size: 16,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRecentlyLearnSection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: _buildGridView(),
+        ),
+      ],
     );
   }
 
