@@ -28,6 +28,7 @@ class _TranslatorScreenState extends State<TranslatorScreen>
   late Animation<double> _rotationAnimation;
   late AnimationController _expandController;
   late Animation<double> _expandAnimation;
+  bool _isBackPressed = false;
 
   @override
   void initState() {
@@ -211,16 +212,24 @@ class _TranslatorScreenState extends State<TranslatorScreen>
                       // Nút quay lại
                       GestureDetector(
                         onTap: () => context.go('/'),
-                        child: Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: Color.fromRGBO(255, 255, 255, 0.2),
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          child: const Icon(
-                            Icons.arrow_back,
-                            color: Colors.white,
-                            size: 24,
+                        onTapDown: (_) => setState(() => _isBackPressed = true),
+                        onTapUp: (_) => setState(() => _isBackPressed = false),
+                        onTapCancel:
+                            () => setState(() => _isBackPressed = false),
+                        child: AnimatedScale(
+                          scale: _isBackPressed ? 0.9 : 1.0,
+                          duration: const Duration(milliseconds: 100),
+                          child: Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: const Color.fromRGBO(255, 255, 255, 0.2),
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            child: const Icon(
+                              Icons.arrow_back,
+                              color: Colors.white,
+                              size: 24,
+                            ),
                           ),
                         ),
                       ),
