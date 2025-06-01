@@ -1,4 +1,5 @@
 import 'package:lacquer/features/dictionary/dtos/search_result_dto.dart';
+import 'package:lacquer/presentation/pages/home/dictionary_page.dart';
 
 sealed class DictionaryState {}
 
@@ -9,13 +10,11 @@ class DictionaryStateMainScreenLoading extends DictionaryState {}
 
 class DictionaryStateMainScreenSuccess extends DictionaryState {
   final String lang;
-  final List<String> recentSearches;
-  final List<String> favorites;
+  final List<String>? recentSearches;
 
   DictionaryStateMainScreenSuccess({
     required this.lang,
-    required this.recentSearches,
-    required this.favorites,
+    this.recentSearches,
   });
 }
 
@@ -40,16 +39,28 @@ class DictionaryStateSearchSuggestions extends DictionaryState {
 
 class DictionaryStateSearchSuccess extends DictionaryState {
   final String query;
-  final int numberOfResults;
   final List<Vocabulary> results;
   final String lang;
 
   DictionaryStateSearchSuccess({
     required this.query,
-    required this.numberOfResults,
     required this.results,
     required this.lang,
   });
+
+  List<SearchResultItem> get searchResults =>
+      results
+          .map(
+            (vocabulary) => SearchResultItem(
+              word: vocabulary.word,
+              pronunciation: vocabulary.pronunciation,
+              meanings: {
+                for (var wordType in vocabulary.wordTypes)
+                  wordType.type: wordType.definitions,
+              },
+            ),
+          )
+          .toList();
 }
 
 class DictionaryStateSearchFailure extends DictionaryState {
@@ -67,4 +78,8 @@ class DictionaryStateWordDetailsSuccess extends DictionaryState {
   DictionaryStateWordDetailsSuccess({required this.vocabulary});
 }
 
+class DictionaryStateWordDetailsFailure extends DictionaryState {
+  final String message;
 
+  DictionaryStateWordDetailsFailure(this.message);
+}

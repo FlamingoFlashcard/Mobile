@@ -6,7 +6,7 @@ import 'package:lacquer/features/dictionary/dtos/search_result_dto.dart';
 class DictionaryApiClients {
   final Dio dio;
 
-  DictionaryApiClients({required this.dio});
+  DictionaryApiClients(this.dio);
 
   Future<SearchWordResultDto> searchWord(SearchWordDto word) async {
     try {
