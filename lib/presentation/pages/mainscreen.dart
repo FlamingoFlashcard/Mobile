@@ -40,7 +40,11 @@ class _MainScreenState extends State<MainScreen> {
         physics: const NeverScrollableScrollPhysics(),
         onPageChanged: _onPageChanged,
         children: [
-          const HomePage(),
+          HomePage(
+            onGoToProfile: () {
+              _onItemTapped(3); // 👈 đổi sang tab Profile
+            },
+          ),
           ChatBotPage(userId: widget.userId),
           const CameraPage(),
           const ProfilePage(),
