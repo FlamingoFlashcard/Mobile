@@ -25,6 +25,7 @@ final List<HomeItemModel> homeItems = [
     imagePath: "assets/images/translatorLogo.png",
     title: "Translator",
     backgroundColor: Color(0xFF34A853),
+    route: '/translator',
   ),
   HomeItemModel(
     imagePath: "assets/images/dictionaryLogo.png",
