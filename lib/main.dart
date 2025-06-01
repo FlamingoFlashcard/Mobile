@@ -28,6 +28,8 @@ import 'package:lacquer/features/friendship/data/friendship_repository.dart';
 import 'package:lacquer/features/post/bloc/post_bloc.dart';
 import 'package:lacquer/features/post/bloc/post_event.dart';
 import 'package:lacquer/features/post/data/post_repository.dart';
+import 'package:lacquer/features/quiz/data/quiz_api_clients.dart';
+import 'package:lacquer/features/quiz/data/quiz_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:lacquer/features/profile/data/profile_repository.dart';
 import 'package:lacquer/features/profile/bloc/profile_bloc.dart';
@@ -66,8 +68,14 @@ class MyApp extends StatelessWidget {
           create:
               (context) => DictionaryRepository(
                 dictionaryApiClients: DictionaryApiClients(dio),
-                dictionaryLocalDataSource: DictionaryLocalDataSource(sharedPreferences),
-              ), 
+                dictionaryLocalDataSource: DictionaryLocalDataSource(
+                  sharedPreferences,
+                ),
+              ),
+        ),
+        RepositoryProvider(
+          create:
+              (context) => QuizRepository(quizApiClient: QuizApiClient(dio)),
         ),
         RepositoryProvider(
           create:
@@ -88,8 +96,9 @@ class MyApp extends StatelessWidget {
             create: (context) => ChatbotBloc(context.read<ChatbotRepository>()),
           ),
           BlocProvider(
-            create: (context) =>
-                DictionaryBloc(context.read<DictionaryRepository>()),
+            create:
+                (context) =>
+                    DictionaryBloc(context.read<DictionaryRepository>()),
           ),
           BlocProvider(
             create:
