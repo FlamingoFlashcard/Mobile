@@ -152,7 +152,10 @@ class _FlashcardOptionDialogState extends State<FlashcardOptionDialog> {
                       color: Colors.black,
                     ),
                     onPressed: () {
+<<<<<<< HEAD
                       Navigator.pop(context);
+=======
+>>>>>>> 3eeb313 (feat(editcard): add Edit Card UI)
                       context.go(RouteName.edit(widget.id));
                     },
                   ),

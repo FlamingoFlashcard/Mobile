@@ -101,7 +101,11 @@ class _EditCardListPageState extends State<EditCardListPage> {
               ),
               const Spacer(),
               IconButton(
+<<<<<<< HEAD
                 icon: const Icon(FontAwesomeIcons.plus, color: Colors.white),
+=======
+                icon: const Icon(FontAwesomeIcons.gear, color: Colors.white),
+>>>>>>> 3eeb313 (feat(editcard): add Edit Card UI)
                 onPressed: null,
               ),
               IconButton(
