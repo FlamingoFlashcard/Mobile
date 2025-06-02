@@ -74,9 +74,9 @@ class HomePage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Image.asset(
-                  'assets/images/logo_home.png',
+                  'assets/images/logoLacquerLinear.png',
                   width: 360,
-                  height: 100,
+                  height: 72,
                   fit: BoxFit.contain,
                 ),
                 Text(
