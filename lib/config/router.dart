@@ -9,6 +9,7 @@ import 'package:lacquer/presentation/pages/auth/login_page.dart';
 import 'package:lacquer/presentation/pages/auth/verify_page.dart';
 import 'package:lacquer/presentation/pages/camera/camera_page.dart';
 import 'package:lacquer/presentation/pages/camera/about_screen.dart';
+import 'package:lacquer/presentation/pages/home/edit_card_list_page.dart';
 import 'package:lacquer/presentation/pages/profile/profile_page.dart';
 import 'package:lacquer/presentation/pages/home/flashcard_page.dart';
 import 'package:lacquer/presentation/pages/home/learning_flashcard_page.dart';
@@ -27,6 +28,7 @@ class RouteName {
   static const String profile = '/profile';
   static const String flashcards = '/flashcards';
   static String learn(String deckId) => '/learn/$deckId';
+  static String edit(String deckId) => '/edit/$deckId';
 
   static const publicRoutes = [login, forgotPassword, verify, register];
 }
@@ -100,6 +102,13 @@ final router = GoRouter(
       builder: (context, state) {
         final deckId = state.pathParameters['deckId']!;
         return LearningFlashcardPage(deckId: deckId);
+      },
+    ),
+    noTransitionRoute(
+      path: '/edit/:deckId',
+      builder: (context, state) {
+        final deckId = state.pathParameters['deckId']!;
+        return EditCardListPage(deckId: deckId);
       },
     ),
   ],

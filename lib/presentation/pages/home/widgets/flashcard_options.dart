@@ -147,6 +147,16 @@ class _FlashcardOptionDialogState extends State<FlashcardOptionDialog> {
                   ),
                   IconButton(
                     icon: Icon(
+                      FontAwesomeIcons.listUl,
+                      size: 20,
+                      color: Colors.black,
+                    ),
+                    onPressed: () {
+                      context.go(RouteName.edit(widget.id));
+                    },
+                  ),
+                  IconButton(
+                    icon: Icon(
                       FontAwesomeIcons.trashCan,
                       size: 20,
                       color: Colors.black,
