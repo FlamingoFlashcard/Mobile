@@ -63,8 +63,7 @@ class _LearningFlashcardPageState extends State<LearningFlashcardPage> {
   static final Map<String, String> _accents = {
     'US English': 'en-US',
     'UK English': 'en-GB',
-    'Australian': 'en-AU',
-    'Indian': 'en-IN',
+    'Indian Accent': 'en-IN',
   };
 
   @override

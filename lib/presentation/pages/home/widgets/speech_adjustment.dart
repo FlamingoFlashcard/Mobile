@@ -28,7 +28,7 @@ class _SpeechAdjustmentState extends State<SpeechAdjustment> {
   @override
   void initState() {
     super.initState();
-    _speechSpeed = widget.initialSpeed.clamp(0, 1.0);
+    _speechSpeed = widget.initialSpeed.clamp(0.1, 1.0);
 
     _selectedAccent =
         _accents.containsKey(widget.initialAccent)
@@ -61,9 +61,9 @@ class _SpeechAdjustmentState extends State<SpeechAdjustment> {
             ),
             Slider(
               value: _speechSpeed,
-              min: 0.0,
+              min: 0.1,
               max: 1.0,
-              divisions: 15,
+              divisions: 9,
               label: _speechSpeed.toStringAsFixed(2),
               onChanged: (value) {
                 setState(() {
