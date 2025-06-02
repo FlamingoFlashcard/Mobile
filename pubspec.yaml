@@ -49,12 +49,6 @@ dev_dependencies:
     lint_staged: ^0.5.1
     commitlint_cli: ^0.8.1
 
-flutter_icons:
-    android: true
-    ios: true
-    image_path: "assets/icons/app_icon.png"
-    adaptive_icon_foreground: "assets/icons/app_icon_foreground.png"
-    adaptive_icon_background: #F4B8E4
 
 flutter:
     uses-material-design: true
