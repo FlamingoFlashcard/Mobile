@@ -13,6 +13,24 @@ class FriendshipRepository {
     }
   }
 
+  Future<Result<List<dynamic>>> getFriendRequests() async {
+    try {
+      final requests = await _userService.getFriendRequests();
+      return Success(requests);
+    } catch (e) {
+      return Failure(e.toString());
+    }
+  }
+
+  Future<Result<List<dynamic>>> getBlockedUsers() async {
+    try {
+      final blocked = await _userService.getBlockedUsers();
+      return Success(blocked);
+    } catch (e) {
+      return Failure(e.toString());
+    }
+  }
+
   Future<Result<void>> sendFriendRequest(String friendId) async {
     try {
       await _userService.sendFriendRequest(friendId);
@@ -40,13 +58,28 @@ class FriendshipRepository {
     }
   }
 
-  // Note: UserService doesn't have removeFriend method,
-  // but we can add it here for future implementation
+  Future<Result<void>> blockFriend(String friendId) async {
+    try {
+      await _userService.blockFriend(friendId);
+      return Success(null);
+    } catch (e) {
+      return Failure(e.toString());
+    }
+  }
+
+  Future<Result<void>> unblockFriend(String friendId) async {
+    try {
+      await _userService.unblockFriend(friendId);
+      return Success(null);
+    } catch (e) {
+      return Failure(e.toString());
+    }
+  }
+
   Future<Result<void>> removeFriend(String friendId) async {
     try {
-      // This would need to be implemented in UserService
-      // For now, we'll return a failure
-      return Failure('Remove friend functionality not implemented yet');
+      await _userService.removeFriend(friendId);
+      return Success(null);
     } catch (e) {
       return Failure(e.toString());
     }

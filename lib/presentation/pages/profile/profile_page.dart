@@ -432,6 +432,14 @@ class _ProfilePageState extends State<ProfilePage>
     return Column(
       children: [
         _buildActionCard(
+          icon: Icons.people_outline,
+          title: 'Friends',
+          subtitle: 'Manage your friends and requests',
+          onTap: () => context.push('/friends'),
+          color: Colors.blue,
+        ),
+        SizedBox(height: 12),
+        _buildActionCard(
           icon: Icons.logout_outlined,
           title: 'Logout',
           subtitle: 'Sign out of your account',
@@ -481,7 +489,7 @@ class _ProfilePageState extends State<ProfilePage>
                 Container(
                   padding: EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Color.fromRGBO(244, 67, 54, 0.1),
+                    color: color.withAlpha((0.1 * 255).toInt()),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(icon, color: color, size: 22),

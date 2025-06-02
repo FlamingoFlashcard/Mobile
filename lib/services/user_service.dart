@@ -142,7 +142,13 @@ class UserService {
   Future<List<dynamic>> getFriends() async {
     try {
       final response = await _apiClient.get('/friend/friends');
-      return response['friends'] ?? [];
+
+      // Handle the new response format
+      if (response['success'] == true && response['data'] != null) {
+        return response['data'] as List<dynamic>;
+      }
+
+      return [];
     } catch (e) {
       print('Get friends error: $e');
       rethrow;
@@ -175,6 +181,70 @@ class UserService {
       return await _apiClient.post('/friend/reject', {'friendId': friendId});
     } catch (e) {
       print('Reject friend request error: $e');
+      rethrow;
+    }
+  }
+
+  // Get friend requests
+  Future<List<dynamic>> getFriendRequests() async {
+    try {
+      final response = await _apiClient.get('/friend/requests');
+
+      // Handle the new response format
+      if (response['success'] == true && response['data'] != null) {
+        return response['data'] as List<dynamic>;
+      }
+
+      return [];
+    } catch (e) {
+      print('Get friend requests error: $e');
+      rethrow;
+    }
+  }
+
+  // Get blocked users
+  Future<List<dynamic>> getBlockedUsers() async {
+    try {
+      final response = await _apiClient.get('/friend/blocked');
+
+      // Handle the new response format
+      if (response['success'] == true && response['data'] != null) {
+        return response['data'] as List<dynamic>;
+      }
+
+      return [];
+    } catch (e) {
+      print('Get blocked users error: $e');
+      rethrow;
+    }
+  }
+
+  // Block friend
+  Future<Map<String, dynamic>> blockFriend(String friendId) async {
+    try {
+      return await _apiClient.post('/friend/block', {'friendId': friendId});
+    } catch (e) {
+      print('Block friend error: $e');
+      rethrow;
+    }
+  }
+
+  // Unblock friend
+  Future<Map<String, dynamic>> unblockFriend(String friendId) async {
+    try {
+      return await _apiClient.post('/friend/unblock', {'friendId': friendId});
+    } catch (e) {
+      print('Unblock friend error: $e');
+      rethrow;
+    }
+  }
+
+  // Remove friend
+  Future<Map<String, dynamic>> removeFriend(String friendId) async {
+    try {
+      return await _apiClient.post('/friend/remove', {'friendId': friendId});
+    } catch (e) {
+      print('Remove friend error: $e');
       rethrow;
     }
   }
