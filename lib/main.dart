@@ -28,6 +28,8 @@ import 'package:lacquer/features/friendship/data/friendship_repository.dart';
 import 'package:lacquer/features/post/bloc/post_bloc.dart';
 import 'package:lacquer/features/post/bloc/post_event.dart';
 import 'package:lacquer/features/post/data/post_repository.dart';
+import 'package:lacquer/features/quiz/bloc/quiz_bloc.dart';
+import 'package:lacquer/features/quiz/bloc/quiz_event.dart';
 import 'package:lacquer/features/quiz/data/quiz_api_clients.dart';
 import 'package:lacquer/features/quiz/data/quiz_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -103,6 +105,11 @@ class MyApp extends StatelessWidget {
           BlocProvider(
             create:
                 (context) =>
+                    QuizBloc(context.read<QuizRepository>()),
+          ),
+          BlocProvider(
+            create:
+                (context) =>
                     FriendshipBloc(context.read<FriendshipRepository>()),
           ),
           BlocProvider(
@@ -141,6 +148,7 @@ class _AppContentState extends State<AppContent> {
     context.read<AuthBloc>().add(AuthAuthenticateStarted());
     context.read<ChatbotBloc>().add(ChatbotEventStarted());
     context.read<DictionaryBloc>().add(DictionaryEventStarted());
+    context.read<QuizBloc>().add(QuizEventStarted());
     context.read<FriendshipBloc>().add(FriendshipEventStarted());
     context.read<PostBloc>().add(PostEventStarted());
     context.read<FlashcardBloc>().add(LoadDecksRequested());
