@@ -152,6 +152,7 @@ class _FlashcardOptionDialogState extends State<FlashcardOptionDialog> {
                       color: Colors.black,
                     ),
                     onPressed: () {
+                      Navigator.pop(context);
                       context.go(RouteName.edit(widget.id));
                     },
                   ),
