@@ -19,7 +19,10 @@ class QuizRepository {
         response.data.vocabularies.map(
           (vocabulary) => MapEntry(
             vocabulary.word,
-            vocabulary.wordTypes[0].definitions.first,
+            vocabulary.wordTypes.isNotEmpty &&
+                    vocabulary.wordTypes[0].definitions.isNotEmpty
+                ? vocabulary.wordTypes[0].definitions.first
+                : "",
           ),
         ),
       );

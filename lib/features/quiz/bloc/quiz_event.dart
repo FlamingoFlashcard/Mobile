@@ -15,3 +15,5 @@ class QuizEventLoadQuestions extends QuizEvent {
     required this.language,
   });
 }
+
+class QuizEventBack extends QuizEvent {}

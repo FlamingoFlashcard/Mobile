@@ -4,7 +4,9 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lacquer/config/theme.dart';
 import 'package:lacquer/features/quiz/bloc/quiz_bloc.dart';
+import 'package:lacquer/features/quiz/bloc/quiz_event.dart';
 import 'package:lacquer/features/quiz/bloc/quiz_state.dart';
+import 'package:lacquer/presentation/pages/home/widgets/quiz_questions_widget.dart';
 
 class QuizPage extends StatefulWidget {
   const QuizPage({super.key});
@@ -16,8 +18,8 @@ class QuizPage extends StatefulWidget {
 class _QuizPageState extends State<QuizPage> {
   int _numberOfQuestions = 10;
   int _numberOfChoices = 4;
-  Color _themeQuestionColor = Colors.black;
   Difficulty _currentDifficulty = Difficulty.easy;
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -25,9 +27,36 @@ class _QuizPageState extends State<QuizPage> {
     var quizWidget = (switch (quizState) {
       QuizStateInitial() => _buildQuizMainScreen(),
       QuizStateLoading() => _buildQuizMainScreen(),
+      QuizStateSuccess() => QuizQuestionsWidget(
+        questions: quizState.questions,
+        onBackToHome: _onQuitQuiz,
+        difficulty: _currentDifficulty,
+      ),
       QuizStateFailure() => _buildQuizMainScreen(),
-      QuizStateSuccess() => _buildQuizMainScreen(),
     });
+    quizWidget = BlocListener<QuizBloc, QuizState>(
+      listener: (context, state) {
+        switch (state) {
+          case QuizStateLoading():
+            setState(() {
+              _isLoading = true;
+            });
+            break;
+          case QuizStateFailure():
+            setState(() {
+              _isLoading = false;
+            });
+            _showErrorDialog(state.message);
+            break;
+          default:
+            setState(() {
+              _isLoading = false;
+            });
+            break;
+        }
+      },
+      child: quizWidget,
+    );
 
     return Container(
       width: MediaQuery.of(context).size.width,
@@ -44,11 +73,13 @@ class _QuizPageState extends State<QuizPage> {
           tileMode: TileMode.clamp,
         ),
       ),
-      child: quizWidget,
+      child: Stack(
+        children: [quizWidget, if (_isLoading) _buildLoadingScreenWidget()],
+      ),
     );
   }
 
-  Future<void> _showInformationDialog() async {
+  void _showInformationDialog() async {
     return showDialog<void>(
       context: context,
       barrierDismissible: false, // User must tap button to dismiss
@@ -206,25 +237,250 @@ class _QuizPageState extends State<QuizPage> {
     );
   }
 
-  Future<void> _showExitQuizDialog() async {
-    return;
-  }
+  void _showCustomDialog({required VoidCallback onConfirm}) async {
+    int tempNumberOfQuestions = _numberOfQuestions;
+    int tempNumberOfChoices = _numberOfChoices;
 
-  Future<void> _showCustomDialog() async {
     showDialog(
       context: context,
       barrierDismissible: true,
-      barrierColor: Colors.black.withOpacity(
-        0.5,
-      ),
+      barrierColor: Colors.black.withOpacity(0.5),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setStateDialog) {
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(
+                  color: Colors.blueGrey.shade300,
+                  width: 2,
+                ), // Softer border
+              ),
+              elevation: 8,
+              child: Container(
+                constraints: BoxConstraints(maxWidth: 320), // Limit width
+                padding: const EdgeInsets.all(24.0), // More padding
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Header section
+                    Column(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: _currentDifficulty.color.withOpacity(0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons
+                                .tune, // More appropriate icon for customization
+                            size: 32,
+                            color: _currentDifficulty.color,
+                          ),
+                        ),
+                        SizedBox(height: 12),
+                        Text(
+                          'Customize Test',
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey.shade800,
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Adjust your ${_currentDifficulty.name} test settings',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey.shade600,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+
+                    SizedBox(height: 24),
+
+                    // Questions section
+                    _buildSettingRow(
+                      label: 'Number of questions',
+                      icon: Icons.quiz_outlined,
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey.shade300),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<int>(
+                            value: tempNumberOfQuestions,
+                            isDense: true,
+                            items:
+                                [5, 10, 15, 20, 25, 30].map((value) {
+                                  return DropdownMenuItem<int>(
+                                    value: value,
+                                    child: Text(
+                                      value.toString(),
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                  );
+                                }).toList(),
+                            onChanged: (int? newValue) {
+                              setStateDialog(() {
+                                tempNumberOfQuestions = newValue!;
+                              });
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    SizedBox(height: 16),
+
+                    // Choices section
+                    _buildSettingRow(
+                      label: 'Number of choices',
+                      icon: Icons.format_list_bulleted,
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey.shade300),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<int>(
+                            value: tempNumberOfChoices,
+                            isDense: true,
+                            items:
+                                [2, 3, 4, 5, 6].map((value) {
+                                  return DropdownMenuItem<int>(
+                                    value: value,
+                                    child: Text(
+                                      value.toString(),
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                  );
+                                }).toList(),
+                            onChanged: (int? newValue) {
+                              setStateDialog(() {
+                                tempNumberOfChoices = newValue!;
+                              });
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    SizedBox(height: 32),
+
+                    // Action buttons
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            style: TextButton.styleFrom(
+                              padding: EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: Text(
+                              'Cancel',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey.shade600,
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                _numberOfQuestions = tempNumberOfQuestions;
+                                _numberOfChoices = tempNumberOfChoices;
+                              });
+                              Navigator.pop(context);
+                              _onStartQuiz();
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: _currentDifficulty.color,
+                              foregroundColor: Colors.white,
+                              padding: EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              elevation: 2,
+                            ),
+                            child: Text(
+                              'Apply',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildSettingRow({
+    required String label,
+    required IconData icon,
+    required Widget child,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(icon, size: 20, color: Colors.grey.shade600),
+            SizedBox(width: 8),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey.shade700,
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 8),
+        child,
+      ],
+    );
+  }
+
+  void _showErrorDialog(String message) async {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierColor: Colors.black.withOpacity(0.5),
       builder: (context) {
         return Dialog(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
-            side: BorderSide(
-              color: _currentDifficulty.color,
-              width: 5,
-            ),
+            side: BorderSide(color: Colors.red, width: 5),
           ),
           elevation: 10,
           child: Padding(
@@ -232,13 +488,12 @@ class _QuizPageState extends State<QuizPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Icon ở giữa tiêu đề
                 Column(
                   children: [
-                    Icon(Icons.info_outline, size: 48, color: _currentDifficulty.color),
+                    Icon(Icons.error, size: 48, color: Colors.red),
                     SizedBox(height: 8),
                     Text(
-                      'Thông báo',
+                      'Quiz Generate Failure:',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -247,14 +502,11 @@ class _QuizPageState extends State<QuizPage> {
                   ],
                 ),
                 SizedBox(height: 16),
-                Text(
-                  'Adjust your ${_currentDifficulty.name} Test:',
-                  textAlign: TextAlign.center,
-                ),
+                Text('Error: $message', textAlign: TextAlign.center),
                 SizedBox(height: 24),
                 ElevatedButton(
                   onPressed: () => Navigator.pop(context),
-                  child: Text('Đóng'),
+                  child: Text('Return'),
                 ),
               ],
             ),
@@ -262,10 +514,6 @@ class _QuizPageState extends State<QuizPage> {
         );
       },
     );
-  }
-
-  Future<void> _showErrorDialog() async {
-    return;
   }
 
   Widget _buildQuizMainScreen() {
@@ -310,20 +558,48 @@ class _QuizPageState extends State<QuizPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _buildDifficultyBox(Difficulty.easy, _showCustomDialog),
-                _buildDifficultyBox(Difficulty.intermediate, _showCustomDialog),
-                _buildDifficultyBox(Difficulty.hard, _showCustomDialog),
+                _buildDifficultyBox(
+                  Difficulty.easy,
+                  () => _showCustomDialog(
+                    onConfirm: () => {_onConfirmCustom(Difficulty.easy)},
+                  ),
+                ),
+                _buildDifficultyBox(
+                  Difficulty.intermediate,
+                  () => _showCustomDialog(
+                    onConfirm:
+                        () => {_onConfirmCustom(Difficulty.intermediate)},
+                  ),
+                ),
+                _buildDifficultyBox(
+                  Difficulty.hard,
+                  () => _showCustomDialog(
+                    onConfirm: () => {_onConfirmCustom(Difficulty.hard)},
+                  ),
+                ),
               ],
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _buildDifficultyBox(Difficulty.TOEIC, _showCustomDialog),
-                _buildDifficultyBox(Difficulty.IELTS, _showCustomDialog),
+                _buildDifficultyBox(
+                  Difficulty.TOEIC,
+                  () => _showCustomDialog(
+                    onConfirm: () => {_onConfirmCustom(Difficulty.TOEIC)},
+                  ),
+                ),
+                _buildDifficultyBox(
+                  Difficulty.IELTS,
+                  () => _showCustomDialog(
+                    onConfirm: () => {_onConfirmCustom(Difficulty.IELTS)},
+                  ),
+                ),
               ],
             ),
-            IconButton(icon: Icon(Icons.add), onPressed: _showCustomDialog),
-            
+            IconButton(
+              icon: Icon(Icons.add),
+              onPressed: () => _showErrorDialog('An error occurred'),
+            ),
           ],
         ),
       ),
@@ -391,7 +667,11 @@ class _QuizPageState extends State<QuizPage> {
           children: [
             Align(
               alignment: Alignment.center,
-              child: Image.asset('assets/icons/test.png', width: 50, height: 50),
+              child: Image.asset(
+                'assets/icons/test.png',
+                width: 50,
+                height: 50,
+              ),
             ),
             Text(
               'Challenges with\nvarying levels of\ndifficulty!',
@@ -411,6 +691,37 @@ class _QuizPageState extends State<QuizPage> {
       ),
     );
   }
+
+  void _onConfirmCustom(Difficulty difficulty) {
+    print("Difficult press: ${difficulty.name}");
+  }
+
+  void _onStartQuiz() {
+    context.read<QuizBloc>().add(
+      QuizEventLoadQuestions(
+        numberOfQuestions: _numberOfQuestions,
+        numverOfOptions: _numberOfChoices,
+        difficulty: _currentDifficulty.parameter,
+        language: "en",
+      ),
+    );
+  }
+
+  void _onQuitQuiz() {
+    context.read<QuizBloc>().add(QuizEventBack());
+  }
+
+  Widget _buildLoadingScreenWidget() {
+    return Stack(
+      children: [
+        ModalBarrier(
+          dismissible: false,
+          color: Colors.black.withValues(alpha: 0.3),
+        ),
+        Center(child: CircularProgressIndicator()),
+      ],
+    );
+  }
 }
 
 // ignore: constant_identifier_names
@@ -425,6 +736,21 @@ extension DifficultyItem on Difficulty {
         return "Intermediate";
       case Difficulty.hard:
         return "Hard";
+      case Difficulty.TOEIC:
+        return "TOEIC";
+      case Difficulty.IELTS:
+        return "IELTS";
+    }
+  }
+
+  String get parameter {
+    switch (this) {
+      case Difficulty.easy:
+        return "easy";
+      case Difficulty.intermediate:
+        return "intermediate";
+      case Difficulty.hard:
+        return "hard";
       case Difficulty.TOEIC:
         return "TOEIC";
       case Difficulty.IELTS:

@@ -13,7 +13,7 @@ class QuizApiClient {
   }) async {
     try {
       final response = await dio.get(
-        '/quiz/$lang',       
+        '/random/$lang',       
        queryParameters: {
           'difficulty': difficulty,
           'count': count,
