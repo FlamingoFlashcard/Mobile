@@ -14,6 +14,7 @@ import '../../../features/post/bloc/post_bloc.dart';
 import '../../../features/post/bloc/post_event.dart';
 import '../../../features/post/bloc/post_state.dart';
 import '../../../services/user_service.dart';
+import '../../widgets/qr_scanner_dialog.dart';
 
 class CameraPage extends StatefulWidget {
   const CameraPage({super.key});
@@ -603,7 +604,7 @@ class _CameraPageState extends State<CameraPage> with TickerProviderStateMixin {
       child: Container(
         height: 50,
         decoration: BoxDecoration(
-          color: Colors.black.withAlpha(128),
+          color: Colors.black.withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(25),
         ),
         child: Stack(
@@ -670,7 +671,7 @@ class _CameraPageState extends State<CameraPage> with TickerProviderStateMixin {
                       color:
                           index == _currentSliderIndex
                               ? Colors.white
-                              : Colors.white.withAlpha(100),
+                              : Colors.white.withValues(alpha: 0.5),
                     ),
                   );
                 }),
@@ -698,7 +699,7 @@ class _CameraPageState extends State<CameraPage> with TickerProviderStateMixin {
                   vertical: 8,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.black.withAlpha(128),
+                  color: Colors.black.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: TextField(
@@ -735,7 +736,7 @@ class _CameraPageState extends State<CameraPage> with TickerProviderStateMixin {
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
-            color: Colors.black.withAlpha(128),
+            color: Colors.black.withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(20),
           ),
           child: Text(
@@ -752,7 +753,7 @@ class _CameraPageState extends State<CameraPage> with TickerProviderStateMixin {
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
-            color: Colors.black.withAlpha(128),
+            color: Colors.black.withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(20),
           ),
           child: const Text(
@@ -771,7 +772,7 @@ class _CameraPageState extends State<CameraPage> with TickerProviderStateMixin {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.black.withAlpha(128),
+              color: Colors.black.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Row(
@@ -808,7 +809,7 @@ class _CameraPageState extends State<CameraPage> with TickerProviderStateMixin {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.black.withAlpha(128),
+              color: Colors.black.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Row(
@@ -888,7 +889,7 @@ class _CameraPageState extends State<CameraPage> with TickerProviderStateMixin {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.black.withAlpha(128),
+                    color: Colors.black.withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -970,18 +971,33 @@ class _CameraPageState extends State<CameraPage> with TickerProviderStateMixin {
                   padding: const EdgeInsets.all(12.0),
                   child: Row(
                     children: [
-                      // Profile image on the left
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 2),
-                        ),
-                        child: ClipOval(
-                          child: Image.asset(
-                            'assets/images/avatar.jpg',
-                            fit: BoxFit.cover,
+                      // QR scan button on the left (replacing profile image)
+                      GestureDetector(
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) => const QRScannerDialog(),
+                          );
+                        },
+                        child: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.orange.shade600,
+                            border: Border.all(color: Colors.white, width: 2),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.orange.withValues(alpha: 0.3),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: const Icon(
+                            Icons.qr_code_scanner,
+                            color: Colors.white,
+                            size: 20,
                           ),
                         ),
                       ),

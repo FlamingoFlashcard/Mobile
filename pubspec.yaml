@@ -38,6 +38,8 @@ dependencies:
   # Image saving
     gal: ^2.3.0
     mime: ^2.0.0
+    # QR code scanner
+    qr_code_scanner_plus: ^2.0.10+1
 dev_dependencies:
     flutter_test:
         sdk: flutter
