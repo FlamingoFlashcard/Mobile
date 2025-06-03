@@ -102,7 +102,9 @@ class _EditCardListPageState extends State<EditCardListPage> {
               const Spacer(),
               IconButton(
                 icon: const Icon(FontAwesomeIcons.plus, color: Colors.white),
-                onPressed: null,
+                onPressed: () {
+                  context.go(RouteName.addNewWord(widget.deckId));
+                },
               ),
               IconButton(
                 icon: const Icon(
