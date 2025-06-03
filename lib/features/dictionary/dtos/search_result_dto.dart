@@ -54,6 +54,7 @@ class Data {
 }
 
 class Vocabulary {
+  final String id;
   final List<String> img;
   final String word;
   final String pronunciation;
@@ -62,6 +63,7 @@ class Vocabulary {
   final List<Example> examples;
 
   const Vocabulary({
+    required this.id,
     required this.img,
     required this.word,
     required this.pronunciation,
@@ -72,6 +74,7 @@ class Vocabulary {
 
   factory Vocabulary.fromJson(Map<String, dynamic> json) {
     return Vocabulary(
+      id: json['_id'] ?? '',
       img:
           (json['img'] as List<dynamic>?)?.map((e) => e.toString()).toList() ??
           [],
@@ -124,10 +127,7 @@ class Example {
   final String english;
   final String vietnamese;
 
-  const Example({
-    required this.english,
-    required this.vietnamese,
-  });
+  const Example({required this.english, required this.vietnamese});
 
   factory Example.fromJson(Map<String, dynamic> json) {
     return Example(

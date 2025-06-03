@@ -110,3 +110,13 @@ class SearchDecksRequested extends FlashcardEvent {
   @override
   List<Object> get props => [query];
 }
+
+class AddCardToDeckRequested extends FlashcardEvent {
+  final String deckId;
+  final String cardId;
+
+  const AddCardToDeckRequested({required this.deckId, required this.cardId});
+
+  @override
+  List<Object?> get props => [deckId, cardId];
+}

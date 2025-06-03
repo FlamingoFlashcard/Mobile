@@ -414,6 +414,43 @@ class _AddNewWordPageState extends State<AddNewWordPage> {
                       ),
                     ],
                     const SizedBox(height: 10),
+                    Center(
+                      child: TextButton(
+                        onPressed: () {
+                          final state =
+                              context.read<DictionaryBloc>().state
+                                  as DictionaryStateWordDetailsSuccess;
+                          context.read<FlashcardBloc>().add(
+                            AddCardToDeckRequested(
+                              deckId: widget.deckId,
+                              cardId: state.vocabulary.id,
+                            ),
+                          );
+                          context.go(RouteName.edit(widget.deckId));
+                        },
+                        style: TextButton.styleFrom(
+                          backgroundColor: CustomTheme.flashcardColor.withAlpha(
+                            (255 * 0.1).round(),
+                          ),
+                          foregroundColor: CustomTheme.flashcardColor,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 12,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            side: BorderSide(color: CustomTheme.flashcardColor),
+                          ),
+                        ),
+                        child: const Text(
+                          'Add to Deck',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
                   ],
                 );
               }),
@@ -439,6 +476,10 @@ class _AddNewWordPageState extends State<AddNewWordPage> {
 
   void _onGetWord(String word) {
     if (word.isEmpty) return;
+    setState(() {
+      suggestions.clear();
+      searchResults.clear();
+    });
     context.read<DictionaryBloc>().add(
       DictionaryEventGetWord(word: word, lang: 'en'),
     );
