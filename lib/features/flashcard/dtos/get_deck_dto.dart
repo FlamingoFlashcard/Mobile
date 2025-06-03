@@ -7,6 +7,7 @@ class GetDeckDto {
   final List<Map<String, dynamic>>? cards;
   final DateTime? createdAt;
   final DateTime? updatedAt;
+  final bool? isDone;
 
   GetDeckDto({
     required this.id,
@@ -17,10 +18,10 @@ class GetDeckDto {
     this.cards,
     this.createdAt,
     this.updatedAt,
+    this.isDone,
   });
 
   factory GetDeckDto.fromJson(Map<String, dynamic> json) {
-    // Handle tags parsing - they might be objects or strings
     List<String> parsedTags = [];
     final tagsData = json['tags'];
     if (tagsData is List) {
@@ -28,7 +29,6 @@ class GetDeckDto {
         if (tag is String) {
           parsedTags.add(tag);
         } else if (tag is Map<String, dynamic>) {
-          // If tag is an object, extract the ID or name
           parsedTags.add(tag['_id'] as String? ?? tag['id'] as String? ?? '');
         }
       }
@@ -52,6 +52,7 @@ class GetDeckDto {
           json['updatedAt'] != null
               ? DateTime.parse(json['updatedAt'] as String)
               : null,
+      isDone: json['isDone'] as bool? ?? false,
     );
   }
 
@@ -65,6 +66,7 @@ class GetDeckDto {
       'cards': cards,
       'createdAt': createdAt?.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
+      'isDone': isDone,
     };
   }
 }
