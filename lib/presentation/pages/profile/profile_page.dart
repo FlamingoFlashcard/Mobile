@@ -667,7 +667,9 @@ class _ProfilePageState extends State<ProfilePage>
   }
 }
 
+// ignore: camel_case_types
 class _buildQRButton extends StatelessWidget {
+  // ignore: unused_element_parameter
   const _buildQRButton({super.key});
 
   @override

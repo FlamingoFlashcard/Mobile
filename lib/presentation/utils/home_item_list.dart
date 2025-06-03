@@ -37,5 +37,6 @@ final List<HomeItemModel> homeItems = [
     imagePath: "assets/images/flashcardLogo.png",
     title: "Quiz",
     backgroundColor: Color(0xFFEA4335),
+    route: '/quiz',
   ),
 ];

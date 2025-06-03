@@ -15,6 +15,7 @@ import 'package:lacquer/presentation/pages/home/learning_flashcard_page.dart';
 import 'package:lacquer/presentation/pages/friends/friends_page.dart';
 import 'package:lacquer/features/profile/bloc/profile_bloc.dart';
 import 'package:lacquer/features/profile/bloc/profile_event.dart';
+import 'package:lacquer/presentation/pages/home/quiz_page.dart';
 import 'package:lacquer/presentation/pages/home/translator_page.dart';
 
 import 'package:lacquer/presentation/pages/mainscreen.dart';
@@ -32,6 +33,7 @@ class RouteName {
   static const String dictionary = '/dictionary';
   static const String translator = '/translator';
   static const String friends = '/friends';
+  static const String quiz = '/quiz';
 
   static const publicRoutes = [login, forgotPassword, verify, register];
 }
@@ -104,6 +106,10 @@ final router = GoRouter(
     noTransitionRoute(
       path: RouteName.friends,
       builder: (context, state) => const FriendsPage(),
+    ),
+    noTransitionRoute(
+      path: RouteName.quiz,
+      builder: (context, state) => const QuizPage(),
     ),
     noTransitionRoute(
       path: '/learn',

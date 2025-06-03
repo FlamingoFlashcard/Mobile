@@ -8,6 +8,7 @@ class MessageScreen extends StatefulWidget {
   State<MessageScreen> createState() => _messageScreenState();
 }
 
+// ignore: camel_case_types
 class _messageScreenState extends State<MessageScreen> {
   @override
   Widget build(BuildContext context) {

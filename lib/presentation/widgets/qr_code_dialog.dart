@@ -565,7 +565,6 @@ class _QRCodeDialogState extends State<QRCodeDialog>
               Expanded(
                 child: ElevatedButton.icon(
                   onPressed: () {
-                    // TODO: Implement share functionality
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text('Share feature coming soon!'),
