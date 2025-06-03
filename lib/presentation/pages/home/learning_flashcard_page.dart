@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:go_router/go_router.dart';
-import 'package:lacquer/config/router.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lacquer/config/router.dart';
 import 'package:lacquer/config/theme.dart';
@@ -77,7 +74,6 @@ class _LearningFlashcardPageState extends State<LearningFlashcardPage> {
               const SizedBox(width: 10),
             ],
           ),
-        ),
         ),
       ),
     );

@@ -62,7 +62,13 @@ class FlashcardRepository {
   }
 
   Future<CreateDeckResponseDto> getDeckById(String deckId) async {
-    return apiClient.getDeckById(deckId);
+    final response = await apiClient.getDeckById(deckId);
+    final responseData = response;
+    if (responseData['success'] == true) {
+      return CreateDeckResponseDto.fromJson(responseData['data']);
+    } else {
+      throw Exception(responseData['message'] ?? 'Failed to retrieve deck');
+    }
   }
 
   Future<void> deleteDeck(String deckId) async {
