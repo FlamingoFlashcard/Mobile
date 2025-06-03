@@ -295,12 +295,15 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
         cardId: event.cardId,
       );
 
+      final groupedDecks = await repository.getDecks();
+
       final updatedDeck = await repository.getDeckById(event.deckId);
 
       emit(
         state.copyWith(
           status: FlashcardStatus.success,
           selectedDeck: updatedDeck,
+          groupedDecks: groupedDecks,
         ),
       );
     } catch (e) {
