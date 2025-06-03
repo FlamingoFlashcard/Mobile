@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import 'package:lacquer/config/env.dart';
 import 'package:lacquer/features/profile/bloc/profile_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lacquer/features/profile/bloc/profile_state.dart';
@@ -504,84 +503,6 @@ class EditProfileScreenState extends State<EditProfileScreen>
             end: Alignment.bottomRight,
             stops: const [0.0, 0.5, 1.0],
           ),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
-        ),
-      ),
-    );
-  }
-
-  //----------------------------- FUNCTIONS -----------------------------
-  Future<void> updateProfile() async {
-    final username = _usernameController.text.trim();
-    final password = _passwordController.text.trim();
-
-    if (username.isEmpty && password.isEmpty) {
-      CustomSnackBar(context, const Text("Please fill in one of the blanks"));
-      return;
-    }
-
-    setState(() => _isLoading = true);
-
-    final dio = Dio();
-    try {
-      final response = await dio.put(
-        '${Env.serverURL}/auth/profile',
-        options: Options(
-          headers: {
-            'Authorization': 'Bearer ${widget.token}',
-            'Content-Type': 'application/json',
-          },
-        ),
-        data: {'username': username, 'password': password},
-      );
-
-      if (!mounted) return;
-      setState(() => _isLoading = false);
-
-      if (response.statusCode == 200) {
-        Navigator.pop(context, true);
-      } else {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Failed to update profile')));
-      }
-    } catch (e) {
-      if (!mounted) return;
-      setState(() => _isLoading = false);
-
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
-    }
-  Widget _buildSaveButton() {
-    return Padding(
-      padding: const EdgeInsets.only(top: 10.0, left: 20.0, right: 20.0),
-      child: ElevatedButton(
-        onPressed: () {
-          if (_formKey.currentState!.validate()) {
-            context.read<ProfileBloc>().add(
-              ProfileUpdateRequested(
-                username: _usernameController.text.trim(),
-                password: _passwordController.text.trim(),
-                avatarFile: _selectedAvatar,
-                about: _aboutController.text.trim(),
-              ),
-            );
-          }
-        },
-        style: ElevatedButton.styleFrom(
-          minimumSize: const Size(double.infinity, 50),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24),
-          ),
-          backgroundColor: Colors.deepOrange,
-        ),
-        child: const Text(
-          'SAVE',
-          style: TextStyle(
-            color: Colors.black87,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
           boxShadow: [
             BoxShadow(
               color: Color.fromRGBO(255, 87, 34, 0.5),
@@ -665,51 +586,6 @@ class EditProfileScreenState extends State<EditProfileScreen>
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
-      final file = File(pickedFile.path);
-      setState(() => _newAvatarFile = file);
-      await _uploadAvatar(file);
-    }
-  }
-
-  Future<void> _uploadAvatar(File imageFile) async {
-    final dio = Dio();
-
-    final formData = FormData.fromMap({
-      'avatar': await MultipartFile.fromFile(
-        imageFile.path,
-        filename: path.basename(imageFile.path),
-        contentType: MediaType('image', 'jpeg'),
-      ),
-    });
-
-    try {
-      final response = await dio.put(
-        '${Env.serverURL}/auth/avatar',
-        data: formData,
-        options: Options(headers: {'Authorization': 'Bearer ${widget.token}'}),
-      );
-
-      if (!mounted) return;
-      if (response.statusCode == 200) {
-        final data = response.data;
-        setState(() {
-          avatarUrl = data['data']['avatar'] ?? avatarUrl;
-        });
-
-        CustomSnackBar(context, Text(data['message']));
-      } else {
-        final errorData = response.data;
-        final errorMessage = errorData['message'];
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(errorMessage)));
-      }
-    } catch (e) {
-      debugPrint('Upload error: $e');
-
-      if (!mounted) return;
-
-      CustomSnackBar(context, const Text('Error occurred while uploading'));
       setState(() {
         _selectedAvatar = File(pickedFile.path);
       });

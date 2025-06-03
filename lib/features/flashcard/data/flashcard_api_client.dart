@@ -219,26 +219,6 @@ class FlashcardApiClient {
     }
   }
 
-  Future<CreateDeckResponseDto> getDeckById(String deckId) async {
-    try {
-      final token = await authLocalDataSource.getToken();
-
-      final options = Options(
-        headers: {if (token != null) 'Authorization': 'Bearer $token'},
-      );
-
-      final response = await dio.get('/deck/$deckId', options: options);
-
-      return CreateDeckResponseDto.fromJson(response.data);
-    } on DioException catch (e) {
-      if (e.response != null) {
-        throw Exception(e.response!.data['message']);
-      } else {
-        throw Exception(e.message);
-      }
-    }
-  }
-
   Future<void> deleteDeck(String deckId) async {
     try {
       final token = await authLocalDataSource.getToken();

@@ -66,8 +66,10 @@ class MyApp extends StatelessWidget {
           create:
               (context) => DictionaryRepository(
                 dictionaryApiClients: DictionaryApiClients(dio),
-                dictionaryLocalDataSource: DictionaryLocalDataSource(sharedPreferences),
-              ), 
+                dictionaryLocalDataSource: DictionaryLocalDataSource(
+                  sharedPreferences,
+                ),
+              ),
         ),
         RepositoryProvider(
           create:
@@ -77,9 +79,6 @@ class MyApp extends StatelessWidget {
         ),
         RepositoryProvider(create: (context) => FriendshipRepository()),
         RepositoryProvider(create: (context) => PostRepository()),
-              (context) =>
-                  ChatbotRepository(chatbotApiClient: ChatbotApiClient(dio)),
-        ),
         RepositoryProvider(create: (context) => ProfileRepository(dio: dio)),
       ],
       child: MultiBlocProvider(
@@ -91,8 +90,9 @@ class MyApp extends StatelessWidget {
             create: (context) => ChatbotBloc(context.read<ChatbotRepository>()),
           ),
           BlocProvider(
-            create: (context) =>
-                DictionaryBloc(context.read<DictionaryRepository>()),
+            create:
+                (context) =>
+                    DictionaryBloc(context.read<DictionaryRepository>()),
           ),
           BlocProvider(
             create:
@@ -103,10 +103,6 @@ class MyApp extends StatelessWidget {
             create: (context) => PostBloc(context.read<PostRepository>()),
           ),
           BlocProvider(
-            create: (context) => FlashcardBloc(
-              repository: context.read<FlashcardRepository>(),
-            )..add(LoadDecksRequested()),
-          ),
             create:
                 (context) => FlashcardBloc(
                   repository: context.read<FlashcardRepository>(),

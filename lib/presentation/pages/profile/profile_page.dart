@@ -4,7 +4,6 @@ import 'package:lacquer/config/theme.dart';
 import 'package:lacquer/features/auth/bloc/auth_bloc.dart';
 import 'package:lacquer/features/auth/bloc/auth_event.dart';
 import 'package:lacquer/presentation/pages/profile/edit_profile_page.dart';
-import 'package:lacquer/config/env.dart';
 import 'package:lacquer/features/profile/bloc/profile_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:lacquer/features/profile/bloc/profile_state.dart';
@@ -665,41 +664,6 @@ class _ProfilePageState extends State<ProfilePage>
 
     Navigator.pop(context, true);
     context.read<AuthBloc>().add(AuthEventDeleteProfile(token: token));
-  }
-
-  Future<void> fetchProfile() async {
-    final authRepo = context.read<AuthRepository>();
-    token = await authRepo.authLocalDataSource.getToken();
-
-    final dio = Dio();
-
-    try {
-      final response = await dio.get(
-        '${Env.serverURL}/auth/profile',
-        options: Options(headers: {'Authorization': 'Bearer $token'}),
-      );
-      if (!mounted) return;
-      if (response.statusCode == 200) {
-        final data = response.data;
-        setState(() {
-          username = data['data']['username'] ?? '';
-          email = data['data']['email'] ?? '';
-          avatarUrl = data['data']['avatar'] ?? '';
-        });
-      } else {
-        final errorData = response.data;
-        final errorMessage = errorData['message'];
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(errorMessage)));
-      }
-    } catch (e) {
-      if (!mounted) return;
-
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
-    }
   }
 }
 
