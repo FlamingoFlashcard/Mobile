@@ -51,7 +51,7 @@ class HomePage extends StatelessWidget {
       expandedHeight: 130,
       floating: false,
       pinned: true,
-      backgroundColor: CustomTheme.mainColor2,
+      backgroundColor: const Color(0xFF6C2323),
       elevation: 0,
       flexibleSpace: FlexibleSpaceBar(
         background: Container(
@@ -60,8 +60,8 @@ class HomePage extends StatelessWidget {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                CustomTheme.mainColor2,
-                CustomTheme.mainColor2.withAlpha((0.9 * 255).toInt()),
+                const Color.fromARGB(255, 35, 9, 9),
+                const Color(0xFF6C2323).withAlpha((0.9 * 255).toInt()),
               ],
             ),
             borderRadius: const BorderRadius.only(
@@ -74,9 +74,9 @@ class HomePage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Image.asset(
-                  'assets/images/logo_home.png',
+                  'assets/images/logoLacquerLinear.png',
                   width: 360,
-                  height: 100,
+                  height: 72,
                   fit: BoxFit.contain,
                 ),
                 Text(

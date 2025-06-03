@@ -17,6 +17,36 @@ class FriendshipGetFriendsFailure extends FriendshipState {
   FriendshipGetFriendsFailure(this.message);
 }
 
+// GET FRIEND REQUESTS
+class FriendshipGetFriendRequestsInProgress extends FriendshipState {}
+
+class FriendshipGetFriendRequestsSuccess extends FriendshipState {
+  final List<dynamic> requests;
+
+  FriendshipGetFriendRequestsSuccess(this.requests);
+}
+
+class FriendshipGetFriendRequestsFailure extends FriendshipState {
+  final String message;
+
+  FriendshipGetFriendRequestsFailure(this.message);
+}
+
+// GET BLOCKED USERS
+class FriendshipGetBlockedUsersInProgress extends FriendshipState {}
+
+class FriendshipGetBlockedUsersSuccess extends FriendshipState {
+  final List<dynamic> blocked;
+
+  FriendshipGetBlockedUsersSuccess(this.blocked);
+}
+
+class FriendshipGetBlockedUsersFailure extends FriendshipState {
+  final String message;
+
+  FriendshipGetBlockedUsersFailure(this.message);
+}
+
 // SEND REQUEST
 class FriendshipSendRequestInProgress extends FriendshipState {}
 
@@ -48,6 +78,28 @@ class FriendshipRejectRequestFailure extends FriendshipState {
   final String message;
 
   FriendshipRejectRequestFailure(this.message);
+}
+
+// BLOCK FRIEND
+class FriendshipBlockFriendInProgress extends FriendshipState {}
+
+class FriendshipBlockFriendSuccess extends FriendshipState {}
+
+class FriendshipBlockFriendFailure extends FriendshipState {
+  final String message;
+
+  FriendshipBlockFriendFailure(this.message);
+}
+
+// UNBLOCK FRIEND
+class FriendshipUnblockFriendInProgress extends FriendshipState {}
+
+class FriendshipUnblockFriendSuccess extends FriendshipState {}
+
+class FriendshipUnblockFriendFailure extends FriendshipState {
+  final String message;
+
+  FriendshipUnblockFriendFailure(this.message);
 }
 
 // REMOVE FRIEND

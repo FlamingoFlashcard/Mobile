@@ -494,6 +494,7 @@ class _QuizQuestionsWidget extends State<QuizQuestionsWidget> {
                 ),
                 boxShadow: [
                   BoxShadow(
+                  // ignore: deprecated_member_use
                   color: Colors.red.withOpacity(0.3),
                   blurRadius: 8,
                   offset: const Offset(0, 2),

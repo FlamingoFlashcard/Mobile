@@ -8,9 +8,13 @@ class FriendshipBloc extends Bloc<FriendshipEvent, FriendshipState> {
   FriendshipBloc(this.friendshipRepository) : super(FriendshipInitial()) {
     on<FriendshipEventStarted>(_onStarted);
     on<FriendshipEventGetFriends>(_onGetFriends);
+    on<FriendshipEventGetFriendRequests>(_onGetFriendRequests);
+    on<FriendshipEventGetBlockedUsers>(_onGetBlockedUsers);
     on<FriendshipEventSendRequest>(_onSendRequest);
     on<FriendshipEventAcceptRequest>(_onAcceptRequest);
     on<FriendshipEventRejectRequest>(_onRejectRequest);
+    on<FriendshipEventBlockFriend>(_onBlockFriend);
+    on<FriendshipEventUnblockFriend>(_onUnblockFriend);
     on<FriendshipEventRemoveFriend>(_onRemoveFriend);
   }
 
@@ -31,6 +35,34 @@ class FriendshipBloc extends Bloc<FriendshipEvent, FriendshipState> {
         FriendshipGetFriendsSuccess(friends),
       ),
       Failure() => emit(FriendshipGetFriendsFailure(result.message)),
+    });
+  }
+
+  void _onGetFriendRequests(
+    FriendshipEventGetFriendRequests event,
+    Emitter<FriendshipState> emit,
+  ) async {
+    emit(FriendshipGetFriendRequestsInProgress());
+    final result = await friendshipRepository.getFriendRequests();
+    return (switch (result) {
+      Success(data: final requests) => emit(
+        FriendshipGetFriendRequestsSuccess(requests),
+      ),
+      Failure() => emit(FriendshipGetFriendRequestsFailure(result.message)),
+    });
+  }
+
+  void _onGetBlockedUsers(
+    FriendshipEventGetBlockedUsers event,
+    Emitter<FriendshipState> emit,
+  ) async {
+    emit(FriendshipGetBlockedUsersInProgress());
+    final result = await friendshipRepository.getBlockedUsers();
+    return (switch (result) {
+      Success(data: final blocked) => emit(
+        FriendshipGetBlockedUsersSuccess(blocked),
+      ),
+      Failure() => emit(FriendshipGetBlockedUsersFailure(result.message)),
     });
   }
 
@@ -71,6 +103,30 @@ class FriendshipBloc extends Bloc<FriendshipEvent, FriendshipState> {
     return (switch (result) {
       Success() => emit(FriendshipRejectRequestSuccess()),
       Failure() => emit(FriendshipRejectRequestFailure(result.message)),
+    });
+  }
+
+  void _onBlockFriend(
+    FriendshipEventBlockFriend event,
+    Emitter<FriendshipState> emit,
+  ) async {
+    emit(FriendshipBlockFriendInProgress());
+    final result = await friendshipRepository.blockFriend(event.friendId);
+    return (switch (result) {
+      Success() => emit(FriendshipBlockFriendSuccess()),
+      Failure() => emit(FriendshipBlockFriendFailure(result.message)),
+    });
+  }
+
+  void _onUnblockFriend(
+    FriendshipEventUnblockFriend event,
+    Emitter<FriendshipState> emit,
+  ) async {
+    emit(FriendshipUnblockFriendInProgress());
+    final result = await friendshipRepository.unblockFriend(event.friendId);
+    return (switch (result) {
+      Success() => emit(FriendshipUnblockFriendSuccess()),
+      Failure() => emit(FriendshipUnblockFriendFailure(result.message)),
     });
   }
 
