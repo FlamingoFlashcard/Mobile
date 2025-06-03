@@ -290,4 +290,25 @@ class FlashcardApiClient {
       }
     }
   }
+
+  Future<void> addCardToDeck({
+    required String deckId,
+    required String cardId,
+  }) async {
+    final token = await authLocalDataSource.getToken();
+
+    final options = Options(
+      headers: {if (token != null) 'Authorization': 'Bearer $token'},
+    );
+
+    final response = await dio.post(
+      '/deck/$deckId/cards',
+      data: {'cardId': cardId},
+      options: options,
+    );
+
+    if (response.data['success'] != true) {
+      throw Exception(response.data['message'] ?? 'Failed to add card to deck');
+    }
+  }
 }

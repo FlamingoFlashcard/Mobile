@@ -108,4 +108,21 @@ class FlashcardRepository {
   Future<void> deleteTag(String tagId) async {
     await apiClient.deleteTag(tagId);
   }
+
+  Future<void> addCardToDeck({
+    required String deckId,
+    required String cardId,
+  }) async {
+    try {
+      await apiClient.addCardToDeck(deckId: deckId, cardId: cardId);
+    } on DioException catch (e) {
+      if (e.response != null) {
+        throw Exception(
+          e.response!.data['message'] ?? 'Failed to add card to deck',
+        );
+      } else {
+        throw Exception(e.message);
+      }
+    }
+  }
 }
