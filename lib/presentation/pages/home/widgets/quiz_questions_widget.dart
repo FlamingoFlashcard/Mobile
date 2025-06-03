@@ -129,10 +129,18 @@ class _QuizQuestionsWidget extends State<QuizQuestionsWidget> {
     }
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Question ${currentQuestionIndex + 1} of ${widget.questions.length}',
+        title: Row(
+          children: [
+            IconButton(
+              onPressed: onQuizExit,
+              icon: Icon(Icons.arrow_back),
+            ),
+            Text(
+              'Question ${currentQuestionIndex + 1} of ${widget.questions.length}',
+            ),
+          ],
         ),
-        backgroundColor: Colors.blue.shade600,
+        backgroundColor: widget.difficulty.color,
         foregroundColor: Colors.white,
         elevation: 0,
       ),
@@ -145,7 +153,9 @@ class _QuizQuestionsWidget extends State<QuizQuestionsWidget> {
             LinearProgressIndicator(
               value: (currentQuestionIndex + 1) / widget.questions.length,
               backgroundColor: Colors.grey.shade300,
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.blue.shade600),
+              valueColor: AlwaysStoppedAnimation<Color>(
+                widget.difficulty.color,
+              ),
             ),
             const SizedBox(height: 30),
 
@@ -263,7 +273,7 @@ class _QuizQuestionsWidget extends State<QuizQuestionsWidget> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.blue.shade50, Colors.white],
+            colors: [Colors.white, Colors.grey.shade700],
           ),
         ),
         child: SafeArea(
@@ -321,7 +331,7 @@ class _QuizQuestionsWidget extends State<QuizQuestionsWidget> {
                           style: TextStyle(
                             fontSize: 48,
                             fontWeight: FontWeight.bold,
-                            color: Colors.blue.shade600,
+                            color: widget.difficulty.color,
                           ),
                         ),
                         Text(
@@ -346,7 +356,7 @@ class _QuizQuestionsWidget extends State<QuizQuestionsWidget> {
                       child: ElevatedButton(
                         onPressed: tryAgain,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue.shade600,
+                          backgroundColor: widget.difficulty.color,
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
@@ -369,7 +379,7 @@ class _QuizQuestionsWidget extends State<QuizQuestionsWidget> {
                         onPressed: widget.onBackToHome,
                         style: OutlinedButton.styleFrom(
                           side: BorderSide(
-                            color: Colors.blue.shade600,
+                            color: widget.difficulty.color,
                             width: 2,
                           ),
                           padding: const EdgeInsets.symmetric(vertical: 16),
@@ -382,7 +392,7 @@ class _QuizQuestionsWidget extends State<QuizQuestionsWidget> {
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
-                            color: Colors.blue.shade600,
+                            color: widget.difficulty.color,
                           ),
                         ),
                       ),
@@ -394,6 +404,138 @@ class _QuizQuestionsWidget extends State<QuizQuestionsWidget> {
           ),
         ),
       ),
+    );
+  }
+
+  void onQuizExit() async {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Prevent closing by tapping outside
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          elevation: 10,
+          backgroundColor: Colors.white,
+          title: Row(
+            children: [
+              Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 28),
+              const SizedBox(width: 12),
+              const Text(
+                'Exit Quiz',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+            ],
+          ),
+          content: Container(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.quiz_outlined, size: 48, color: Colors.grey[400]),
+                const SizedBox(height: 16),
+                const Text(
+                  'The process will not be saved. Are you sure you want to leave?',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.black54,
+                    height: 1.4,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+          actionsPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 12,
+          ),
+            actions: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+              // Left container (Cancel)
+              Container(
+                decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.grey[300]!),
+                ),
+                child: TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close dialog
+                },
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.grey[700],
+                  padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                  ),
+                  shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: const Text(
+                  'Cancel',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                ),
+                ),
+              ),
+              // Right container (Leave)
+              Container(
+                decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                gradient: LinearGradient(
+                  colors: [Colors.red[400]!, Colors.red[600]!],
+                ),
+                boxShadow: [
+                  BoxShadow(
+                  color: Colors.red.withOpacity(0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                  ),
+                ],
+                ),
+                child: TextButton(
+                onPressed: () {
+                  widget.onBackToHome();
+                  Navigator.of(context).pop();
+                },
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                  ),
+                  shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                  const Icon(Icons.exit_to_app, size: 18),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Leave',
+                    style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  ],
+                ),
+                ),
+              ),
+              ],
+            ),
+          ],
+        );
+      },
     );
   }
 }

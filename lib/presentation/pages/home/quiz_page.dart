@@ -520,41 +520,42 @@ class _QuizPageState extends State<QuizPage> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
         title: Row(
           children: [
-            Text("Quiz"),
             IconButton(
               onPressed: () {
                 context.go('/');
               },
-              icon: Icon(Icons.turn_left),
+              icon: Icon(Icons.arrow_back),
             ),
-          ],
-        ),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            const SizedBox(height: 20),
-            Align(
-              alignment: Alignment.topRight,
-              child: Padding(
-                padding: const EdgeInsets.only(right: 10),
-                child: Container(
-                  decoration: BoxDecoration(),
-                  child: IconButton(
-                    onPressed: _showInformationDialog,
-                    icon: Icon(
-                      Icons.info_outline,
-                      color: CustomTheme.mainColor1,
-                    ),
+            Expanded(
+              child: Center(
+                child: Text(
+                  "Quiz",
+                  style: const TextStyle(
+                    fontSize: 24,
+                    color: CustomTheme.mainColor1,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
             ),
+            IconButton(
+              onPressed: _showInformationDialog,
+              icon: Icon(Icons.info_outline, color: CustomTheme.mainColor1),
+            ),
+          ],
+        ),
+      ),
+
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            const SizedBox(height: 50),
             _buildMainTitle(),
-            const SizedBox(height: 20),
+            const SizedBox(height: 30),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -595,10 +596,6 @@ class _QuizPageState extends State<QuizPage> {
                   ),
                 ),
               ],
-            ),
-            IconButton(
-              icon: Icon(Icons.add),
-              onPressed: () => _showErrorDialog('An error occurred'),
             ),
           ],
         ),
