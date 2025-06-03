@@ -9,6 +9,7 @@ import 'package:lacquer/presentation/pages/auth/login_page.dart';
 import 'package:lacquer/presentation/pages/auth/verify_page.dart';
 import 'package:lacquer/presentation/pages/camera/camera_page.dart';
 import 'package:lacquer/presentation/pages/camera/about_screen.dart';
+import 'package:lacquer/presentation/pages/home/add_new_word_page.dart';
 import 'package:lacquer/presentation/pages/home/edit_card_list_page.dart';
 import 'package:lacquer/presentation/pages/home/dictionary_page.dart';
 import 'package:lacquer/presentation/pages/profile/profile_page.dart';
@@ -37,6 +38,7 @@ class RouteName {
   static const String dictionary = '/dictionary';
   static const String translator = '/translator';
   static const String friends = '/friends';
+  static String addNewWord(String deckId) => '/add-new-word/$deckId';
 
   static const publicRoutes = [login, forgotPassword, verify, register];
 }
@@ -134,6 +136,13 @@ final router = GoRouter(
       builder: (context, state) {
         final deckId = state.pathParameters['deckId']!;
         return EditCardListPage(deckId: deckId);
+      },
+    ),
+    noTransitionRoute(
+      path: '/add-new-word/:deckId',
+      builder: (context, state) {
+        final deckId = state.pathParameters['deckId']!;
+        return AddNewWordPage(deckId: deckId);
       },
     ),
   ],
