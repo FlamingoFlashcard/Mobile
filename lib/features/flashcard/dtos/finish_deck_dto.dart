@@ -24,13 +24,12 @@ class DeckDto {
   final List<String> tags;
   final String? description;
   final String? img;
-  final List<String>?
-  cards; // Changed from List<Map<String, dynamic>> to List<String>
+  final List<String>? cards;
   final DateTime? createdAt;
   final DateTime? updatedAt;
   final bool? isDone;
-  final String? owner; // Added
-  final int? v; // Added for __v
+  final String? owner;
+  final int? v;
 
   DeckDto({
     required this.id,

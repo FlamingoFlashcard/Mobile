@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:lacquer/config/router.dart';
 import 'package:lacquer/features/flashcard/bloc/flashcard_bloc.dart';
 import 'package:lacquer/features/flashcard/bloc/flashcard_event.dart';
 import 'package:lacquer/features/flashcard/dtos/card_dto.dart';
@@ -40,12 +42,12 @@ class _LearningCardListState extends State<LearningCardList> {
   void _onPageChanged(int index) {
     if (index > _highestPageReached) {
       _highestPageReached = index;
-      final maxPages = widget.cards.length - 1;
+      final maxPages = widget.cards.length;
       final progress = maxPages > 0 ? index / maxPages : 0.0;
       widget.onScrollProgress?.call(progress.clamp(0.0, 1.0));
 
-      if (index == widget.cards.length - 1 &&
-          widget.cards.isNotEmpty &&
+      if (widget.cards.isNotEmpty &&
+          index == widget.cards.length &&
           !widget.isDone) {
         context.read<FlashcardBloc>().add(
           FinishDeckRequested(deckId: widget.deckId),
@@ -62,17 +64,63 @@ class _LearningCardListState extends State<LearningCardList> {
 
   @override
   Widget build(BuildContext context) {
+    final hasCards = widget.cards.isNotEmpty;
+    final totalPages = hasCards ? widget.cards.length + 1 : 0;
+
     return PageView.builder(
       controller: _pageController,
-      itemCount: widget.cards.length,
+      itemCount: totalPages,
       onPageChanged: _onPageChanged,
       itemBuilder: (context, index) {
-        return LearningCard(
-          card: widget.cards[index],
-          speechRate: widget.speechRate,
-          selectedAccent: widget.selectedAccent,
-        );
+        if (index < widget.cards.length) {
+          return LearningCard(
+            card: widget.cards[index],
+            speechRate: widget.speechRate,
+            selectedAccent: widget.selectedAccent,
+          );
+        } else {
+          return _buildCompletionCard(context);
+        }
       },
     );
   }
+}
+
+Widget _buildCompletionCard(BuildContext context) {
+  return Center(
+    child: Padding(
+      padding: const EdgeInsets.all(24.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.emoji_events, size: 80, color: Colors.amber),
+          const SizedBox(height: 24),
+          const Text(
+            '🎉 Congratulations!',
+            style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+          const Text(
+            'You have completed the deck.',
+            style: TextStyle(fontSize: 18),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 32),
+          ElevatedButton.icon(
+            onPressed: () {
+              context.go(RouteName.flashcards);
+            },
+            icon: const Icon(Icons.check),
+            label: const Text('Got it'),
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+              backgroundColor: Colors.green,
+              textStyle: const TextStyle(fontSize: 16),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
 }
