@@ -40,6 +40,8 @@ dependencies:
     mime: ^2.0.0
     # QR code scanner
     qr_code_scanner_plus: ^2.0.10+1
+    # Socket.IO for real-time chat
+    socket_io_client: ^3.0.0
 dev_dependencies:
     flutter_test:
         sdk: flutter

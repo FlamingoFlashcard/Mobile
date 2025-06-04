@@ -1005,7 +1005,7 @@ class _CameraPageState extends State<CameraPage> with TickerProviderStateMixin {
                       // Chat button on the right
                       IconButton(
                         onPressed: () {
-                          // Navigate to chat or open chat dialog
+                          context.push('/chat');
                         },
                         icon: const Icon(
                           Icons.chat_bubble_outline,

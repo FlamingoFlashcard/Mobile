@@ -13,6 +13,9 @@ import 'package:lacquer/features/chatbot/bloc/chatbot_bloc.dart';
 import 'package:lacquer/features/chatbot/bloc/chatbot_event.dart';
 import 'package:lacquer/features/chatbot/data/chatbot_api_client.dart';
 import 'package:lacquer/features/chatbot/data/chatbot_repository.dart';
+import 'package:lacquer/features/chat/bloc/chat_bloc.dart';
+import 'package:lacquer/features/chat/bloc/chat_event.dart';
+import 'package:lacquer/features/chat/data/chat_repository.dart';
 import 'package:lacquer/features/dictionary/bloc/dictionary_bloc.dart';
 import 'package:lacquer/features/dictionary/bloc/dictionary_event.dart';
 import 'package:lacquer/features/dictionary/data/dictionary_api_clients.dart';
@@ -66,6 +69,7 @@ class MyApp extends StatelessWidget {
               (context) =>
                   ChatbotRepository(chatbotApiClient: ChatbotApiClient(dio)),
         ),
+        RepositoryProvider(create: (context) => ChatRepository()),
         RepositoryProvider(
           create:
               (context) => DictionaryRepository(
@@ -96,6 +100,9 @@ class MyApp extends StatelessWidget {
           ),
           BlocProvider(
             create: (context) => ChatbotBloc(context.read<ChatbotRepository>()),
+          ),
+          BlocProvider(
+            create: (context) => ChatBloc(),
           ),
           BlocProvider(
             create:
@@ -152,6 +159,8 @@ class _AppContentState extends State<AppContent> {
     context.read<FriendshipBloc>().add(FriendshipEventStarted());
     context.read<PostBloc>().add(PostEventStarted());
     context.read<FlashcardBloc>().add(LoadDecksRequested());
+    // Initialize WebSocket connection for chat
+    context.read<ChatBloc>().add(ChatEventConnectWebSocket());
   }
 
   @override

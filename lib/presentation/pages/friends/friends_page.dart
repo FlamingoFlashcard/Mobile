@@ -8,7 +8,14 @@ import 'package:lacquer/features/auth/data/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class FriendsPage extends StatefulWidget {
-  const FriendsPage({super.key});
+  final bool selectMode;
+  final bool multiSelect;
+  
+  const FriendsPage({
+    super.key,
+    this.selectMode = false,
+    this.multiSelect = false,
+  });
 
   @override
   State<FriendsPage> createState() => _FriendsPageState();
@@ -21,6 +28,9 @@ class _FriendsPageState extends State<FriendsPage>
   List<dynamic> friendRequests = [];
   List<dynamic> blockedUsers = [];
   String? currentUserId;
+  
+  // Selection mode variables
+  List<String> selectedFriendIds = [];
 
   @override
   void initState() {
@@ -51,10 +61,28 @@ class _FriendsPageState extends State<FriendsPage>
 
   // Helper method to get the friend user ID from a friendship relationship
   String _getFriendUserId(dynamic friendship) {
-    if (currentUserId == null) return '';
+    if (currentUserId == null) {
+      return '';
+    }
 
-    final requesterId = friendship['requester'];
-    final recipientId = friendship['recipient'];
+    final requester = friendship['requester'];
+    final recipient = friendship['recipient'];
+    
+    // Handle both old format (just IDs) and new format (full objects)
+    String requesterId;
+    String recipientId;
+    
+    if (requester is Map) {
+      requesterId = requester['_id'] ?? '';
+    } else {
+      requesterId = requester?.toString() ?? '';
+    }
+    
+    if (recipient is Map) {
+      recipientId = recipient['_id'] ?? '';
+    } else {
+      recipientId = recipient?.toString() ?? '';
+    }
 
     // Return the other person's ID
     return requesterId == currentUserId ? recipientId : requesterId;
@@ -62,13 +90,45 @@ class _FriendsPageState extends State<FriendsPage>
 
   // Helper method to get display information from friendship object
   Map<String, String> _getFriendDisplayInfo(dynamic friendship) {
-    final friendId = _getFriendUserId(friendship);
+    if (currentUserId == null) {
+      return {
+        'id': '',
+        'username': 'Unknown',
+        'email': '',
+        'avatarUrl': '',
+      };
+    }
 
-    // For now, we'll use the friendship ID and basic info
-    // In a real app, you'd want to populate user details from the API
+    final requester = friendship['requester'];
+    final recipient = friendship['recipient'];
+
+    // Determine which user is the friend (not the current user)
+    Map<String, dynamic>? friendUser;
+    
+    if (requester is Map && requester['_id'] == currentUserId) {
+      friendUser = recipient is Map ? Map<String, dynamic>.from(recipient) : null;
+    } else if (recipient is Map && recipient['_id'] == currentUserId) {
+      friendUser = requester is Map ? Map<String, dynamic>.from(requester) : null;
+    } else if (requester is Map) {
+      friendUser = Map<String, dynamic>.from(requester);
+    } else if (recipient is Map) {
+      friendUser = Map<String, dynamic>.from(recipient);
+    }
+    
+    if (friendUser != null) {
+      return {
+        'id': friendUser['_id'] ?? '',
+        'username': friendUser['username'] ?? 'Unknown',
+        'email': friendUser['email'] ?? '',
+        'avatarUrl': friendUser['avatar'] ?? '',
+      };
+    }
+    
+    // Fallback for old format
+    final friendId = _getFriendUserId(friendship);
     return {
       'id': friendId,
-      'username': 'User ${friendId.substring(friendId.length - 4)}',
+      'username': 'User ${friendId.isNotEmpty && friendId.length >= 4 ? friendId.substring(friendId.length - 4) : friendId}',
       'email': '',
       'avatarUrl': '',
     };
@@ -98,7 +158,11 @@ class _FriendsPageState extends State<FriendsPage>
           backgroundColor: Colors.transparent,
           elevation: 0,
           title: Text(
-            'Friends',
+            widget.selectMode 
+                ? (widget.multiSelect 
+                    ? 'Select Friends (${selectedFriendIds.length})' 
+                    : 'Select a Friend')
+                : 'Friends',
             style: TextStyle(
               color: Colors.black87,
               fontWeight: FontWeight.w600,
@@ -106,7 +170,27 @@ class _FriendsPageState extends State<FriendsPage>
             ),
           ),
           centerTitle: true,
-          bottom: PreferredSize(
+          actions: widget.selectMode ? [
+            if (widget.multiSelect || selectedFriendIds.isNotEmpty)
+              TextButton(
+                onPressed: () {
+                  if (widget.multiSelect) {
+                    Navigator.of(context).pop(selectedFriendIds);
+                  } else if (selectedFriendIds.isNotEmpty) {
+                    Navigator.of(context).pop(selectedFriendIds.first);
+                  }
+                },
+                child: Text(
+                  'Done',
+                  style: TextStyle(
+                    color: const Color(0xFFA31D1D),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+          ] : null,
+          bottom: widget.selectMode ? null : PreferredSize(
             preferredSize: Size.fromHeight(48),
             child: Container(
               margin: EdgeInsets.symmetric(horizontal: 20),
@@ -482,11 +566,35 @@ class _FriendsPageState extends State<FriendsPage>
     final avatarUrl = friendInfo['avatarUrl'] ?? '';
     final friendId = friendInfo['id'] ?? '';
 
-    return Container(
+    final isSelected = selectedFriendIds.contains(friendId);
+
+    return GestureDetector(
+      onTap: widget.selectMode ? () {
+        setState(() {
+          if (widget.multiSelect) {
+            if (isSelected) {
+              selectedFriendIds.remove(friendId);
+            } else {
+              selectedFriendIds.add(friendId);
+            }
+          } else {
+            // Single select mode
+            selectedFriendIds.clear();
+            selectedFriendIds.add(friendId);
+            Navigator.of(context).pop(friendId);
+          }
+        });
+      } : null,
+      child: Container(
       margin: EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Color.fromRGBO(255, 255, 255, 0.95),
+          color: widget.selectMode && isSelected 
+              ? const Color(0xFFA31D1D).withValues(alpha: 0.1)
+              : Color.fromRGBO(255, 255, 255, 0.95),
         borderRadius: BorderRadius.circular(16),
+          border: widget.selectMode && isSelected
+              ? Border.all(color: const Color(0xFFA31D1D), width: 2)
+              : null,
         boxShadow: [
           BoxShadow(
             color: Color.fromRGBO(0, 0, 0, 0.05),
@@ -499,6 +607,22 @@ class _FriendsPageState extends State<FriendsPage>
         padding: EdgeInsets.all(16),
         child: Row(
           children: [
+              if (widget.selectMode && widget.multiSelect) ...[
+                Checkbox(
+                  value: isSelected,
+                  onChanged: (value) {
+                    setState(() {
+                      if (value == true) {
+                        selectedFriendIds.add(friendId);
+                      } else {
+                        selectedFriendIds.remove(friendId);
+                      }
+                    });
+                  },
+                  activeColor: const Color(0xFFA31D1D),
+                ),
+                SizedBox(width: 8),
+              ],
             CircleAvatar(
               radius: 30,
               backgroundColor: Colors.grey.shade200,
@@ -548,6 +672,7 @@ class _FriendsPageState extends State<FriendsPage>
                 ],
               ),
             ),
+              if (!widget.selectMode)
             PopupMenuButton<String>(
               onSelected: (value) {
                 switch (value) {
@@ -594,8 +719,11 @@ class _FriendsPageState extends State<FriendsPage>
                 ),
                 child: Icon(Icons.more_vert, color: Colors.black54, size: 20),
               ),
-            ),
+                )
+              else if (widget.selectMode && !widget.multiSelect && isSelected)
+                Icon(Icons.check_circle, color: const Color(0xFFA31D1D), size: 24),
           ],
+          ),
         ),
       ),
     );
