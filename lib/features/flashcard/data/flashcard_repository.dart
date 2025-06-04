@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:lacquer/features/flashcard/dtos/card_dto.dart';
 import 'dart:io';
 import 'package:lacquer/features/flashcard/dtos/create_tag_dto.dart';
+import 'package:lacquer/features/flashcard/dtos/finish_deck_dto.dart';
 import 'package:lacquer/features/flashcard/dtos/grouped_decks_dto.dart';
 import 'package:lacquer/features/flashcard/dtos/update_deck_dto.dart';
 import 'package:lacquer/features/flashcard/dtos/update_tag_dto.dart';
@@ -123,6 +124,15 @@ class FlashcardRepository {
       } else {
         throw Exception(e.message);
       }
+    }
+  }
+
+  Future<FinishDeckResponseDto> finishDeck(String deckId) async {
+    try {
+      final response = await apiClient.finishDeck(deckId);
+      return response;
+    } catch (e) {
+      throw Exception('Failed to finish deck: $e');
     }
   }
 }

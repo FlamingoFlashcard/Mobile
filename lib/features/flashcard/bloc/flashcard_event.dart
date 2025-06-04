@@ -120,3 +120,12 @@ class AddCardToDeckRequested extends FlashcardEvent {
   @override
   List<Object?> get props => [deckId, cardId];
 }
+
+class FinishDeckRequested extends FlashcardEvent {
+  final String deckId;
+
+  const FinishDeckRequested({required this.deckId});
+
+  @override
+  List<Object?> get props => [deckId];
+}

@@ -20,6 +20,7 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
     on<DeleteTagRequested>(_onDeleteTagRequested);
     on<SearchDecksRequested>(_onSearchDecksRequested);
     on<AddCardToDeckRequested>(_onAddCardToDeckRequested);
+    on<FinishDeckRequested>(_onFinishDeckRequested);
   }
 
   Future<void> _onCreateDeckRequested(
@@ -347,5 +348,33 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
       (sum, item) => sum + item.decks.length,
     );
     return GroupedDecksResponseDto(count: newCount, data: filteredItems);
+  }
+
+  Future<void> _onFinishDeckRequested(
+    FinishDeckRequested event,
+    Emitter<FlashcardState> emit,
+  ) async {
+    emit(state.copyWith(status: FlashcardStatus.loading));
+
+    try {
+      await repository.finishDeck(event.deckId);
+      final groupedDecks = await repository.getDecks();
+      final updatedDeck = await repository.getDeckById(event.deckId);
+
+      emit(
+        state.copyWith(
+          status: FlashcardStatus.success,
+          selectedDeck: updatedDeck,
+          groupedDecks: groupedDecks,
+        ),
+      );
+    } catch (e) {
+      emit(
+        state.copyWith(
+          status: FlashcardStatus.failure,
+          errorMessage: e.toString(),
+        ),
+      );
+    }
   }
 }
