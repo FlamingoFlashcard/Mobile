@@ -63,6 +63,7 @@ class CreateDeckResponseDto {
   final List<CardDto>? cards;
   final String? userId;
   final DateTime? createdAt;
+  final bool? isDone;
 
   CreateDeckResponseDto({
     this.id,
@@ -73,6 +74,7 @@ class CreateDeckResponseDto {
     this.cards,
     this.userId,
     this.createdAt,
+    this.isDone,
   });
 
   factory CreateDeckResponseDto.fromJson(Map<String, dynamic> json) {
@@ -112,6 +114,7 @@ class CreateDeckResponseDto {
           json['createdAt'] != null
               ? DateTime.tryParse(json['createdAt'] as String)
               : null,
+      isDone: json['isDone'] as bool? ?? false,
     );
   }
 

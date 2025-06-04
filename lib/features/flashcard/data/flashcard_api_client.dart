@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:lacquer/features/flashcard/dtos/finish_deck_dto.dart';
 import 'package:lacquer/features/flashcard/dtos/update_deck_dto.dart';
 import 'package:lacquer/features/flashcard/dtos/update_tag_dto.dart';
 import 'dart:io';
@@ -201,6 +202,30 @@ class FlashcardApiClient {
     } on DioException catch (e) {
       if (e.response != null) {
         throw Exception(e.response!.data['message'] ?? 'Failed to update tag');
+      } else {
+        throw Exception(e.message);
+      }
+    }
+  }
+
+  Future<FinishDeckResponseDto> finishDeck(String deckId) async {
+    try {
+      final token = await authLocalDataSource.getToken();
+      final options = Options(
+        headers: {if (token != null) 'Authorization': 'Bearer $token'},
+      );
+
+      final response = await dio.put('/deck/$deckId/finish', options: options);
+
+      final responseData = response.data as Map<String, dynamic>;
+      if (responseData['success'] != true) {
+        throw Exception(responseData['message'] ?? 'Failed to finish deck');
+      }
+
+      return FinishDeckResponseDto.fromJson(responseData);
+    } on DioException catch (e) {
+      if (e.response != null) {
+        throw Exception(e.response!.data['message'] ?? 'Failed to finish deck');
       } else {
         throw Exception(e.message);
       }

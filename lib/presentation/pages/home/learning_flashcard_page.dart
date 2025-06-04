@@ -119,10 +119,12 @@ class _LearningFlashcardPageState extends State<LearningFlashcardPage> {
                     ),
                     Expanded(
                       child: LearningCardList(
+                        deckId: widget.deckId,
                         cards: deck.cards ?? [],
                         onScrollProgress: _updateProgress,
                         speechRate: _speechRate,
                         selectedAccent: _selectedAccent,
+                        isDone: deck.isDone ?? false,
                       ),
                     ),
                     const SizedBox(height: 20),

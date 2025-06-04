@@ -1,19 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lacquer/features/flashcard/bloc/flashcard_bloc.dart';
+import 'package:lacquer/features/flashcard/bloc/flashcard_event.dart';
 import 'package:lacquer/features/flashcard/dtos/card_dto.dart';
 import 'package:lacquer/presentation/pages/home/widgets/learning_card.dart';
 
 class LearningCardList extends StatefulWidget {
+  final String deckId;
   final List<CardDto> cards;
   final Function(double)? onScrollProgress;
   final double speechRate;
   final String selectedAccent;
+  final bool isDone;
 
   const LearningCardList({
     super.key,
+    required this.deckId,
     required this.cards,
     this.onScrollProgress,
     required this.speechRate,
     required this.selectedAccent,
+    required this.isDone,
   });
 
   @override
@@ -36,6 +43,14 @@ class _LearningCardListState extends State<LearningCardList> {
       final maxPages = widget.cards.length - 1;
       final progress = maxPages > 0 ? index / maxPages : 0.0;
       widget.onScrollProgress?.call(progress.clamp(0.0, 1.0));
+
+      if (index == widget.cards.length - 1 &&
+          widget.cards.isNotEmpty &&
+          !widget.isDone) {
+        context.read<FlashcardBloc>().add(
+          FinishDeckRequested(deckId: widget.deckId),
+        );
+      }
     }
   }
 
