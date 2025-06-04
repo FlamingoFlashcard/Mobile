@@ -45,14 +45,6 @@ class _LearningCardListState extends State<LearningCardList> {
       final maxPages = widget.cards.length;
       final progress = maxPages > 0 ? index / maxPages : 0.0;
       widget.onScrollProgress?.call(progress.clamp(0.0, 1.0));
-
-      if (widget.cards.isNotEmpty &&
-          index == widget.cards.length &&
-          !widget.isDone) {
-        context.read<FlashcardBloc>().add(
-          FinishDeckRequested(deckId: widget.deckId),
-        );
-      }
     }
   }
 
@@ -79,14 +71,14 @@ class _LearningCardListState extends State<LearningCardList> {
             selectedAccent: widget.selectedAccent,
           );
         } else {
-          return _buildCompletionCard(context);
+          return _buildCompletionCard(context, widget.deckId, widget.isDone);
         }
       },
     );
   }
 }
 
-Widget _buildCompletionCard(BuildContext context) {
+Widget _buildCompletionCard(BuildContext context, String deckId, bool isDone) {
   return Center(
     child: Padding(
       padding: const EdgeInsets.all(24.0),
@@ -109,6 +101,11 @@ Widget _buildCompletionCard(BuildContext context) {
           const SizedBox(height: 32),
           ElevatedButton.icon(
             onPressed: () {
+              if (isDone != true) {
+                context.read<FlashcardBloc>().add(
+                  FinishDeckRequested(deckId: deckId),
+                );
+              }
               context.go(RouteName.flashcards);
             },
             icon: const Icon(Icons.check),
