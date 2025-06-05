@@ -45,7 +45,7 @@ class _EditCardListPageState extends State<EditCardListPage> {
                 _buildAppBar(context, deck.title),
                 Column(
                   children: [
-                    const SizedBox(height: 80),
+                    const SizedBox(height: 70),
                     Padding(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 16.0,

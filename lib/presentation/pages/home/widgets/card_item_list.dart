@@ -16,7 +16,7 @@ class CardItemList extends StatelessWidget {
     return ListView.separated(
       padding: const EdgeInsets.all(12.0),
       itemCount: cards.length,
-      separatorBuilder: (context, index) => const SizedBox(height: 8),
+      separatorBuilder: (context, index) => const SizedBox(height: 4),
       itemBuilder: (context, index) {
         return CardItem(card: cards[index]);
       },
