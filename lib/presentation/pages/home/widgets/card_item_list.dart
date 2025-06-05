@@ -4,8 +4,19 @@ import 'card_item.dart';
 
 class CardItemList extends StatelessWidget {
   final List<CardDto> cards;
+  final Set<String> selectedCardIds;
+  final bool isMultiSelectMode;
+  final void Function(CardDto card) onCardTap;
+  final void Function(CardDto card) onCardLongPress;
 
-  const CardItemList({super.key, required this.cards});
+  const CardItemList({
+    super.key,
+    required this.cards,
+    required this.selectedCardIds,
+    required this.isMultiSelectMode,
+    required this.onCardTap,
+    required this.onCardLongPress,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -16,9 +27,19 @@ class CardItemList extends StatelessWidget {
     return ListView.separated(
       padding: const EdgeInsets.all(12.0),
       itemCount: cards.length,
-      separatorBuilder: (context, index) => const SizedBox(height: 4),
+      separatorBuilder: (_, __) => const SizedBox(height: 4),
       itemBuilder: (context, index) {
-        return CardItem(card: cards[index]);
+        final card = cards[index];
+        final isSelected = selectedCardIds.contains(card.id);
+        return GestureDetector(
+          onTap: () => onCardTap(card),
+          onLongPress: () => onCardLongPress(card),
+          child: CardItem(
+            card: card,
+            isSelected: isSelected,
+            isMultiSelectMode: isMultiSelectMode,
+          ),
+        );
       },
     );
   }

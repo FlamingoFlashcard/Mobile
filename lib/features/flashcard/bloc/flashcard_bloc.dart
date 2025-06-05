@@ -268,11 +268,12 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
   ) async {
     emit(state.copyWith(status: FlashcardStatus.loading));
 
-    final updatedDeck = await repository.getDeckById(event.deckId);
-    final groupedDecks = await repository.getDecks();
-
     try {
       await repository.deleteCard(event.deckId, event.cardId);
+
+      final updatedDeck = await repository.getDeckById(event.deckId);
+      final groupedDecks = await repository.getDecks();
+
       emit(
         state.copyWith(
           status: FlashcardStatus.success,
@@ -326,7 +327,6 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
       );
 
       final groupedDecks = await repository.getDecks();
-
       final updatedDeck = await repository.getDeckById(event.deckId);
 
       emit(
