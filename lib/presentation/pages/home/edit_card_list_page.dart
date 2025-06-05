@@ -7,7 +7,8 @@ import 'package:lacquer/config/theme.dart';
 import 'package:lacquer/features/flashcard/bloc/flashcard_bloc.dart';
 import 'package:lacquer/features/flashcard/bloc/flashcard_event.dart';
 import 'package:lacquer/features/flashcard/bloc/flashcard_state.dart';
-import 'package:lacquer/presentation/pages/home/widgets/card_item_list.dart';
+import 'package:lacquer/features/flashcard/dtos/card_dto.dart';
+import 'package:lacquer/presentation/pages/home/widgets/card_item.dart';
 
 class EditCardListPage extends StatefulWidget {
   final String deckId;
@@ -19,16 +20,73 @@ class EditCardListPage extends StatefulWidget {
 }
 
 class _EditCardListPageState extends State<EditCardListPage> {
+  bool isMultiSelectMode = false;
+  final Set<String> selectedCardIds = {};
+
   @override
   void initState() {
     super.initState();
     context.read<FlashcardBloc>().add(LoadDeckByIdRequested(widget.deckId));
   }
 
+  void _onCardTap(CardDto card) {
+    final cardId = card.id;
+    if (cardId == null) return;
+    if (!isMultiSelectMode) return;
+    setState(() {
+      selectedCardIds.contains(card.id)
+          ? selectedCardIds.remove(card.id)
+          : selectedCardIds.add(cardId);
+    });
+  }
+
+  void _onCardLongPress(CardDto card) {
+    final cardId = card.id;
+    if (cardId == null) return;
+    setState(() {
+      isMultiSelectMode = true;
+      selectedCardIds.add(cardId);
+    });
+  }
+
+  void _exitMultiSelect() {
+    setState(() {
+      isMultiSelectMode = false;
+      selectedCardIds.clear();
+    });
+  }
+
+  void _selectAll(List<CardDto> cards) {
+    setState(() {
+      selectedCardIds.addAll(cards.map((c) => c.id).whereType<String>());
+    });
+  }
+
+  void _deleteSelected() {
+    final bloc = context.read<FlashcardBloc>();
+    for (final cardId in selectedCardIds) {
+      bloc.add(DeleteCardRequested(widget.deckId, cardId));
+    }
+    _exitMultiSelect();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: CustomTheme.lightbeige,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(90),
+        child: BlocBuilder<FlashcardBloc, FlashcardState>(
+          builder: (context, state) {
+            final title = state.selectedDeck?.title ?? '';
+            return _buildAppBar(
+              context,
+              title,
+              state.selectedDeck?.cards ?? [],
+            );
+          },
+        ),
+      ),
       body: BlocBuilder<FlashcardBloc, FlashcardState>(
         builder: (context, state) {
           if (state.status == FlashcardStatus.loading) {
@@ -40,24 +98,33 @@ class _EditCardListPageState extends State<EditCardListPage> {
           } else if (state.status == FlashcardStatus.success &&
               state.selectedDeck != null) {
             final deck = state.selectedDeck!;
-            return Stack(
+            return Column(
               children: [
-                _buildAppBar(context, deck.title),
-                Column(
-                  children: [
-                    const SizedBox(height: 70),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16.0,
-                        vertical: 8.0,
-                      ),
-                    ),
-                    Expanded(child: CardItemList(cards: deck.cards ?? [])),
-                    const SizedBox(height: 20),
-                    if (deck.cards == null || deck.cards!.isEmpty)
-                      const Text('No cards available in this deck'),
-                  ],
+                Expanded(
+                  child: ListView.separated(
+                    padding: const EdgeInsets.all(12.0),
+                    itemCount: deck.cards?.length ?? 0,
+                    separatorBuilder: (_, __) => const SizedBox(height: 4),
+                    itemBuilder: (context, index) {
+                      final card = deck.cards![index];
+                      final isSelected = selectedCardIds.contains(card.id);
+                      return GestureDetector(
+                        onTap: () => _onCardTap(card),
+                        onLongPress: () => _onCardLongPress(card),
+                        child: CardItem(
+                          card: card,
+                          isSelected: isSelected,
+                          isMultiSelectMode: isMultiSelectMode,
+                        ),
+                      );
+                    },
+                  ),
                 ),
+                if (deck.cards == null || deck.cards!.isEmpty)
+                  const Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Text('No cards available in this deck'),
+                  ),
               ],
             );
           }
@@ -67,7 +134,44 @@ class _EditCardListPageState extends State<EditCardListPage> {
     );
   }
 
-  Widget _buildAppBar(BuildContext context, String? title) {
+  Widget _buildAppBar(BuildContext context, String title, List<CardDto> cards) {
+    if (isMultiSelectMode) {
+      return AppBar(
+        backgroundColor: CustomTheme.mainColor1,
+        title: Text(
+          '${selectedCardIds.length} selected',
+          style: TextStyle(color: Colors.white),
+        ),
+        leading: IconButton(
+          icon: const Icon(Icons.close),
+          color: Colors.white,
+          onPressed: _exitMultiSelect,
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.select_all),
+            color: CustomTheme.mainColor3,
+            onPressed: () => _selectAll(cards),
+          ),
+          IconButton(
+            icon: const Icon(Icons.copy),
+            color: CustomTheme.mainColor3,
+            onPressed: () {},
+          ),
+          IconButton(
+            icon: const Icon(Icons.drive_file_move),
+            color: CustomTheme.mainColor3,
+            onPressed: () {},
+          ),
+          IconButton(
+            icon: const Icon(Icons.delete),
+            color: CustomTheme.mainColor3,
+            onPressed: _deleteSelected,
+          ),
+        ],
+      );
+    }
+
     return ClipRRect(
       borderRadius: const BorderRadius.only(
         bottomLeft: Radius.circular(8),
@@ -87,12 +191,10 @@ class _EditCardListPageState extends State<EditCardListPage> {
                   FontAwesomeIcons.arrowLeft,
                   color: Colors.white,
                 ),
-                onPressed: () {
-                  context.go(RouteName.flashcards);
-                },
+                onPressed: () => context.go(RouteName.flashcards),
               ),
               Text(
-                title ?? '',
+                title,
                 style: const TextStyle(
                   fontSize: 24,
                   color: Colors.white,
@@ -102,9 +204,8 @@ class _EditCardListPageState extends State<EditCardListPage> {
               const Spacer(),
               IconButton(
                 icon: const Icon(FontAwesomeIcons.plus, color: Colors.white),
-                onPressed: () {
-                  context.go(RouteName.addNewWord(widget.deckId));
-                },
+                onPressed:
+                    () => context.go(RouteName.addNewWord(widget.deckId)),
               ),
               IconButton(
                 icon: const Icon(
