@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:lacquer/features/flashcard/dtos/create_tag_dto.dart';
+import 'package:lacquer/features/flashcard/dtos/get_deck_dto.dart';
 import 'package:lacquer/features/flashcard/dtos/grouped_decks_dto.dart';
 import '../dtos/create_deck_dto.dart';
 
@@ -12,6 +13,7 @@ class FlashcardState extends Equatable {
   final GroupedDecksResponseDto? groupedDecks;
   final CreateDeckResponseDto? selectedDeck;
   final List<CreateTagResponseDto> tags;
+  final List<GetDeckDto> decks;
   final String? errorMessage;
   final String searchQuery;
   final bool searchResult;
@@ -23,6 +25,7 @@ class FlashcardState extends Equatable {
     this.groupedDecks,
     this.selectedDeck,
     this.tags = const [],
+    this.decks = const [],
     this.errorMessage,
     this.searchQuery = '',
     this.searchResult = true,
@@ -35,6 +38,7 @@ class FlashcardState extends Equatable {
     GroupedDecksResponseDto? groupedDecks,
     CreateDeckResponseDto? selectedDeck,
     List<CreateTagResponseDto>? tags,
+    List<GetDeckDto>? decks,
     String? errorMessage,
     String? searchQuery,
     bool? searchResult,
@@ -46,6 +50,7 @@ class FlashcardState extends Equatable {
       groupedDecks: groupedDecks ?? this.groupedDecks,
       selectedDeck: selectedDeck ?? this.selectedDeck,
       tags: tags ?? this.tags,
+      decks: decks ?? this.decks,
       errorMessage: errorMessage ?? this.errorMessage,
       searchQuery: searchQuery ?? this.searchQuery,
       searchResult: searchResult ?? this.searchResult,
@@ -60,6 +65,7 @@ class FlashcardState extends Equatable {
     groupedDecks,
     selectedDeck,
     tags,
+    decks,
     errorMessage,
     searchQuery,
     searchResult,

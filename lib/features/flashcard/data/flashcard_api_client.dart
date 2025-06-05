@@ -91,6 +91,29 @@ class FlashcardApiClient {
     }
   }
 
+  Future<dynamic> getUserAllDecks() async {
+    try {
+      final token = await authLocalDataSource.getToken();
+      final options = Options(
+        headers: {if (token != null) 'Authorization': 'Bearer $token'},
+      );
+      final response = await dio.get('/deck', options: options);
+
+      final responseData = response.data as Map<String, dynamic>;
+      if (responseData['success'] != true) {
+        throw Exception(responseData['message'] ?? 'Failed to load decks');
+      }
+
+      return responseData;
+    } on DioException catch (e) {
+      if (e.response != null) {
+        throw Exception(e.response!.data['message']);
+      } else {
+        throw Exception(e.message);
+      }
+    }
+  }
+
   Future<Map<String, dynamic>> getDeckById(String deckId) async {
     try {
       final token = await authLocalDataSource.getToken();
