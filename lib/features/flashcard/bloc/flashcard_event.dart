@@ -33,6 +33,10 @@ class LoadDecksRequested extends FlashcardEvent {
   const LoadDecksRequested();
 }
 
+class LoadUserAllDecksRequested extends FlashcardEvent {
+  const LoadUserAllDecksRequested();
+}
+
 class LoadTagsRequested extends FlashcardEvent {
   const LoadTagsRequested();
 }
@@ -110,6 +114,22 @@ class DeleteCardRequested extends FlashcardEvent {
 
   @override
   List<Object> get props => [deckId, cardId];
+}
+
+class CopyCardsRequested extends FlashcardEvent {
+  final String sourceDeckId;
+  final String targetDeckId;
+  final List<String> cardIds;
+
+  const CopyCardsRequested(this.sourceDeckId, this.targetDeckId, this.cardIds);
+}
+
+class MoveCardsRequested extends FlashcardEvent {
+  final String sourceDeckId;
+  final String targetDeckId;
+  final List<String> cardIds;
+
+  const MoveCardsRequested(this.sourceDeckId, this.targetDeckId, this.cardIds);
 }
 
 class SearchDecksRequested extends FlashcardEvent {

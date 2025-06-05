@@ -8,6 +8,7 @@ import 'package:lacquer/features/flashcard/bloc/flashcard_bloc.dart';
 import 'package:lacquer/features/flashcard/bloc/flashcard_event.dart';
 import 'package:lacquer/features/flashcard/bloc/flashcard_state.dart';
 import 'package:lacquer/features/flashcard/dtos/card_dto.dart';
+import 'package:lacquer/features/flashcard/dtos/get_deck_dto.dart';
 import 'package:lacquer/presentation/pages/home/widgets/card_item.dart';
 
 class EditCardListPage extends StatefulWidget {
@@ -68,6 +69,90 @@ class _EditCardListPageState extends State<EditCardListPage> {
       bloc.add(DeleteCardRequested(widget.deckId, cardId));
     }
     _exitMultiSelect();
+  }
+
+  Future<void> _showDeckSelectionDialog(bool isCopy) async {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return FutureBuilder<List<GetDeckDto>>(
+          future: context.read<FlashcardBloc>().repository.getUserAllDecks(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const AlertDialog(
+                content: SizedBox(
+                  height: 100,
+                  child: Center(child: CircularProgressIndicator()),
+                ),
+              );
+            } else if (snapshot.hasError) {
+              return AlertDialog(
+                title: const Text('Error'),
+                content: Text('Failed to load decks: ${snapshot.error}'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('OK'),
+                  ),
+                ],
+              );
+            } else if (snapshot.hasData && snapshot.data != null) {
+              final decks = snapshot.data!;
+              return AlertDialog(
+                title: Text(isCopy ? 'Copy Cards To' : 'Move Cards To'),
+                content: SizedBox(
+                  width: double.maxFinite,
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: decks.length,
+                    itemBuilder: (context, index) {
+                      final deck = decks[index];
+                      if (deck.id == widget.deckId)
+                        return const SizedBox.shrink();
+                      return ListTile(
+                        title: Text(deck.title),
+                        onTap: () {
+                          final bloc = context.read<FlashcardBloc>();
+                          if (isCopy) {
+                            bloc.add(
+                              CopyCardsRequested(
+                                widget.deckId,
+                                deck.id,
+                                selectedCardIds.toList(),
+                              ),
+                            );
+                          } else {
+                            bloc.add(
+                              MoveCardsRequested(
+                                widget.deckId,
+                                deck.id,
+                                selectedCardIds.toList(),
+                              ),
+                            );
+                          }
+                          Navigator.of(context).pop();
+                          _exitMultiSelect();
+                        },
+                      );
+                    },
+                  ),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('Cancel'),
+                  ),
+                ],
+              );
+            }
+            return const AlertDialog(
+              content: Text('No decks available'),
+              actions: [TextButton(onPressed: null, child: Text('OK'))],
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -140,7 +225,7 @@ class _EditCardListPageState extends State<EditCardListPage> {
         backgroundColor: CustomTheme.mainColor1,
         title: Text(
           '${selectedCardIds.length} selected',
-          style: TextStyle(color: Colors.white),
+          style: const TextStyle(color: Colors.white),
         ),
         leading: IconButton(
           icon: const Icon(Icons.close),
@@ -156,12 +241,12 @@ class _EditCardListPageState extends State<EditCardListPage> {
           IconButton(
             icon: const Icon(Icons.copy),
             color: CustomTheme.mainColor3,
-            onPressed: () {},
+            onPressed: () => _showDeckSelectionDialog(true),
           ),
           IconButton(
             icon: const Icon(Icons.drive_file_move),
             color: CustomTheme.mainColor3,
-            onPressed: () {},
+            onPressed: () => _showDeckSelectionDialog(false),
           ),
           IconButton(
             icon: const Icon(Icons.delete),
@@ -206,13 +291,6 @@ class _EditCardListPageState extends State<EditCardListPage> {
                 icon: const Icon(FontAwesomeIcons.plus, color: Colors.white),
                 onPressed:
                     () => context.go(RouteName.addNewWord(widget.deckId)),
-              ),
-              IconButton(
-                icon: const Icon(
-                  FontAwesomeIcons.ellipsisVertical,
-                  color: Colors.white,
-                ),
-                onPressed: null,
               ),
               const SizedBox(width: 10),
             ],

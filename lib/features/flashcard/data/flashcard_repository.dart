@@ -3,6 +3,7 @@ import 'package:lacquer/features/flashcard/dtos/card_dto.dart';
 import 'dart:io';
 import 'package:lacquer/features/flashcard/dtos/create_tag_dto.dart';
 import 'package:lacquer/features/flashcard/dtos/finish_deck_dto.dart';
+import 'package:lacquer/features/flashcard/dtos/get_deck_dto.dart';
 import 'package:lacquer/features/flashcard/dtos/grouped_decks_dto.dart';
 import 'package:lacquer/features/flashcard/dtos/update_deck_dto.dart';
 import 'package:lacquer/features/flashcard/dtos/update_tag_dto.dart';
@@ -43,6 +44,31 @@ class FlashcardRepository {
       }
 
       return GroupedDecksResponseDto.fromJson(responseData);
+    } on DioException catch (e) {
+      if (e.response != null) {
+        throw Exception(e.response!.data['message']);
+      } else {
+        throw Exception(e.message);
+      }
+    }
+  }
+
+  Future<List<GetDeckDto>> getUserAllDecks() async {
+    try {
+      final response = await apiClient.getUserAllDecks();
+      final responseData = response as Map<String, dynamic>;
+      if (responseData['success'] != true) {
+        throw Exception(
+          'Failed to load decks: ${responseData['message'] ?? 'Unknown error'}',
+        );
+      }
+
+      final decksData = responseData['data']['data'] as List<dynamic>;
+      return decksData
+          .map(
+            (deckJson) => GetDeckDto.fromJson(deckJson as Map<String, dynamic>),
+          )
+          .toList();
     } on DioException catch (e) {
       if (e.response != null) {
         throw Exception(e.response!.data['message']);
