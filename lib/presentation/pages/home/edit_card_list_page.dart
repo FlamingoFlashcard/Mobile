@@ -97,19 +97,36 @@ class _EditCardListPageState extends State<EditCardListPage> {
                 ],
               );
             } else if (snapshot.hasData && snapshot.data != null) {
-              final decks = snapshot.data!;
+              final decks =
+                  snapshot.data!
+                      .where((deck) => deck.id != widget.deckId)
+                      .toList();
+
+              if (decks.isEmpty) {
+                return const AlertDialog(
+                  content: Text('No other decks available.'),
+                  actions: [TextButton(onPressed: null, child: Text('OK'))],
+                );
+              }
+
               return AlertDialog(
-                title: Text(isCopy ? 'Copy Cards To' : 'Move Cards To'),
+                title: Text(
+                  isCopy ? 'Copy Cards To' : 'Move Cards To',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
                 content: SizedBox(
                   width: double.maxFinite,
-                  child: ListView.builder(
+                  child: ListView.separated(
                     shrinkWrap: true,
                     itemCount: decks.length,
+                    separatorBuilder: (_, __) => const Divider(),
                     itemBuilder: (context, index) {
                       final deck = decks[index];
-                      if (deck.id == widget.deckId)
-                        return const SizedBox.shrink();
                       return ListTile(
+                        leading: Icon(
+                          isCopy ? Icons.copy : Icons.drive_file_move,
+                          color: Theme.of(context).primaryColor,
+                        ),
                         title: Text(deck.title),
                         onTap: () {
                           final bloc = context.read<FlashcardBloc>();
@@ -145,8 +162,9 @@ class _EditCardListPageState extends State<EditCardListPage> {
                 ],
               );
             }
+
             return const AlertDialog(
-              content: Text('No decks available'),
+              content: Text('No decks available.'),
               actions: [TextButton(onPressed: null, child: Text('OK'))],
             );
           },
