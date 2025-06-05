@@ -102,6 +102,16 @@ class DeleteTagRequested extends FlashcardEvent {
   List<Object> get props => [tagId];
 }
 
+class DeleteCardRequested extends FlashcardEvent {
+  final String deckId;
+  final String cardId;
+
+  const DeleteCardRequested(this.deckId, this.cardId);
+
+  @override
+  List<Object> get props => [deckId, cardId];
+}
+
 class SearchDecksRequested extends FlashcardEvent {
   final String query;
 

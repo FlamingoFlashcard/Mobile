@@ -244,6 +244,18 @@ class FlashcardApiClient {
     }
   }
 
+  Future<void> deleteCard(String deckId, String cardId) async {
+    try {
+      final token = await authLocalDataSource.getToken();
+      final options = Options(
+        headers: {if (token != null) 'Authorization': 'Bearer $token'},
+      );
+      await dio.delete('/deck/$deckId/cards/$cardId', options: options);
+    } on DioException catch (e) {
+      throw Exception(e.response?.data['message'] ?? e.message);
+    }
+  }
+
   Future<void> deleteDeck(String deckId) async {
     try {
       final token = await authLocalDataSource.getToken();

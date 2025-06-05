@@ -110,6 +110,10 @@ class FlashcardRepository {
     await apiClient.deleteTag(tagId);
   }
 
+  Future<void> deleteCard(String deckId, String cardId) async {
+    await apiClient.deleteCard(deckId, cardId);
+  }
+
   Future<void> addCardToDeck({
     required String deckId,
     required String cardId,
