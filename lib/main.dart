@@ -14,7 +14,32 @@ import 'package:lacquer/features/chatbot/bloc/chatbot_bloc.dart';
 import 'package:lacquer/features/chatbot/bloc/chatbot_event.dart';
 import 'package:lacquer/features/chatbot/data/chatbot_api_client.dart';
 import 'package:lacquer/features/chatbot/data/chatbot_repository.dart';
+import 'package:lacquer/features/chat/bloc/chat_bloc.dart';
+import 'package:lacquer/features/chat/bloc/chat_event.dart';
+import 'package:lacquer/features/chat/data/chat_repository.dart';
+import 'package:lacquer/features/dictionary/bloc/dictionary_bloc.dart';
+import 'package:lacquer/features/dictionary/bloc/dictionary_event.dart';
+import 'package:lacquer/features/dictionary/data/dictionary_api_clients.dart';
+import 'package:lacquer/features/dictionary/data/dictionary_local_data_source.dart';
+import 'package:lacquer/features/dictionary/data/dictionary_repository.dart';
+import 'package:lacquer/features/flashcard/bloc/flashcard_bloc.dart';
+import 'package:lacquer/features/flashcard/bloc/flashcard_event.dart';
+import 'package:lacquer/features/flashcard/data/flashcard_api_client.dart';
+import 'package:lacquer/features/flashcard/data/flashcard_repository.dart';
+import 'package:lacquer/features/friendship/bloc/friendship_bloc.dart';
+import 'package:lacquer/features/friendship/bloc/friendship_event.dart';
+import 'package:lacquer/features/friendship/data/friendship_repository.dart';
+import 'package:lacquer/features/post/bloc/post_bloc.dart';
+import 'package:lacquer/features/post/bloc/post_event.dart';
+import 'package:lacquer/features/post/data/post_repository.dart';
+import 'package:lacquer/features/quiz/bloc/quiz_bloc.dart';
+import 'package:lacquer/features/quiz/bloc/quiz_event.dart';
+import 'package:lacquer/features/quiz/data/quiz_api_clients.dart';
+import 'package:lacquer/features/quiz/data/quiz_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:lacquer/features/profile/data/profile_repository.dart';
+import 'package:lacquer/features/profile/bloc/profile_bloc.dart';
+import 'package:lacquer/features/profile/bloc/profile_event.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,10 +67,32 @@ class MyApp extends StatelessWidget {
         ),
         RepositoryProvider(
           create:
-              (context) => ChatbotRepository(
-                chatbotApiClient: ChatbotApiClient(dio),
+              (context) =>
+                  ChatbotRepository(chatbotApiClient: ChatbotApiClient(dio)),
+        ),
+        RepositoryProvider(create: (context) => ChatRepository()),
+        RepositoryProvider(
+          create:
+              (context) => DictionaryRepository(
+                dictionaryApiClients: DictionaryApiClients(dio),
+                dictionaryLocalDataSource: DictionaryLocalDataSource(
+                  sharedPreferences,
+                ),
               ),
         ),
+        RepositoryProvider(
+          create:
+              (context) => QuizRepository(quizApiClient: QuizApiClient(dio)),
+        ),
+        RepositoryProvider(
+          create:
+              (context) => FlashcardRepository(
+                FlashcardApiClient(dio, AuthLocalDataSource(sharedPreferences)),
+              ),
+        ),
+        RepositoryProvider(create: (context) => FriendshipRepository()),
+        RepositoryProvider(create: (context) => PostRepository()),
+        RepositoryProvider(create: (context) => ProfileRepository(dio: dio)),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -54,6 +101,39 @@ class MyApp extends StatelessWidget {
           ),
           BlocProvider(
             create: (context) => ChatbotBloc(context.read<ChatbotRepository>()),
+          ),
+          BlocProvider(
+            create: (context) => ChatBloc(),
+          ),
+          BlocProvider(
+            create:
+                (context) =>
+                    DictionaryBloc(context.read<DictionaryRepository>()),
+          ),
+          BlocProvider(
+            create:
+                (context) =>
+                    QuizBloc(context.read<QuizRepository>()),
+          ),
+          BlocProvider(
+            create:
+                (context) =>
+                    FriendshipBloc(context.read<FriendshipRepository>()),
+          ),
+          BlocProvider(
+            create: (context) => PostBloc(context.read<PostRepository>()),
+          ),
+          BlocProvider(
+            create:
+                (context) => FlashcardBloc(
+                  repository: context.read<FlashcardRepository>(),
+                )..add(LoadDecksRequested()),
+          ),
+          BlocProvider(
+            create:
+                (context) =>
+                    ProfileBloc(context.read<ProfileRepository>())
+                      ..add(ProfileLoadRequested()),
           ),
         ],
         child: AppContent(),
@@ -78,6 +158,13 @@ class _AppContentState extends State<AppContent> {
     });
     context.read<AuthBloc>().add(AuthAuthenticateStarted());
     context.read<ChatbotBloc>().add(ChatbotEventStarted());
+    context.read<DictionaryBloc>().add(DictionaryEventStarted());
+    context.read<QuizBloc>().add(QuizEventStarted());
+    context.read<FriendshipBloc>().add(FriendshipEventStarted());
+    context.read<PostBloc>().add(PostEventStarted());
+    context.read<FlashcardBloc>().add(LoadDecksRequested());
+    // Initialize WebSocket connection for chat
+    context.read<ChatBloc>().add(ChatEventConnectWebSocket());
   }
 
   @override

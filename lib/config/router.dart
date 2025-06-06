@@ -10,7 +10,15 @@ import 'package:lacquer/presentation/pages/auth/reset_password_page.dart';
 import 'package:lacquer/presentation/pages/auth/verify_page.dart';
 import 'package:lacquer/presentation/pages/camera/camera_page.dart';
 import 'package:lacquer/presentation/pages/camera/about_screen.dart';
-import 'package:lacquer/presentation/pages/profile/profile_page.dart';
+import 'package:lacquer/presentation/pages/home/dictionary_page.dart';
+import 'package:lacquer/presentation/pages/home/flashcard_page.dart';
+import 'package:lacquer/presentation/pages/home/learning_flashcard_page.dart';
+import 'package:lacquer/presentation/pages/friends/friends_page.dart';
+import 'package:lacquer/features/profile/bloc/profile_bloc.dart';
+import 'package:lacquer/features/profile/bloc/profile_event.dart';
+import 'package:lacquer/presentation/pages/home/quiz_page.dart';
+import 'package:lacquer/presentation/pages/home/translator_page.dart';
+import 'package:lacquer/presentation/pages/chat/chat_screen.dart';
 
 import 'package:lacquer/presentation/pages/mainscreen.dart';
 import 'package:flutter/widgets.dart';
@@ -23,6 +31,12 @@ class RouteName {
   static const String register = '/register';
   static const String camera = '/camera';
   static const String about = '/about';
+  static const String flashcards = '/flashcards';
+  static const String dictionary = '/dictionary';
+  static const String translator = '/translator';
+  static const String friends = '/friends';
+  static const String quiz = '/quiz';
+  static const String chat = '/chat';
   static const String profile = '/profile';
   static const String resetPassword = '/reset-password';
 
@@ -56,6 +70,7 @@ final router = GoRouter(
       context.read<ChatbotBloc>().add(
         ChatbotEventGetHistory(userId: userId ?? ''),
       );
+      context.read<ProfileBloc>().add(ProfileLoadRequested());
       return null;
     }
     return RouteName.login;
@@ -89,8 +104,38 @@ final router = GoRouter(
       },
     ),
     noTransitionRoute(
-      path: RouteName.profile,
-      builder: (context, state) => const ProfilePage(),
+      path: RouteName.flashcards,
+      builder: (context, state) => const FlashcardPage(),
+    ),
+    noTransitionRoute(
+      path: RouteName.dictionary,
+      builder: (context, state) => const Dictionarypage(),
+    ),
+    noTransitionRoute(
+      path: RouteName.friends,
+      builder: (context, state) => const FriendsPage(),
+    ),
+    noTransitionRoute(
+      path: RouteName.quiz,
+      builder: (context, state) => const QuizPage(),
+    ),
+    noTransitionRoute(
+      path: '/learn',
+      builder: (context, state) {
+        final data = state.extra as Map<String, dynamic>;
+        final cards = data['cards'] as List<String>;
+        final title = data['title'] as String;
+
+        return LearningFlashcardPage(title: title, cards: cards);
+      },
+    ),
+    noTransitionRoute(
+      path: RouteName.translator,
+      builder: (context, state) => const TranslatorScreen(),
+    ),
+    noTransitionRoute(
+      path: '/chat',
+      builder: (context, state) => const ChatScreen(),
     ),
     noTransitionRoute(
       path: RouteName.resetPassword,

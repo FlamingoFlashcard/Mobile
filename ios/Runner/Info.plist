@@ -24,6 +24,10 @@
    <string>This app needs camera access to perform OCR</string>
    <key>NSPhotoLibraryUsageDescription</key>
    <string>This app needs photos access to perform OCR</string>
+   <key>NSLocationWhenInUseUsageDescription</key>
+   <string>This app needs location access to show your current location and weather information on photos</string>
+   <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+   <string>This app needs location access to show your current location and weather information on photos</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>

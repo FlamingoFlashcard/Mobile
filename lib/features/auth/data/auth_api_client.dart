@@ -84,7 +84,7 @@ class AuthApiClient {
   Future<Result<void>> deleteprofile(String? token) async {
     try {
       await dio.delete(
-        'https://lacquer.up.railway.app/auth/delete',
+        '/auth/delete',
         options: Options(headers: {'Authorization': 'Bearer $token'}),
       );
       return Success(null);

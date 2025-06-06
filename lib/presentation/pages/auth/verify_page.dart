@@ -88,7 +88,7 @@ class VerifyEmailPageState extends State<VerifyEmailPage>
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
-                      color: CustomTheme.lightbeige,
+                      color: const Color.fromARGB(255, 0, 0, 0),
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -97,7 +97,7 @@ class VerifyEmailPageState extends State<VerifyEmailPage>
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 16,
-                      color: CustomTheme.lightbeige,
+                      color: const Color.fromARGB(255, 0, 0, 0),
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -114,7 +114,7 @@ class VerifyEmailPageState extends State<VerifyEmailPage>
                           : 'Resend code in $_seconds seconds',
                       style: TextStyle(
                         fontSize: 16,
-                        color: _canResend ? Colors.black : Colors.grey,
+                        color: _canResend ? Colors.black : const Color.fromARGB(255, 66, 61, 61),
                         decoration:
                             _canResend
                                 ? TextDecoration.underline
