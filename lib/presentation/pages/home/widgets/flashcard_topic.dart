@@ -39,6 +39,7 @@ class FlashcardTopicState extends State<FlashcardTopic> {
                 title: widget.title,
                 tags: widget.tags,
                 imagePath: widget.imagePath,
+                isDone: widget.isDone,
               ),
         );
       },
