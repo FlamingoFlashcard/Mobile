@@ -47,7 +47,9 @@ class Chat {
           : null,
       lastMessageTime: json['lastMessageTime'] != null
           ? DateTime.tryParse(json['lastMessageTime'])
-          : null,
+          : json['latestMessage'] != null && json['latestMessage']['createdAt'] != null
+              ? DateTime.tryParse(json['latestMessage']['createdAt'])
+              : DateTime.tryParse(json['updatedAt'] ?? '') ?? DateTime.now(),
     );
   }
 

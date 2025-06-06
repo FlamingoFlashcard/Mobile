@@ -25,36 +25,34 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   String? currentUserId;
-  ChatBloc? _chatBloc; // Store ChatBloc reference
+  ChatBloc? _chatBloc;
   
   List<Message> _messages = [];
-  final Map<String, String> _typingUsers = {}; // userId -> username
+  final Map<String, String> _typingUsers = {};
   bool _isTyping = false;
   bool _isConnected = false;
+  
+  // Pagination variables
+  int _currentPage = 1;
+  bool _isLoadingMore = false;
+  bool _hasMoreMessages = true;
 
   @override
   void initState() {
     super.initState();
     _initializeUserId();
     
-    // Store ChatBloc reference
     _chatBloc = context.read<ChatBloc>();
+    _isConnected = true;
     
-    // Check initial connection status
-    _isConnected = true; // Allow sending even if WebSocket is connecting
-    
-    // Select this chat
     _chatBloc!.add(ChatEventSelectChat(chatId: widget.chat.id));
+    _chatBloc!.add(ChatEventLoadMessages(chatId: widget.chat.id, page: _currentPage));
     
-    // Load messages for this chat
-    _chatBloc!.add(ChatEventLoadMessages(chatId: widget.chat.id));
-    
-    // Listen for text changes to handle typing indicators
     _messageController.addListener(_onTextChanged);
+    _scrollController.addListener(_onScroll);
   }
 
   Future<void> _initializeUserId() async {
-    // Get current user ID from auth
     try {
       final authDataSource = AuthLocalDataSource(await SharedPreferences.getInstance());
       final userId = await authDataSource.getUserId();
@@ -72,11 +70,9 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
     final text = _messageController.text;
     
     if (text.isNotEmpty && !_isTyping) {
-      // Start typing
       _isTyping = true;
       _chatBloc!.add(ChatEventStartTyping(chatId: widget.chat.id));
     } else if (text.isEmpty && _isTyping) {
-      // Stop typing
       _isTyping = false;
       _chatBloc!.add(ChatEventStopTyping(chatId: widget.chat.id));
     }
@@ -87,32 +83,34 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
     print('🔹 ConversationScreen: Send button pressed, content: "$content", isConnected: $_isConnected');
     
     if (content.isNotEmpty) {
-      // Stop typing indicator
       if (_isTyping) {
         _isTyping = false;
         _chatBloc!.add(ChatEventStopTyping(chatId: widget.chat.id));
       }
       
       print('🔹 ConversationScreen: Sending message via ChatBloc...');
-      // Send message
       _chatBloc!.add(
         ChatEventSendMessage(chatId: widget.chat.id, content: content),
       );
       
       _messageController.clear();
       
-      // Scroll to bottom
+      // Scroll to bottom after sending
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (_scrollController.hasClients) {
-          _scrollController.animateTo(
-            0.0,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeOut,
-          );
-        }
+        _scrollToBottom();
       });
     } else {
       print('🔹 ConversationScreen: Message content is empty, not sending');
+    }
+  }
+
+  void _scrollToBottom() {
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
     }
   }
 
@@ -125,13 +123,25 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
     );
   }
 
+  void _onScroll() {
+    // Load more messages when scrolling near the top
+    if (_scrollController.position.pixels <= 100 && _hasMoreMessages && !_isLoadingMore) {
+      setState(() {
+        _isLoadingMore = true;
+      });
+      _currentPage++;
+      print('🔹 Loading more messages - Page: $_currentPage');
+      _chatBloc!.add(ChatEventLoadMessages(chatId: widget.chat.id, page: _currentPage));
+    }
+  }
+
   @override
   void dispose() {
     _messageController.removeListener(_onTextChanged);
+    _scrollController.removeListener(_onScroll);
     _messageController.dispose();
     _scrollController.dispose();
     
-    // Stop typing if user leaves screen while typing
     if (_isTyping) {
       _chatBloc!.add(ChatEventStopTyping(chatId: widget.chat.id));
     }
@@ -166,7 +176,7 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.chat.name ?? 'Unknown Chat',
+                    _getChatDisplayName(),
                     style: const TextStyle(
                       color: Colors.black,
                       fontSize: 16,
@@ -231,8 +241,24 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
         listener: (context, state) {
           if (state is ChatMessagesLoaded && state.chatId == widget.chat.id) {
             setState(() {
-              _messages = state.messages;
+              if (_currentPage == 1) {
+                // First load - reverse the messages to show oldest first
+                _messages = state.messages.reversed.toList();
+              } else {
+                // Pagination - reverse and prepend older messages
+                final olderMessages = state.messages.reversed.toList();
+                _messages.insertAll(0, olderMessages);
+              }
+              _isLoadingMore = false;
+              _hasMoreMessages = state.messages.length >= 20; // Check if we got a full page
             });
+            
+            // Auto-scroll to bottom only on first load
+            if (_currentPage == 1) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                _scrollToBottom();
+              });
+            }
           } else if (state is ChatMessageReceived) {
             // Add new message if it belongs to this chat
             if (state.message.chat == widget.chat.id) {
@@ -245,15 +271,9 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
                 _markMessageAsRead(state.message.id);
               }
               
-              // Scroll to bottom
+              // Scroll to bottom for new messages
               WidgetsBinding.instance.addPostFrameCallback((_) {
-                if (_scrollController.hasClients) {
-                  _scrollController.animateTo(
-                    0.0,
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeOut,
-                  );
-                }
+                _scrollToBottom();
               });
             }
           } else if (state is ChatUserTyping && state.chatId == widget.chat.id) {
@@ -279,6 +299,14 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
                 backgroundColor: Colors.red,
               ),
             );
+          } else if (state is ChatMessageSent) {
+            // When message is sent successfully via HTTP API (fallback)
+            setState(() {
+              _messages.add(state.message);
+            });
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              _scrollToBottom();
+            });
           }
         },
         child: Column(
@@ -353,7 +381,7 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
   Widget _buildMessagesList() {
     return BlocBuilder<ChatBloc, ChatState>(
       builder: (context, state) {
-        if (state is ChatLoadingMessages) {
+        if (state is ChatLoadingMessages && _currentPage == 1) {
           return const Center(child: CircularProgressIndicator());
         }
         
@@ -380,10 +408,22 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
 
         return ListView.builder(
           controller: _scrollController,
-          reverse: true,
-          itemCount: _messages.length,
+          reverse: false, // Normal order: oldest at top, newest at bottom
+          itemCount: _messages.length + (_isLoadingMore ? 1 : 0),
           itemBuilder: (context, index) {
-            final message = _messages.reversed.toList()[index];
+            // Show loading indicator at the top when loading more
+            if (index == 0 && _isLoadingMore) {
+              return Container(
+                padding: const EdgeInsets.all(16),
+                alignment: Alignment.center,
+                child: const CircularProgressIndicator(),
+              );
+            }
+            
+            final messageIndex = _isLoadingMore ? index - 1 : index;
+            if (messageIndex >= _messages.length) return const SizedBox.shrink();
+            
+            final message = _messages[messageIndex];
             return _buildMessageBubble(message);
           },
         );
@@ -593,5 +633,17 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
         ],
       ),
     );
+  }
+
+  String _getChatDisplayName() {
+    if (widget.chat.isGroup) {
+      return widget.chat.name ?? 'Group Chat';
+    } else {
+      final otherParticipant = widget.chat.participants.firstWhere(
+        (p) => p.id != currentUserId,
+        orElse: () => widget.chat.participants.first,
+      );
+      return otherParticipant.username;
+    }
   }
 } 

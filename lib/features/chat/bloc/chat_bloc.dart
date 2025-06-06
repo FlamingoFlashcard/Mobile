@@ -135,24 +135,31 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       print('🔹 ChatBloc: Sending via WebSocket...');
       await _webSocketChat.sendMessage(event.chatId, event.content);
       
-      // Note: The message confirmation will come through WebSocket
-      // but we can also send via HTTP API for reliability
+      // Note: The message confirmation will come through WebSocket via ChatEventWebSocketMessage
+      // Don't emit ChatMessageSent here to avoid duplicates
+      print('🔹 ChatBloc: Message sent via WebSocket successfully');
+      
+      // Emit initial state to clear the sending state
+      // The actual message will be received via WebSocket callback
+      if (state is ChatSendingMessage) {
+        // Don't emit anything here - wait for WebSocket response
+      }
+    } catch (e) {
+      print('❌ ChatBloc: WebSocket message send failed: $e');
+      
+      // If WebSocket fails, try HTTP API as fallback
       try {
-        print('🔹 ChatBloc: Sending via HTTP API...');
+        print('🔹 ChatBloc: Trying HTTP API as fallback...');
         final message = await _chatRepository.sendMessage(
           chatId: event.chatId,
           content: event.content,
         );
-        print('🔹 ChatBloc: HTTP API message sent successfully: ${message.id}');
-        // Emit the message sent state for HTTP response
+        print('🔹 ChatBloc: HTTP API fallback successful: ${message.id}');
         emit(ChatMessageSent(message: message));
-      } catch (e) {
-        // Log HTTP API error but don't fail the WebSocket send
-        print('❌ ChatBloc: HTTP message send failed: $e');
+      } catch (httpError) {
+        print('❌ ChatBloc: HTTP API fallback also failed: $httpError');
+        emit(ChatSendMessageError(message: httpError.toString()));
       }
-    } catch (e) {
-      print('❌ ChatBloc: WebSocket message send failed: $e');
-      emit(ChatSendMessageError(message: e.toString()));
     }
   }
 
@@ -160,6 +167,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     ChatEventWebSocketMessage event,
     Emitter<ChatState> emit,
   ) {
+    // Clear sending state and emit the received message
     emit(ChatMessageReceived(message: event.message));
   }
 

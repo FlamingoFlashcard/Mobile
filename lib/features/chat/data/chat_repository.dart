@@ -49,6 +49,11 @@ class ChatRepository {
     File? avatar,
   }) async {
     try {
+      // Ensure participants list is not empty
+      if (participants.isEmpty) {
+        throw Exception('At least one participant is required');
+      }
+
       if (avatar != null) {
         // Use multipart for avatar upload
         Map<String, dynamic> data = {
@@ -60,8 +65,10 @@ class ChatRepository {
           data['description'] = description;
         }
 
-        // Add participants as array
-        data['participants'] = participants;
+        // Add participants properly for multipart
+        for (int i = 0; i < participants.length; i++) {
+          data['participants[$i]'] = participants[i];
+        }
 
         List<MapEntry<String, File>> files = [];
         files.add(MapEntry('avatar', avatar));
@@ -74,18 +81,20 @@ class ChatRepository {
         Map<String, dynamic> data = {
           'name': name,
           'admin': admin,
-          'participants': participants,
+          'participants': participants, // Send as array for JSON
         };
 
         if (description != null && description.isNotEmpty) {
           data['description'] = description;
         }
 
+        print('🔹 Creating group chat with data: $data');
         final response = await _apiClient.post('/chat/group', data);
         final responseData = _processResponse(response);
         return Chat.fromJson(responseData);
       }
     } catch (e) {
+      print('❌ Group chat creation error: $e');
       throw Exception('Failed to create group chat: $e');
     }
   }

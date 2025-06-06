@@ -96,20 +96,10 @@ class _CreateGroupChatScreenState extends State<CreateGroupChatScreen> {
           if (state is ChatGroupChatCreated) {
             // Navigate back and show success
             Navigator.of(context).pop();
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Group chat created successfully!'),
-                backgroundColor: Colors.green,
-              ),
-            );
+            _showSuccessDialog('Group chat created successfully!');
           } else if (state is ChatCreateChatError) {
-            // Show error
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Failed to create group: ${state.message}'),
-                backgroundColor: Colors.red,
-              ),
-            );
+            // Show beautiful error dialog
+            _showErrorDialog('Failed to create group', state.message);
           }
         },
         child: Padding(
@@ -345,34 +335,21 @@ class _CreateGroupChatScreenState extends State<CreateGroupChatScreen> {
   void _createGroupChat() {
     // Validate input
     if (_nameController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please enter a group name'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      _showErrorDialog('Validation Error', 'Please enter a group name');
       return;
     }
 
     if (_selectedFriends.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please select at least one friend'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      _showErrorDialog('Validation Error', 'Please select at least one friend to add to the group');
       return;
     }
 
     if (currentUserId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('User not authenticated'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      _showErrorDialog('Authentication Error', 'User not authenticated. Please log in again.');
       return;
     }
+
+    print('🔹 Creating group with ${_selectedFriends.length} friends: $_selectedFriends');
 
     // Create the group chat using ChatBloc
     context.read<ChatBloc>().add(
@@ -384,6 +361,67 @@ class _CreateGroupChatScreenState extends State<CreateGroupChatScreen> {
         admin: currentUserId!,
         participants: _selectedFriends,
         avatar: _avatarImage,
+      ),
+    );
+  }
+
+  void _showSuccessDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: [
+            Icon(Icons.check_circle, color: Colors.green, size: 28),
+            SizedBox(width: 8),
+            Text('Success'),
+          ],
+        ),
+        content: Text(message),
+        actions: [
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            child: Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showErrorDialog(String title, String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: [
+            Icon(Icons.error, color: Colors.red, size: 28),
+            SizedBox(width: 8),
+            Expanded(child: Text(title)),
+          ],
+        ),
+        content: SingleChildScrollView(
+          child: Text(
+            message,
+            style: TextStyle(fontSize: 14),
+          ),
+        ),
+        actions: [
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            child: Text('OK'),
+          ),
+        ],
       ),
     );
   }

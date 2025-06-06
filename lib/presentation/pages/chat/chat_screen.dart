@@ -121,6 +121,12 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
           if (state is ChatChatsLoaded) {
             setState(() {
               _chats = state.chats;
+              // Sort chats by most recent message time
+              _chats.sort((a, b) {
+                final aTime = a.lastMessageTime ?? a.updatedAt;
+                final bTime = b.lastMessageTime ?? b.updatedAt;
+                return bTime.compareTo(aTime); // Most recent first
+              });
             });
           } else if (state is ChatOnlineUsersUpdated) {
             setState(() {
@@ -164,19 +170,9 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
           } else if (state is ChatGroupChatCreated) {
             _navigateToConversation(state.chat);
           } else if (state is ChatLoadChatsError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Error loading chats: ${state.message}'),
-                backgroundColor: Colors.red,
-              ),
-            );
+            _showErrorDialog('Error Loading Chats', state.message);
           } else if (state is ChatCreateChatError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Error creating chat: ${state.message}'),
-                backgroundColor: Colors.red,
-              ),
-            );
+            _showErrorDialog('Error Creating Chat', state.message);
           }
         },
         child: Column(
@@ -501,6 +497,34 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
           value: context.read<ChatBloc>(),
           child: ChatConversationScreen(chat: chat),
         ),
+      ),
+    );
+  }
+
+  void _showErrorDialog(String title, String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: [
+            Icon(Icons.error, color: Colors.red, size: 28),
+            SizedBox(width: 8),
+            Expanded(child: Text(title)),
+          ],
+        ),
+        content: Text(message, style: TextStyle(fontSize: 14)),
+        actions: [
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            child: Text('OK'),
+          ),
+        ],
       ),
     );
   }
