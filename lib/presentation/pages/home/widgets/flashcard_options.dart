@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lacquer/config/router.dart';
 import 'package:lacquer/config/theme.dart';
 import 'package:lacquer/presentation/pages/home/widgets/flashcard_confirm_delete.dart';
+import 'package:lacquer/presentation/pages/home/widgets/flashcard_confirm_reset.dart';
 import 'package:lacquer/presentation/pages/home/widgets/flashcard_topic_edit.dart';
 
 class FlashcardOptionDialog extends StatefulWidget {
@@ -11,12 +12,14 @@ class FlashcardOptionDialog extends StatefulWidget {
   final String title;
   final List<String> tags;
   final String imagePath;
+  final bool isDone;
   const FlashcardOptionDialog({
     super.key,
     required this.id,
     required this.title,
     required this.tags,
     required this.imagePath,
+    required this.isDone,
   });
 
   @override
@@ -35,7 +38,7 @@ class _FlashcardOptionDialogState extends State<FlashcardOptionDialog> {
       {
         "icon": FontAwesomeIcons.play,
         "title": "Explore",
-        "subtitle": "10 new cards",
+        "subtitle": "",
         "action": () {
           context.go(RouteName.learn(widget.id));
         },
@@ -43,7 +46,7 @@ class _FlashcardOptionDialogState extends State<FlashcardOptionDialog> {
       {
         "icon": FontAwesomeIcons.rotateRight,
         "title": "Revise",
-        "subtitle": "Repeat 10 cards",
+        "subtitle": "",
         "action": () {
           print("Revise clicked");
         },
@@ -141,6 +144,25 @@ class _FlashcardOptionDialogState extends State<FlashcardOptionDialog> {
                               title: widget.title,
                               tags: widget.tags,
                               imagePath: widget.imagePath,
+                            ),
+                      );
+                    },
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      FontAwesomeIcons.rotateLeft,
+                      size: 20,
+                      color: Colors.black,
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      showDialog(
+                        context: context,
+                        builder:
+                            (context) => FlashcardConfirmReset(
+                              id: widget.id,
+                              title: widget.title,
+                              isDone: widget.isDone,
                             ),
                       );
                     },
