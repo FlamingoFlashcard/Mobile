@@ -1,4 +1,5 @@
 import 'dart:io';
+import '../data/models/message.dart';
 
 abstract class ChatEvent {}
 
@@ -15,14 +16,14 @@ class ChatEventCreatePrivateChat extends ChatEvent {
 // Create group chat
 class ChatEventCreateGroupChat extends ChatEvent {
   final String name;
-  final String description;
+  final String? description;
   final String admin;
   final List<String> participants;
   final File? avatar;
 
   ChatEventCreateGroupChat({
     required this.name,
-    required this.description,
+    this.description,
     required this.admin,
     required this.participants,
     this.avatar,
@@ -78,11 +79,11 @@ class ChatEventSendMessage extends ChatEvent {
 // Mark message as read
 class ChatEventMarkMessageAsRead extends ChatEvent {
   final String messageId;
-  final String? chatId;
+  final String chatId;
 
   ChatEventMarkMessageAsRead({
     required this.messageId,
-    this.chatId,
+    required this.chatId,
   });
 }
 
@@ -108,7 +109,87 @@ class ChatEventConnectWebSocket extends ChatEvent {}
 class ChatEventDisconnectWebSocket extends ChatEvent {}
 
 class ChatEventWebSocketMessage extends ChatEvent {
-  final Map<String, dynamic> data;
+  final Message message;
 
-  ChatEventWebSocketMessage({required this.data});
+  ChatEventWebSocketMessage({required this.message});
+}
+
+// Typing events
+class ChatEventStartTyping extends ChatEvent {
+  final String chatId;
+
+  ChatEventStartTyping({required this.chatId});
+}
+
+class ChatEventStopTyping extends ChatEvent {
+  final String chatId;
+
+  ChatEventStopTyping({required this.chatId});
+}
+
+class ChatEventUserTyping extends ChatEvent {
+  final String chatId;
+  final String userId;
+  final String username;
+
+  ChatEventUserTyping({
+    required this.chatId,
+    required this.userId,
+    required this.username,
+  });
+}
+
+class ChatEventUserStoppedTyping extends ChatEvent {
+  final String chatId;
+  final String userId;
+
+  ChatEventUserStoppedTyping({
+    required this.chatId,
+    required this.userId,
+  });
+}
+
+// Online users events
+class ChatEventOnlineUsersUpdated extends ChatEvent {
+  final List<String> onlineUsers;
+
+  ChatEventOnlineUsersUpdated({required this.onlineUsers});
+}
+
+// Message seen events
+class ChatEventMessageSeen extends ChatEvent {
+  final String chatId;
+  final String messageId;
+  final String userId;
+
+  ChatEventMessageSeen({
+    required this.chatId,
+    required this.messageId,
+    required this.userId,
+  });
+}
+
+// New message notification
+class ChatEventNewMessageNotification extends ChatEvent {
+  final String chatId;
+  final Message message;
+
+  ChatEventNewMessageNotification({
+    required this.chatId,
+    required this.message,
+  });
+}
+
+// WebSocket error
+class ChatEventWebSocketError extends ChatEvent {
+  final String message;
+
+  ChatEventWebSocketError({required this.message});
+}
+
+// Chats joined
+class ChatEventChatsJoined extends ChatEvent {
+  final List<String> chatIds;
+
+  ChatEventChatsJoined({required this.chatIds});
 } 

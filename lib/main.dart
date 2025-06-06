@@ -13,6 +13,7 @@ import 'package:lacquer/features/chatbot/bloc/chatbot_bloc.dart';
 import 'package:lacquer/features/chatbot/bloc/chatbot_event.dart';
 import 'package:lacquer/features/chatbot/data/chatbot_api_client.dart';
 import 'package:lacquer/features/chatbot/data/chatbot_repository.dart';
+import 'package:lacquer/features/chat/bloc/chat_bloc.dart';
 import 'package:lacquer/features/chat/data/chat_repository.dart';
 import 'package:lacquer/features/dictionary/bloc/dictionary_bloc.dart';
 import 'package:lacquer/features/dictionary/bloc/dictionary_event.dart';
@@ -98,6 +99,9 @@ class MyApp extends StatelessWidget {
           ),
           BlocProvider(
             create: (context) => ChatbotBloc(context.read<ChatbotRepository>()),
+          ),
+          BlocProvider(
+            create: (context) => ChatBloc(),
           ),
           BlocProvider(
             create:

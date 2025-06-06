@@ -1,15 +1,26 @@
 import 'dart:io';
 import '../../../config/api_client.dart';
 import 'models/chat.dart';
+import 'models/message.dart';
 
 class ChatRepository {
   final ApiClient _apiClient = ApiClient();
+
+  // Helper method to process backend response
+  dynamic _processResponse(dynamic response) {
+    if (response['success'] == true) {
+      return response['data'];
+    } else {
+      throw Exception(response['message'] ?? 'Request failed');
+    }
+  }
 
   // Get all chats
   Future<List<Chat>> getChats() async {
     try {
       final response = await _apiClient.get('/chat');
-      final List<dynamic> chatData = response['data'];
+      final data = _processResponse(response);
+      final List<dynamic> chatData = data;
       return chatData.map((chat) => Chat.fromJson(chat)).toList();
     } catch (e) {
       throw Exception('Failed to fetch chats: $e');
@@ -22,7 +33,8 @@ class ChatRepository {
       final response = await _apiClient.post('/chat/private', {
         'friendId': friendId,
       });
-      return Chat.fromJson(response['data']);
+      final data = _processResponse(response);
+      return Chat.fromJson(data);
     } catch (e) {
       throw Exception('Failed to create private chat: $e');
     }
@@ -31,30 +43,48 @@ class ChatRepository {
   // Create group chat
   Future<Chat> createGroupChat({
     required String name,
-    required String description,
+    String? description,
     required String admin,
     required List<String> participants,
     File? avatar,
   }) async {
     try {
-      Map<String, dynamic> data = {
-        'name': name,
-        'description': description,
-        'admin': admin,
-      };
-
-      // Add participants
-      for (int i = 0; i < participants.length; i++) {
-        data['participants[$i]'] = participants[i];
-      }
-
-      List<MapEntry<String, File>> files = [];
       if (avatar != null) {
-        files.add(MapEntry('avatar', avatar));
-      }
+        // Use multipart for avatar upload
+        Map<String, dynamic> data = {
+          'name': name,
+          'admin': admin,
+        };
 
-      final response = await _apiClient.postMultipart('/chat/group', data, files);
-      return Chat.fromJson(response['data']);
+        if (description != null && description.isNotEmpty) {
+          data['description'] = description;
+        }
+
+        // Add participants as array
+        data['participants'] = participants;
+
+        List<MapEntry<String, File>> files = [];
+        files.add(MapEntry('avatar', avatar));
+
+        final response = await _apiClient.postMultipart('/chat/group', data, files);
+        final responseData = _processResponse(response);
+        return Chat.fromJson(responseData);
+      } else {
+        // Regular JSON post without avatar
+        Map<String, dynamic> data = {
+          'name': name,
+          'admin': admin,
+          'participants': participants,
+        };
+
+        if (description != null && description.isNotEmpty) {
+          data['description'] = description;
+        }
+
+        final response = await _apiClient.post('/chat/group', data);
+        final responseData = _processResponse(response);
+        return Chat.fromJson(responseData);
+      }
     } catch (e) {
       throw Exception('Failed to create group chat: $e');
     }
@@ -66,16 +96,11 @@ class ChatRepository {
     required List<String> members,
   }) async {
     try {
-      Map<String, dynamic> data = {
+      final response = await _apiClient.post('/chat/group/members/add', {
         'chatId': chatId,
-      };
-
-      // Add members
-      for (int i = 0; i < members.length; i++) {
-        data['members[$i]'] = members[i];
-      }
-
-      await _apiClient.post('/chat/group/members/add', data);
+        'members': members,
+      });
+      _processResponse(response); // Check for success
     } catch (e) {
       throw Exception('Failed to add members to group chat: $e');
     }
@@ -87,16 +112,11 @@ class ChatRepository {
     required List<String> members,
   }) async {
     try {
-      Map<String, dynamic> data = {
+      final response = await _apiClient.post('/chat/group/members/remove', {
         'chatId': chatId,
-      };
-
-      // Add members to remove
-      for (int i = 0; i < members.length; i++) {
-        data['members[$i]'] = members[i];
-      }
-
-      await _apiClient.post('/chat/group/members/remove', data);
+        'members': members,
+      });
+      _processResponse(response); // Check for success
     } catch (e) {
       throw Exception('Failed to remove members from group chat: $e');
     }
@@ -112,7 +132,8 @@ class ChatRepository {
         'chatId': chatId,
         'content': content,
       });
-      return Message.fromJson(response['data']);
+      final data = _processResponse(response);
+      return Message.fromJson(data);
     } catch (e) {
       throw Exception('Failed to send message: $e');
     }
@@ -126,7 +147,8 @@ class ChatRepository {
   }) async {
     try {
       final response = await _apiClient.get('/chat/$chatId/messages?page=$page&limit=$limit');
-      return MessagesResponse.fromJson(response['data']);
+      final data = _processResponse(response);
+      return MessagesResponse.fromJson(data);
     } catch (e) {
       throw Exception('Failed to fetch messages: $e');
     }
@@ -135,20 +157,21 @@ class ChatRepository {
   // Mark message as read
   Future<void> markMessageAsRead(String messageId) async {
     try {
-      await _apiClient.put('/chat/message/$messageId/read', {});
+      final response = await _apiClient.put('/chat/message/$messageId/read', {});
+      _processResponse(response); // Check for success
     } catch (e) {
       throw Exception('Failed to mark message as read: $e');
     }
   }
 
-  // Get unread message count (placeholder)
-  Future<int> getUnreadCount() async {
+  // Get unread message count
+  Future<Map<String, dynamic>> getUnreadCount() async {
     try {
       final response = await _apiClient.get('/chat/messages/unread/count');
-      return response['data']['count'] ?? 0;
+      final data = _processResponse(response);
+      return data;
     } catch (e) {
-      // Return 0 as placeholder since endpoint is not working
-      return 0;
+      throw Exception('Failed to fetch unread count: $e');
     }
   }
 } 

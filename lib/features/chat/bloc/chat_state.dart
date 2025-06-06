@@ -1,4 +1,5 @@
 import '../data/models/chat.dart';
+import '../data/models/message.dart';
 
 abstract class ChatState {}
 
@@ -15,6 +16,19 @@ class ChatLoadingMessages extends ChatState {}
 class ChatSendingMessage extends ChatState {}
 
 class ChatCreatingChat extends ChatState {}
+
+// WebSocket connection states
+class ChatWebSocketConnecting extends ChatState {}
+
+class ChatWebSocketConnected extends ChatState {}
+
+class ChatWebSocketDisconnected extends ChatState {}
+
+class ChatWebSocketError extends ChatState {
+  final String message;
+
+  ChatWebSocketError({required this.message});
+}
 
 // Success states
 class ChatChatsLoaded extends ChatState {
@@ -87,6 +101,79 @@ class ChatSelected extends ChatState {
   final String chatId;
 
   ChatSelected({required this.chatId});
+}
+
+// Typing states
+class ChatUserTyping extends ChatState {
+  final String chatId;
+  final String userId;
+  final String username;
+
+  ChatUserTyping({
+    required this.chatId,
+    required this.userId,
+    required this.username,
+  });
+}
+
+class ChatUserStoppedTyping extends ChatState {
+  final String chatId;
+  final String userId;
+
+  ChatUserStoppedTyping({
+    required this.chatId,
+    required this.userId,
+  });
+}
+
+class ChatTypingStarted extends ChatState {
+  final String chatId;
+
+  ChatTypingStarted({required this.chatId});
+}
+
+class ChatTypingStopped extends ChatState {
+  final String chatId;
+
+  ChatTypingStopped({required this.chatId});
+}
+
+// Online users state
+class ChatOnlineUsersUpdated extends ChatState {
+  final List<String> onlineUsers;
+
+  ChatOnlineUsersUpdated({required this.onlineUsers});
+}
+
+// Message seen state
+class ChatMessageSeen extends ChatState {
+  final String chatId;
+  final String messageId;
+  final String userId;
+
+  ChatMessageSeen({
+    required this.chatId,
+    required this.messageId,
+    required this.userId,
+  });
+}
+
+// New message notification
+class ChatNewMessageNotification extends ChatState {
+  final String chatId;
+  final Message message;
+
+  ChatNewMessageNotification({
+    required this.chatId,
+    required this.message,
+  });
+}
+
+// Chats joined state
+class ChatChatsJoined extends ChatState {
+  final List<String> chatIds;
+
+  ChatChatsJoined({required this.chatIds});
 }
 
 // Error states
