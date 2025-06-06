@@ -430,12 +430,16 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
         ),
       );
     } catch (e) {
-      emit(
-        state.copyWith(
-          status: FlashcardStatus.failure,
-          errorMessage: e.toString(),
-        ),
-      );
+      if (e.toString().contains('already exists')) {
+        emit(state.copyWith(status: FlashcardStatus.success));
+      } else {
+        emit(
+          state.copyWith(
+            status: FlashcardStatus.failure,
+            errorMessage: e.toString(),
+          ),
+        );
+      }
     }
   }
 
