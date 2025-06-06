@@ -41,7 +41,7 @@ dependencies:
     # QR code scanner
     qr_code_scanner_plus: ^2.0.10+1
     # Socket.IO for real-time chat
-    socket_io_client: ^3.0.0
+    socket_io_client: ^3.1.2
 dev_dependencies:
     flutter_test:
         sdk: flutter

@@ -1,15 +1,45 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../../features/chat/bloc/chat_bloc.dart';
-import '../../../features/chat/bloc/chat_event.dart';
-import '../../../features/chat/bloc/chat_state.dart';
-import '../../../features/chat/data/models/chat.dart';
-import '../../../features/auth/data/constants.dart';
+
+// Mock data for UI demonstration
+class MockMessage {
+  final String id;
+  final String text;
+  final String senderId;
+  final String senderName;
+  final String? senderAvatar;
+  final DateTime createdAt;
+  final bool isRead;
+
+  MockMessage({
+    required this.id,
+    required this.text,
+    required this.senderId,
+    required this.senderName,
+    this.senderAvatar,
+    required this.createdAt,
+    this.isRead = false,
+  });
+}
+
+class MockChat {
+  final String id;
+  final String name;
+  final bool isGroup;
+  final String? description;
+  final String? avatar;
+
+  MockChat({
+    required this.id,
+    required this.name,
+    required this.isGroup,
+    this.description,
+    this.avatar,
+  });
+}
 
 class ChatConversationScreen extends StatefulWidget {
-  final Chat chat;
+  final MockChat chat;
 
   const ChatConversationScreen({
     super.key,
@@ -23,51 +53,49 @@ class ChatConversationScreen extends StatefulWidget {
 class _ChatConversationScreenState extends State<ChatConversationScreen> {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  String? currentUserId;
-  ChatBloc? _chatBloc; // Store reference to avoid context access in dispose
+  final String currentUserId = 'current_user_123';
 
-  @override
-  void initState() {
-    super.initState();
-    _loadCurrentUser();
-    // Store the BLoC reference
-    _chatBloc = context.read<ChatBloc>();
-    // Select this chat (joins WebSocket room and loads messages)
-    _chatBloc!.add(ChatEventSelectChat(chatId: widget.chat.id));
-    _chatBloc!.add(ChatEventLoadMessages(chatId: widget.chat.id));
-  }
+  // Mock messages for demonstration
+  final List<MockMessage> _mockMessages = [
+    MockMessage(
+      id: '1',
+      text: 'Hey! How are you doing?',
+      senderId: 'other_user_456',
+      senderName: 'John Doe',
+      createdAt: DateTime.now().subtract(const Duration(hours: 2)),
+      isRead: true,
+    ),
+    MockMessage(
+      id: '2',
+      text: 'I\'m doing great! Just working on this Flutter project.',
+      senderId: 'current_user_123',
+      senderName: 'Me',
+      createdAt: DateTime.now().subtract(const Duration(hours: 1, minutes: 30)),
+      isRead: true,
+    ),
+    MockMessage(
+      id: '3',
+      text: 'That sounds awesome! What are you building?',
+      senderId: 'other_user_456',
+      senderName: 'John Doe',
+      createdAt: DateTime.now().subtract(const Duration(hours: 1)),
+      isRead: true,
+    ),
+    MockMessage(
+      id: '4',
+      text: 'A chat application with a clean UI design.',
+      senderId: 'current_user_123',
+      senderName: 'Me',
+      createdAt: DateTime.now().subtract(const Duration(minutes: 30)),
+      isRead: false,
+    ),
+  ];
 
   @override
   void dispose() {
-    // Leave the chat room when disposing - use stored reference
-    _chatBloc?.add(ChatEventClearSelectedChat());
     _messageController.dispose();
     _scrollController.dispose();
     super.dispose();
-  }
-
-  Future<void> _loadCurrentUser() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      currentUserId = prefs.getString(AuthDataConstants.userIdKey);
-    });
-  }
-
-  // Helper method to get chat display name
-  String _getChatDisplayName() {
-    if (widget.chat.isGroup) {
-      return widget.chat.name ?? 'Group Chat';
-    } else {
-      // For private chat, find the other participant
-      if (currentUserId != null) {
-        final otherParticipant = widget.chat.participants.firstWhere(
-          (participant) => participant.id != currentUserId,
-          orElse: () => ChatParticipant(id: '', username: 'Unknown'),
-        );
-        return otherParticipant.username;
-      }
-      return 'Private Chat';
-    }
   }
 
   @override
@@ -97,7 +125,7 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    _getChatDisplayName(),
+                    widget.chat.name,
                     style: const TextStyle(
                       color: Colors.black,
                       fontSize: 16,
@@ -125,159 +153,50 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
             ),
         ],
       ),
-      body: BlocConsumer<ChatBloc, ChatState>(
-        listener: (context, state) {
-          if (state is ChatMessageSent) {
-            _messageController.clear();
-            _scrollToBottom();
-          } else if (state is ChatMessageReceived) {
-            // Handle real-time message received
-            if (state.message.chat == widget.chat.id) {
-              _scrollToBottom();
-              // Mark message as read if from another user
-              if (currentUserId != null && state.message.sender.id != currentUserId) {
-                context.read<ChatBloc>().add(
-                  ChatEventMarkMessageAsRead(
-                    messageId: state.message.id,
-                    chatId: widget.chat.id,
-                  ),
-                );
-              }
-            }
-          } else if (state is ChatSendMessageError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Failed to send message: ${state.message}'),
-                backgroundColor: Colors.red,
-              ),
-            );
-          }
-        },
-        builder: (context, state) {
-          return Column(
-            children: [
-              Expanded(
-                child: _buildMessagesList(state),
-              ),
-              _buildMessageInput(),
-            ],
-          );
-        },
+      body: Column(
+        children: [
+          Expanded(child: _buildMessagesList()),
+          _buildMessageInput(),
+        ],
       ),
     );
   }
 
-  Widget _buildMessagesList(ChatState state) {
-    if (state is ChatLoadingMessages) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    if (state is ChatLoadMessagesError) {
-      return Center(
+  Widget _buildMessagesList() {
+    if (_mockMessages.isEmpty) {
+      return const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('Error loading messages: ${state.message}'),
-            ElevatedButton(
-              onPressed: () {
-                context.read<ChatBloc>().add(
-                  ChatEventLoadMessages(chatId: widget.chat.id),
-                );
-              },
-              child: const Text('Retry'),
+            Icon(Icons.chat_bubble_outline, size: 64, color: Colors.grey),
+            SizedBox(height: 16),
+            Text(
+              'No messages yet',
+              style: TextStyle(fontSize: 18, color: Colors.grey),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Start the conversation!',
+              style: TextStyle(color: Colors.grey),
             ),
           ],
         ),
       );
     }
 
-    // Handle the case where we have loaded messages for this specific chat
-    final chatBloc = context.read<ChatBloc>();
-    final messages = chatBloc.getMessagesForChat(widget.chat.id);
-    
-    if (state is ChatMessagesLoaded && state.chatId == widget.chat.id) {
-      // Use messages from the state
-      final stateMessages = state.messages;
-
-      if (stateMessages.isEmpty) {
-        return const Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.chat_bubble_outline, size: 64, color: Colors.grey),
-              SizedBox(height: 16),
-              Text(
-                'No messages yet',
-                style: TextStyle(fontSize: 18, color: Colors.grey),
-              ),
-              SizedBox(height: 8),
-              Text(
-                'Start the conversation!',
-                style: TextStyle(color: Colors.grey),
-              ),
-            ],
-          ),
-        );
-      }
-
-      // Auto-scroll when messages are loaded
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (_scrollController.hasClients) {
-          _scrollController.animateTo(
-            0,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeOut,
-          );
-        }
-      });
-
-      return ListView.builder(
-        controller: _scrollController,
-        reverse: true,
-        itemCount: stateMessages.length,
-        itemBuilder: (context, index) {
-          final message = stateMessages[index];
-          return _buildMessageBubble(message);
-        },
-      );
-    }
-    
-    // If we have cached messages but no specific loaded state yet
-    if (messages.isNotEmpty) {
-      return ListView.builder(
-        controller: _scrollController,
-        reverse: true,
-        itemCount: messages.length,
-        itemBuilder: (context, index) {
-          final message = messages[index];
-          return _buildMessageBubble(message);
-        },
-      );
-    }
-
-    // Default empty state
-    return const Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.chat_bubble_outline, size: 64, color: Colors.grey),
-          SizedBox(height: 16),
-          Text(
-            'No messages yet',
-            style: TextStyle(fontSize: 18, color: Colors.grey),
-          ),
-          SizedBox(height: 8),
-          Text(
-            'Start the conversation!',
-            style: TextStyle(color: Colors.grey),
-          ),
-        ],
-      ),
+    return ListView.builder(
+      controller: _scrollController,
+      reverse: true,
+      itemCount: _mockMessages.length,
+      itemBuilder: (context, index) {
+        final message = _mockMessages.reversed.toList()[index];
+        return _buildMessageBubble(message);
+      },
     );
   }
 
-  Widget _buildMessageBubble(Message message) {
-    final isCurrentUser = currentUserId != null && message.sender.id == currentUserId;
+  Widget _buildMessageBubble(MockMessage message) {
+    final isCurrentUser = message.senderId == currentUserId;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -290,13 +209,13 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
             CircleAvatar(
               radius: 16,
               backgroundColor: Colors.grey,
-              backgroundImage: message.sender.avatar != null 
-                  ? NetworkImage(message.sender.avatar!) 
+              backgroundImage: message.senderAvatar != null 
+                  ? NetworkImage(message.senderAvatar!) 
                   : null,
-              child: message.sender.avatar == null
+              child: message.senderAvatar == null
                   ? Text(
-                      message.sender.username.isNotEmpty 
-                          ? message.sender.username[0].toUpperCase()
+                      message.senderName.isNotEmpty 
+                          ? message.senderName[0].toUpperCase()
                           : '?',
                       style: const TextStyle(color: Colors.white, fontSize: 12),
                     )
@@ -316,7 +235,7 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
                 children: [
                   if (!isCurrentUser && widget.chat.isGroup)
                     Text(
-                      message.sender.username,
+                      message.senderName,
                       style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
@@ -344,9 +263,9 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
                       if (isCurrentUser) ...[
                         const SizedBox(width: 4),
                         Icon(
-                          message.readBy.length > 1 ? Icons.done_all : Icons.done,
+                          message.isRead ? Icons.done_all : Icons.done,
                           size: 12,
-                          color: message.readBy.length > 1 
+                          color: message.isRead 
                               ? Colors.blue 
                               : Colors.white.withValues(alpha: 0.7),
                         ),
@@ -359,10 +278,10 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
           ),
           if (isCurrentUser) ...[
             const SizedBox(width: 8),
-            CircleAvatar(
+            const CircleAvatar(
               radius: 16,
-              backgroundColor: const Color(0xFFA31D1D),
-              child: const Icon(Icons.person, color: Colors.white, size: 16),
+              backgroundColor: Color(0xFFA31D1D),
+              child: Icon(Icons.person, color: Colors.white, size: 16),
             ),
           ],
         ],
@@ -402,26 +321,11 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
             ),
           ),
           const SizedBox(width: 8),
-          BlocBuilder<ChatBloc, ChatState>(
-            builder: (context, state) {
-              final isLoading = state is ChatSendingMessage;
-              return CircleAvatar(
-                backgroundColor: const Color(0xFFA31D1D),
-                child: IconButton(
-                  onPressed: isLoading ? null : _sendMessage,
-                  icon: isLoading
-                      ? const SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : const Icon(Icons.send, color: Colors.white),
-                ),
-              );
-            },
+          FloatingActionButton(
+            onPressed: _sendMessage,
+            backgroundColor: const Color(0xFFA31D1D),
+            mini: true,
+            child: const Icon(Icons.send, color: Colors.white),
           ),
         ],
       ),
@@ -431,22 +335,8 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
   void _sendMessage() {
     final text = _messageController.text.trim();
     if (text.isNotEmpty) {
-      context.read<ChatBloc>().add(
-        ChatEventSendMessage(
-          chatId: widget.chat.id,
-          content: text,
-        ),
-      );
-    }
-  }
-
-  void _scrollToBottom() {
-    if (_scrollController.hasClients) {
-      _scrollController.animateTo(
-        0,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      );
+      // UI only - no actual sending logic
+      _messageController.clear();
     }
   }
 
@@ -454,7 +344,7 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(widget.chat.name ?? 'Group Info'),
+        title: Text(widget.chat.name),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -463,9 +353,9 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
               Text('Description: ${widget.chat.description}'),
               const SizedBox(height: 8),
             ],
-            Text('Participants: ${widget.chat.participants.length}'),
-            Text('Admins: ${widget.chat.admins.length}'),
-            Text('Created: ${DateFormat('dd/MM/yyyy').format(widget.chat.createdAt)}'),
+            const Text('Participants: 5'),
+            const Text('Admins: 2'),
+            Text('Created: ${DateFormat('dd/MM/yyyy').format(DateTime.now().subtract(const Duration(days: 30)))}'),
           ],
         ),
         actions: [

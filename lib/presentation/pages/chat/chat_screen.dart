@@ -1,16 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../../features/chat/bloc/chat_bloc.dart';
-import '../../../features/chat/bloc/chat_event.dart';
-import '../../../features/chat/bloc/chat_state.dart';
-import '../../../features/chat/data/models/chat.dart';
-import '../../../features/auth/data/constants.dart';
-import '../../../services/websocket_service.dart';
-import 'chat_conversation_screen.dart';
-import 'create_group_chat_screen.dart';
-import '../friends/friends_page.dart';
+
+// Static mock data for UI demonstration
+class MockChat {
+  final String id;
+  final String name;
+  final bool isGroup;
+  final String? description;
+  final String? avatar;
+  final String? latestMessageText;
+  final DateTime? lastMessageTime;
+  final bool hasUnread;
+
+  MockChat({
+    required this.id,
+    required this.name,
+    required this.isGroup,
+    this.description,
+    this.avatar,
+    this.latestMessageText,
+    this.lastMessageTime,
+    this.hasUnread = false,
+  });
+}
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -21,46 +33,47 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   late TabController _tabController;
-  String? currentUserId;
-  final WebSocketService _webSocketService = WebSocketService();
+
+  // Mock data for demonstration
+  final List<MockChat> _mockChats = [
+    MockChat(
+      id: '1',
+      name: 'John Doe',
+      isGroup: false,
+      latestMessageText: 'Hey, how are you?',
+      lastMessageTime: DateTime.now().subtract(const Duration(minutes: 5)),
+      hasUnread: true,
+    ),
+    MockChat(
+      id: '2',
+      name: 'Flutter Developers',
+      isGroup: true,
+      description: 'Discuss Flutter development',
+      latestMessageText: 'Check out this new widget!',
+      lastMessageTime: DateTime.now().subtract(const Duration(hours: 2)),
+      hasUnread: false,
+    ),
+    MockChat(
+      id: '3',
+      name: 'Team Project',
+      isGroup: true,
+      description: 'Work collaboration',
+      latestMessageText: 'Meeting at 3 PM',
+      lastMessageTime: DateTime.now().subtract(const Duration(days: 1)),
+      hasUnread: true,
+    ),
+  ];
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    _loadCurrentUser();
-    // Load chats when screen initializes
-    context.read<ChatBloc>().add(ChatEventLoadChats());
   }
 
   @override
   void dispose() {
     _tabController.dispose();
     super.dispose();
-  }
-
-  Future<void> _loadCurrentUser() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      currentUserId = prefs.getString(AuthDataConstants.userIdKey);
-    });
-  }
-
-  // Helper method to get chat display name
-  String _getChatDisplayName(Chat chat) {
-    if (chat.isGroup) {
-      return chat.name ?? 'Group Chat';
-    } else {
-      // For private chat, find the other participant
-      if (currentUserId != null) {
-        final otherParticipant = chat.participants.firstWhere(
-          (participant) => participant.id != currentUserId,
-          orElse: () => ChatParticipant(id: '', username: 'Unknown'),
-        );
-        return otherParticipant.username;
-      }
-      return 'Private Chat';
-    }
   }
 
   @override
@@ -70,9 +83,9 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       appBar: AppBar(
         backgroundColor: const Color(0xFFFEFCF6),
         elevation: 0,
-        title: Row(
+        title: const Row(
           children: [
-            const Text(
+            Text(
               'Messages',
               style: TextStyle(
                 color: Colors.black,
@@ -80,45 +93,19 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(width: 8),
-            // WebSocket connection status indicator
-            StreamBuilder<bool>(
-              stream: Stream.periodic(const Duration(seconds: 1), (_) => _webSocketService.isConnected),
-              builder: (context, snapshot) {
-                final isConnected = snapshot.data ?? false;
-                return Container(
-                  width: 8,
-                  height: 8,
-                  decoration: BoxDecoration(
-                    color: isConnected ? Colors.green : Colors.red,
-                    shape: BoxShape.circle,
-                  ),
-                );
-              },
-            ),
+            SizedBox(width: 8),
           ],
         ),
         actions: [
           IconButton(
             onPressed: () {
-              context.read<ChatBloc>().add(ChatEventRefreshChats());
+              // UI only - no logic
             },
             icon: const Icon(Icons.refresh, color: Colors.black),
           ),
-          // Debug button to test WebSocket connection
           IconButton(
-            onPressed: () async {
-              final isConnected = _webSocketService.isConnected;
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('WebSocket Status: ${isConnected ? "Connected" : "Disconnected"}'),
-                  backgroundColor: isConnected ? Colors.green : Colors.red,
-                ),
-              );
-              
-              if (!isConnected) {
-                await _webSocketService.connect();
-              }
+            onPressed: () {
+              // UI only - no logic
             },
             icon: const Icon(Icons.wifi, color: Colors.black),
           ),
@@ -134,181 +121,127 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
           ],
         ),
       ),
-      body: BlocConsumer<ChatBloc, ChatState>(
-        listener: (context, state) {
-          if (state is ChatCreateChatError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Error creating chat: ${state.message}'),
-                backgroundColor: Colors.red,
-              ),
-            );
-          } else if (state is ChatPrivateChatCreated || state is ChatGroupChatCreated) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Chat created successfully!'),
-                backgroundColor: Colors.green,
-              ),
-            );
-          }
-        },
-        builder: (context, state) {
-          return Column(
-            children: [
-              // Quick action buttons
-              Container(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: () => _showCreatePrivateChatDialog(),
-                        icon: const Icon(Icons.person_add),
-                        label: const Text('New Private Chat'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFA31D1D),
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
+      body: Column(
+        children: [
+          // Quick action buttons
+          Container(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () => _showCreatePrivateChatDialog(),
+                    icon: const Icon(Icons.person_add),
+                    label: const Text('New Private Chat'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFA31D1D),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: () => _navigateToCreateGroupChat(),
-                        icon: const Icon(Icons.group_add),
-                        label: const Text('Create Group'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      // UI only - no navigation logic
+                    },
+                    icon: const Icon(Icons.group_add),
+                    label: const Text('Create Group'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                  ],
+                  ),
                 ),
-              ),
-              // Chat list
-              Expanded(
-                child: TabBarView(
-                  controller: _tabController,
-                  children: [
-                    _buildAllChatsTab(state),
-                    _buildGroupChatsTab(state),
-                  ],
-                ),
-              ),
-            ],
-          );
-        },
+              ],
+            ),
+          ),
+          // Chat list
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                _buildAllChatsTab(),
+                _buildGroupChatsTab(),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildAllChatsTab(ChatState state) {
-    if (state is ChatLoadingChats) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    if (state is ChatLoadChatsError) {
-      return Center(
+  Widget _buildAllChatsTab() {
+    if (_mockChats.isEmpty) {
+      return const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('Error: ${state.message}'),
-            ElevatedButton(
-              onPressed: () {
-                context.read<ChatBloc>().add(ChatEventLoadChats());
-              },
-              child: const Text('Retry'),
+            Icon(Icons.chat_bubble_outline, size: 64, color: Colors.grey),
+            SizedBox(height: 16),
+            Text(
+              'No chats yet',
+              style: TextStyle(fontSize: 18, color: Colors.grey),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Start a conversation with friends!',
+              style: TextStyle(color: Colors.grey),
             ),
           ],
         ),
       );
     }
 
-    if (state is ChatChatsLoaded) {
-      final chats = state.chats;
-      
-      if (chats.isEmpty) {
-        return const Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.chat_bubble_outline, size: 64, color: Colors.grey),
-              SizedBox(height: 16),
-              Text(
-                'No chats yet',
-                style: TextStyle(fontSize: 18, color: Colors.grey),
-              ),
-              SizedBox(height: 8),
-              Text(
-                'Start a conversation with friends!',
-                style: TextStyle(color: Colors.grey),
-              ),
-            ],
-          ),
-        );
-      }
-
-      return ListView.builder(
-        itemCount: chats.length,
-        itemBuilder: (context, index) {
-          final chat = chats[index];
-          return _buildChatTile(chat);
-        },
-      );
-    }
-
-    return const Center(
-      child: Text('Load chats to get started'),
+    return ListView.builder(
+      itemCount: _mockChats.length,
+      itemBuilder: (context, index) {
+        final chat = _mockChats[index];
+        return _buildChatTile(chat);
+      },
     );
   }
 
-  Widget _buildGroupChatsTab(ChatState state) {
-    if (state is ChatChatsLoaded) {
-      final groupChats = state.chats.where((chat) => chat.isGroup).toList();
-      
-      if (groupChats.isEmpty) {
-        return const Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.group_outlined, size: 64, color: Colors.grey),
-              SizedBox(height: 16),
-              Text(
-                'No group chats yet',
-                style: TextStyle(fontSize: 18, color: Colors.grey),
-              ),
-              SizedBox(height: 8),
-              Text(
-                'Create a group to start chatting!',
-                style: TextStyle(color: Colors.grey),
-              ),
-            ],
-          ),
-        );
-      }
-
-      return ListView.builder(
-        itemCount: groupChats.length,
-        itemBuilder: (context, index) {
-          final chat = groupChats[index];
-          return _buildChatTile(chat);
-        },
+  Widget _buildGroupChatsTab() {
+    final groupChats = _mockChats.where((chat) => chat.isGroup).toList();
+    
+    if (groupChats.isEmpty) {
+      return const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.group_outlined, size: 64, color: Colors.grey),
+            SizedBox(height: 16),
+            Text(
+              'No group chats yet',
+              style: TextStyle(fontSize: 18, color: Colors.grey),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Create a group to start chatting!',
+              style: TextStyle(color: Colors.grey),
+            ),
+          ],
+        ),
       );
     }
 
-    return _buildAllChatsTab(state);
+    return ListView.builder(
+      itemCount: groupChats.length,
+      itemBuilder: (context, index) {
+        final chat = groupChats[index];
+        return _buildChatTile(chat);
+      },
+    );
   }
 
-  Widget _buildChatTile(Chat chat) {
-    final displayName = _getChatDisplayName(chat);
-    
+  Widget _buildChatTile(MockChat chat) {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: ListTile(
@@ -323,12 +256,12 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               : null,
         ),
         title: Text(
-          displayName,
+          chat.name,
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
-        subtitle: chat.latestMessage != null
+        subtitle: chat.latestMessageText != null
             ? Text(
-                chat.latestMessage!.text,
+                chat.latestMessageText!,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               )
@@ -344,8 +277,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               ),
             const SizedBox(height: 4),
             // Show unread indicator if there are unread messages
-            if (chat.latestMessage != null && currentUserId != null && 
-                !chat.latestMessage!.readBy.contains(currentUserId))
+            if (chat.hasUnread)
               Container(
                 width: 8,
                 height: 8,
@@ -356,7 +288,9 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               ),
           ],
         ),
-        onTap: () => _navigateToChatConversation(chat),
+        onTap: () {
+          // UI only - no navigation logic
+        },
       ),
     );
   }
@@ -392,47 +326,12 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
           ElevatedButton(
             onPressed: () {
               Navigator.of(context).pop();
-              _navigateToFriendsForChat();
+              // UI only - no navigation logic
             },
             child: const Text('Choose Friend'),
           ),
         ],
       ),
     );
-  }
-
-  void _navigateToFriendsForChat() {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const FriendsPage(selectMode: true),
-      ),
-    ).then((selectedFriendId) {
-      if (selectedFriendId != null && mounted) {
-        context.read<ChatBloc>().add(
-          ChatEventCreatePrivateChat(friendId: selectedFriendId),
-        );
-      }
-    });
-  }
-
-  void _navigateToCreateGroupChat() {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const CreateGroupChatScreen(),
-      ),
-    );
-  }
-
-  void _navigateToChatConversation(Chat chat) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => ChatConversationScreen(chat: chat),
-      ),
-    ).then((_) {
-      // Refresh chats when returning from conversation
-      if (mounted) {
-        context.read<ChatBloc>().add(ChatEventRefreshChats());
-      }
-    });
   }
 } 

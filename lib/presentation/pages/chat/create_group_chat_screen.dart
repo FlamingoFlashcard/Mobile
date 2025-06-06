@@ -1,13 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../../features/chat/bloc/chat_bloc.dart';
-import '../../../features/chat/bloc/chat_event.dart';
-import '../../../features/chat/bloc/chat_state.dart';
-import '../../../features/auth/data/constants.dart';
-import '../friends/friends_page.dart';
 
 class CreateGroupChatScreen extends StatefulWidget {
   const CreateGroupChatScreen({super.key});
@@ -24,26 +17,12 @@ class _CreateGroupChatScreenState extends State<CreateGroupChatScreen> {
   File? _avatarImage;
   List<String> _selectedFriends = [];
   bool _isLoading = false;
-  String? currentUserId;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadCurrentUser();
-  }
 
   @override
   void dispose() {
     _nameController.dispose();
     _descriptionController.dispose();
     super.dispose();
-  }
-
-  Future<void> _loadCurrentUser() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      currentUserId = prefs.getString(AuthDataConstants.userIdKey);
-    });
   }
 
   @override
@@ -62,47 +41,21 @@ class _CreateGroupChatScreenState extends State<CreateGroupChatScreen> {
           ),
         ),
         actions: [
-          BlocConsumer<ChatBloc, ChatState>(
-            listener: (context, state) {
-              if (state is ChatCreatingChat) {
-                setState(() => _isLoading = true);
-              } else if (state is ChatGroupChatCreated) {
-                setState(() => _isLoading = false);
-                Navigator.of(context).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Group chat created successfully!'),
-                    backgroundColor: Colors.green,
+          TextButton(
+            onPressed: _isLoading ? null : _createGroupChat,
+            child: _isLoading
+                ? const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Text(
+                    'Create',
+                    style: TextStyle(
+                      color: Colors.blue,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                );
-              } else if (state is ChatCreateChatError) {
-                setState(() => _isLoading = false);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Error: ${state.message}'),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-              }
-            },
-            builder: (context, state) {
-              return TextButton(
-                onPressed: _isLoading ? null : _createGroupChat,
-                child: _isLoading
-                    ? const SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Text(
-                        'Create',
-                        style: TextStyle(
-                          color: Colors.blue,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-              );
-            },
           ),
         ],
       ),
@@ -294,20 +247,30 @@ class _CreateGroupChatScreenState extends State<CreateGroupChatScreen> {
   }
 
   void _selectFriends() {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const FriendsPage(
-          selectMode: true,
-          multiSelect: true,
-        ),
+    // Mock friend selection - in real app would navigate to friends page
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Select Friends'),
+        content: const Text('This would show a list of friends to select from.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              // Mock adding some friends
+              setState(() {
+                _selectedFriends = ['friend1', 'friend2', 'friend3'];
+              });
+            },
+            child: const Text('Add Mock Friends'),
+          ),
+        ],
       ),
-    ).then((selectedFriendIds) {
-      if (selectedFriendIds != null && selectedFriendIds is List<String>) {
-        setState(() {
-          _selectedFriends = selectedFriendIds;
-        });
-      }
-    });
+    );
   }
 
   void _createGroupChat() {
@@ -331,24 +294,20 @@ class _CreateGroupChatScreenState extends State<CreateGroupChatScreen> {
       return;
     }
 
-    if (currentUserId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Unable to get current user. Please try again.'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-
-    context.read<ChatBloc>().add(
-      ChatEventCreateGroupChat(
-        name: _nameController.text.trim(),
-        description: _descriptionController.text.trim(),
-        admin: currentUserId!,
-        participants: [..._selectedFriends, currentUserId!],
-        avatar: _avatarImage,
-      ),
-    );
+    // UI only - simulate creating group chat
+    setState(() => _isLoading = true);
+    
+    Future.delayed(const Duration(seconds: 2), () {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Group chat created successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    });
   }
 } 
