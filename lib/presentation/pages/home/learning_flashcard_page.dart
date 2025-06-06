@@ -84,52 +84,115 @@ class _LearningFlashcardPageState extends State<LearningFlashcardPage> {
                 Column(
                   children: [
                     const SizedBox(height: 100),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16.0,
-                        vertical: 8.0,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SizedBox(
-                            width: 200,
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(4.0),
-                              child: LinearProgressIndicator(
-                                value: _progress,
-                                backgroundColor: Colors.grey[300],
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  const Color.fromARGB(255, 104, 175, 106),
+                    if (deck.cards != null && deck.cards!.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16.0,
+                          vertical: 8.0,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              width: 200,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(4.0),
+                                child: LinearProgressIndicator(
+                                  value: _progress,
+                                  backgroundColor: Colors.grey[300],
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    const Color.fromARGB(255, 104, 175, 106),
+                                  ),
+                                  minHeight: 12.0,
                                 ),
-                                minHeight: 12.0,
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 12),
-                          Text(
-                            '${(_progress * 100).toStringAsFixed(0)}%',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
+                            const SizedBox(width: 12),
+                            Text(
+                              '${(_progress * 100).toStringAsFixed(0)}%',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
                     Expanded(
-                      child: LearningCardList(
-                        deckId: widget.deckId,
-                        cards: deck.cards ?? [],
-                        onScrollProgress: _updateProgress,
-                        speechRate: _speechRate,
-                        selectedAccent: _selectedAccent,
-                        isDone: deck.isDone ?? false,
-                      ),
+                      child:
+                          (deck.cards == null || deck.cards!.isEmpty)
+                              ? Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 24.0,
+                                  ),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(
+                                        Icons.menu_book_outlined,
+                                        size: 80,
+                                        color: Colors.grey,
+                                      ),
+                                      const SizedBox(height: 16),
+                                      const Text(
+                                        'No cards yet',
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black54,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      const Text(
+                                        'Start by adding your first card to this deck.',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.black45,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 20),
+                                      ElevatedButton.icon(
+                                        onPressed:
+                                            () => context.go(
+                                              RouteName.addNewWord(
+                                                widget.deckId,
+                                              ),
+                                            ),
+                                        icon: const Icon(
+                                          Icons.add,
+                                          color: Colors.white,
+                                        ),
+                                        label: const Text('Add New Card'),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor:
+                                              CustomTheme.mainColor1,
+                                          foregroundColor: Colors.white,
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 24,
+                                            vertical: 12,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              )
+                              : LearningCardList(
+                                deckId: widget.deckId,
+                                cards: deck.cards!,
+                                onScrollProgress: _updateProgress,
+                                speechRate: _speechRate,
+                                selectedAccent: _selectedAccent,
+                                isDone: deck.isDone ?? false,
+                              ),
                     ),
-                    const SizedBox(height: 20),
-                    if (deck.cards == null || deck.cards!.isEmpty)
-                      const Text('No cards available in this deck'),
                   ],
                 ),
               ],

@@ -201,32 +201,89 @@ class _EditCardListPageState extends State<EditCardListPage> {
           } else if (state.status == FlashcardStatus.success &&
               state.selectedDeck != null) {
             final deck = state.selectedDeck!;
+            final hasCards = deck.cards != null && deck.cards!.isNotEmpty;
+
             return Column(
               children: [
-                Expanded(
-                  child: ListView.separated(
-                    padding: const EdgeInsets.all(12.0),
-                    itemCount: deck.cards?.length ?? 0,
-                    separatorBuilder: (_, __) => const SizedBox(height: 4),
-                    itemBuilder: (context, index) {
-                      final card = deck.cards![index];
-                      final isSelected = selectedCardIds.contains(card.id);
-                      return GestureDetector(
-                        onTap: () => _onCardTap(card),
-                        onLongPress: () => _onCardLongPress(card),
-                        child: CardItem(
-                          card: card,
-                          isSelected: isSelected,
-                          isMultiSelectMode: isMultiSelectMode,
+                if (hasCards)
+                  Expanded(
+                    child: ListView.separated(
+                      padding: const EdgeInsets.all(12.0),
+                      itemCount: deck.cards!.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 4),
+                      itemBuilder: (context, index) {
+                        final card = deck.cards![index];
+                        final isSelected = selectedCardIds.contains(card.id);
+                        return GestureDetector(
+                          onTap: () => _onCardTap(card),
+                          onLongPress: () => _onCardLongPress(card),
+                          child: CardItem(
+                            card: card,
+                            isSelected: isSelected,
+                            isMultiSelectMode: isMultiSelectMode,
+                          ),
+                        );
+                      },
+                    ),
+                  )
+                else
+                  Expanded(
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.style_outlined,
+                              size: 80,
+                              color: Colors.grey,
+                            ),
+                            const SizedBox(height: 16),
+                            const Text(
+                              'No Cards Yet',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black54,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            const Text(
+                              'Start by adding your first flashcard to this deck.',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.black45,
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            ElevatedButton.icon(
+                              onPressed:
+                                  () => context.go(
+                                    RouteName.addNewWord(widget.deckId),
+                                  ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: CustomTheme.mainColor1,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 24,
+                                  vertical: 12,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              icon: const Icon(Icons.add, color: Colors.white),
+                              label: const Text(
+                                'Add New Card',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                            ),
+                          ],
                         ),
-                      );
-                    },
-                  ),
-                ),
-                if (deck.cards == null || deck.cards!.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: Text('No cards available in this deck'),
+                      ),
+                    ),
                   ),
               ],
             );
