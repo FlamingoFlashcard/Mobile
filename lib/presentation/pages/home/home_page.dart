@@ -34,7 +34,6 @@ class HomePage extends StatelessWidget {
                 children: [
                   const SizedBox(height: 24),
                   _buildWelcomeSection(context),
-                  const SizedBox(height: 24),
                   _buildRecentlyLearnSection(context),
                   const SizedBox(height: 24),
                 ],
