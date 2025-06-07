@@ -15,6 +15,8 @@ import '../../../features/post/bloc/post_event.dart';
 import '../../../features/post/bloc/post_state.dart';
 import '../../../services/user_service.dart';
 import '../../widgets/qr_scanner_dialog.dart';
+import '../history/history_page.dart';
+import '../../../features/friendship/bloc/friendship_bloc.dart';
 
 class CameraPage extends StatefulWidget {
   const CameraPage({super.key});
@@ -32,6 +34,7 @@ class _CameraPageState extends State<CameraPage> with TickerProviderStateMixin {
   // Variables for drag gesture
   double _dragStartPosition = 0;
   bool _isDragging = false;
+  double _dragOffset = 0;
 
   // Zoom variables
   double _minAvailableZoom = 1.0;
@@ -434,7 +437,35 @@ class _CameraPageState extends State<CameraPage> with TickerProviderStateMixin {
   }
 
   void _navigateToHistoryPage() {
-    context.push('/history');
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) {
+          return BlocProvider.value(
+            value: context.read<PostBloc>(),
+            child: BlocProvider.value(
+              value: context.read<FriendshipBloc>(),
+              child: const HistoryPage(),
+            ),
+          );
+        },
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          const begin = Offset(0.0, 1.0);
+          const end = Offset.zero;
+          const curve = Curves.easeInOutCubic;
+
+          var tween = Tween(begin: begin, end: end).chain(
+            CurveTween(curve: curve),
+          );
+
+          return SlideTransition(
+            position: animation.drive(tween),
+            child: child,
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 600),
+        reverseTransitionDuration: const Duration(milliseconds: 400),
+      ),
+    );
   }
 
   void _sendImage() {
@@ -573,7 +604,11 @@ class _CameraPageState extends State<CameraPage> with TickerProviderStateMixin {
   void _onVerticalDragUpdate(DragUpdateDetails details) {
     if (!_isDragging) return;
 
-    // If dragged up more than 100 pixels, navigate to history
+    setState(() {
+      _dragOffset = (_dragStartPosition - details.globalPosition.dy).clamp(0, 250);
+    });
+
+    // If dragged up more than 200 pixels, navigate to history
     if (_dragStartPosition - details.globalPosition.dy > 200) {
       _isDragging = false;
       _navigateToHistoryPage();
@@ -582,6 +617,9 @@ class _CameraPageState extends State<CameraPage> with TickerProviderStateMixin {
 
   void _onVerticalDragEnd(DragEndDetails details) {
     _isDragging = false;
+    setState(() {
+      _dragOffset = 0;
+    });
   }
 
   Widget _buildSliderOverlay() {
@@ -964,9 +1002,54 @@ class _CameraPageState extends State<CameraPage> with TickerProviderStateMixin {
           onVerticalDragStart: _onVerticalDragStart,
           onVerticalDragUpdate: _onVerticalDragUpdate,
           onVerticalDragEnd: _onVerticalDragEnd,
-          child: SafeArea(
-            child: Column(
-              children: [
+                      child: SafeArea(
+              child: Stack(
+                children: [
+                  // Drag indicator overlay
+                  if (_dragOffset > 0)
+                    Positioned(
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      child: Container(
+                        height: _dragOffset,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.blue.withValues(alpha: 0.3),
+                              Colors.transparent,
+                            ],
+                          ),
+                        ),
+                        child: Center(
+                          child: Opacity(
+                            opacity: (_dragOffset / 200).clamp(0, 1),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.keyboard_arrow_up,
+                                  color: Colors.blue[700],
+                                  size: 30,
+                                ),
+                                Text(
+                                  'Release to view History',
+                                  style: TextStyle(
+                                    color: Colors.blue[700],
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  Column(
+                    children: [
                 Padding(
                   padding: const EdgeInsets.all(12.0),
                   child: Row(
@@ -1120,8 +1203,10 @@ class _CameraPageState extends State<CameraPage> with TickerProviderStateMixin {
                     ],
                   ),
                 ),
-              ],
-            ),
+                    ],
+                  ),
+                ],
+              ),
           ),
         ),
       ),
