@@ -9,16 +9,16 @@ import 'package:lacquer/presentation/pages/auth/login_page.dart';
 import 'package:lacquer/presentation/pages/auth/verify_page.dart';
 import 'package:lacquer/presentation/pages/camera/camera_page.dart';
 import 'package:lacquer/presentation/pages/camera/about_screen.dart';
+import 'package:lacquer/presentation/pages/home/add_new_word_page.dart';
+import 'package:lacquer/presentation/pages/home/edit_card_list_page.dart';
 import 'package:lacquer/presentation/pages/home/dictionary_page.dart';
+import 'package:lacquer/presentation/pages/profile/profile_page.dart';
 import 'package:lacquer/presentation/pages/home/flashcard_page.dart';
 import 'package:lacquer/presentation/pages/home/learning_flashcard_page.dart';
 import 'package:lacquer/presentation/pages/friends/friends_page.dart';
 import 'package:lacquer/features/profile/bloc/profile_bloc.dart';
 import 'package:lacquer/features/profile/bloc/profile_event.dart';
-import 'package:lacquer/presentation/pages/home/quiz_page.dart';
 import 'package:lacquer/presentation/pages/home/translator_page.dart';
-import 'package:lacquer/presentation/pages/chat/chat_screen.dart';
-import 'package:lacquer/presentation/pages/history/history_page.dart';
 
 import 'package:lacquer/presentation/pages/mainscreen.dart';
 import 'package:flutter/widgets.dart';
@@ -31,13 +31,14 @@ class RouteName {
   static const String register = '/register';
   static const String camera = '/camera';
   static const String about = '/about';
+  static const String profile = '/profile';
   static const String flashcards = '/flashcards';
+  static String learn(String deckId) => '/learn/$deckId';
+  static String edit(String deckId) => '/edit/$deckId';
   static const String dictionary = '/dictionary';
   static const String translator = '/translator';
   static const String friends = '/friends';
-  static const String quiz = '/quiz';
-  static const String chat = '/chat';
-  static const String history = '/history';
+  static String addNewWord(String deckId) => '/add-new-word/$deckId';
 
   static const publicRoutes = [login, forgotPassword, verify, register];
 }
@@ -100,6 +101,10 @@ final router = GoRouter(
       },
     ),
     noTransitionRoute(
+      path: RouteName.profile,
+      builder: (context, state) => const ProfilePage(),
+    ),
+    noTransitionRoute(
       path: RouteName.flashcards,
       builder: (context, state) => const FlashcardPage(),
     ),
@@ -112,17 +117,10 @@ final router = GoRouter(
       builder: (context, state) => const FriendsPage(),
     ),
     noTransitionRoute(
-      path: RouteName.quiz,
-      builder: (context, state) => const QuizPage(),
-    ),
-    noTransitionRoute(
-      path: '/learn',
+      path: '/learn/:deckId',
       builder: (context, state) {
-        final data = state.extra as Map<String, dynamic>;
-        final cards = data['cards'] as List<String>;
-        final title = data['title'] as String;
-
-        return LearningFlashcardPage(title: title, cards: cards);
+        final deckId = state.pathParameters['deckId']!;
+        return LearningFlashcardPage(deckId: deckId);
       },
     ),
     noTransitionRoute(
@@ -130,12 +128,22 @@ final router = GoRouter(
       builder: (context, state) => const TranslatorScreen(),
     ),
     noTransitionRoute(
-      path: '/chat',
-      builder: (context, state) => const ChatScreen(),
+      path: RouteName.translator,
+      builder: (context, state) => const TranslatorScreen(),
     ),
     noTransitionRoute(
-      path: RouteName.history,
-      builder: (context, state) => const HistoryPage(),
+      path: '/edit/:deckId',
+      builder: (context, state) {
+        final deckId = state.pathParameters['deckId']!;
+        return EditCardListPage(deckId: deckId);
+      },
+    ),
+    noTransitionRoute(
+      path: '/add-new-word/:deckId',
+      builder: (context, state) {
+        final deckId = state.pathParameters['deckId']!;
+        return AddNewWordPage(deckId: deckId);
+      },
     ),
   ],
 );

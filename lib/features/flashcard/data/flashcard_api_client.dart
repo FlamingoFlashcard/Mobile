@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:lacquer/features/flashcard/dtos/finish_deck_dto.dart';
 import 'package:lacquer/features/flashcard/dtos/update_deck_dto.dart';
 import 'package:lacquer/features/flashcard/dtos/update_tag_dto.dart';
 import 'dart:io';
@@ -25,7 +26,7 @@ class FlashcardApiClient {
         'title': deckDto.title,
         'description': deckDto.description,
         'tags': deckDto.tags,
-        'cards': deckDto.cardIds,
+        'cards': deckDto.cards,
       });
 
       if (imageFile != null) {
@@ -81,6 +82,49 @@ class FlashcardApiClient {
       }
 
       return responseData;
+    } on DioException catch (e) {
+      if (e.response != null) {
+        throw Exception(e.response!.data['message']);
+      } else {
+        throw Exception(e.message);
+      }
+    }
+  }
+
+  Future<dynamic> getUserAllDecks() async {
+    try {
+      final token = await authLocalDataSource.getToken();
+      final options = Options(
+        headers: {if (token != null) 'Authorization': 'Bearer $token'},
+      );
+      final response = await dio.get('/deck', options: options);
+
+      final responseData = response.data as Map<String, dynamic>;
+      if (responseData['success'] != true) {
+        throw Exception(responseData['message'] ?? 'Failed to load decks');
+      }
+
+      return responseData;
+    } on DioException catch (e) {
+      if (e.response != null) {
+        throw Exception(e.response!.data['message']);
+      } else {
+        throw Exception(e.message);
+      }
+    }
+  }
+
+  Future<Map<String, dynamic>> getDeckById(String deckId) async {
+    try {
+      final token = await authLocalDataSource.getToken();
+
+      final options = Options(
+        headers: {if (token != null) 'Authorization': 'Bearer $token'},
+      );
+
+      final response = await dio.get('/deck/$deckId', options: options);
+
+      return response.data as Map<String, dynamic>;
     } on DioException catch (e) {
       if (e.response != null) {
         throw Exception(e.response!.data['message']);
@@ -187,6 +231,30 @@ class FlashcardApiClient {
     }
   }
 
+  Future<FinishDeckResponseDto> finishDeck(String deckId) async {
+    try {
+      final token = await authLocalDataSource.getToken();
+      final options = Options(
+        headers: {if (token != null) 'Authorization': 'Bearer $token'},
+      );
+
+      final response = await dio.put('/deck/$deckId/finish', options: options);
+
+      final responseData = response.data as Map<String, dynamic>;
+      if (responseData['success'] != true) {
+        throw Exception(responseData['message'] ?? 'Failed to finish deck');
+      }
+
+      return FinishDeckResponseDto.fromJson(responseData);
+    } on DioException catch (e) {
+      if (e.response != null) {
+        throw Exception(e.response!.data['message'] ?? 'Failed to finish deck');
+      } else {
+        throw Exception(e.message);
+      }
+    }
+  }
+
   Future<void> deleteTag(String tagId) async {
     try {
       final token = await authLocalDataSource.getToken();
@@ -199,28 +267,17 @@ class FlashcardApiClient {
     }
   }
 
-  // Future<CreateDeckResponseDto> getDeckById(String deckId) async {
-  //   try {
-  //     final token = await authLocalDataSource.getToken();
-
-  //     final options = Options(headers: {
-  //       if (token != null) 'Authorization': 'Bearer $token',
-  //     });
-
-  //     final response = await dio.get(
-  //       '/decks/$deckId',
-  //       options: options,
-  //     );
-
-  //     return CreateDeckResponseDto.fromJson(response.data);
-  //   } on DioException catch (e) {
-  //     if (e.response != null) {
-  //       throw Exception(e.response!.data['message']);
-  //     } else {
-  //       throw Exception(e.message);
-  //     }
-  //   }
-  // }
+  Future<void> deleteCard(String deckId, String cardId) async {
+    try {
+      final token = await authLocalDataSource.getToken();
+      final options = Options(
+        headers: {if (token != null) 'Authorization': 'Bearer $token'},
+      );
+      await dio.delete('/deck/$deckId/cards/$cardId', options: options);
+    } on DioException catch (e) {
+      throw Exception(e.response?.data['message'] ?? e.message);
+    }
+  }
 
   Future<void> deleteDeck(String deckId) async {
     try {
@@ -291,6 +348,27 @@ class FlashcardApiClient {
       } else {
         throw Exception(e.message);
       }
+    }
+  }
+
+  Future<void> addCardToDeck({
+    required String deckId,
+    required String cardId,
+  }) async {
+    final token = await authLocalDataSource.getToken();
+
+    final options = Options(
+      headers: {if (token != null) 'Authorization': 'Bearer $token'},
+    );
+
+    final response = await dio.post(
+      '/deck/$deckId/cards',
+      data: {'cardId': cardId},
+      options: options,
+    );
+
+    if (response.data['success'] != true) {
+      throw Exception(response.data['message'] ?? 'Failed to add card to deck');
     }
   }
 }

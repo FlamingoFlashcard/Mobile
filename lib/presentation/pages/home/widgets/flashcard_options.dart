@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:go_router/go_router.dart';
+import 'package:lacquer/config/router.dart';
 import 'package:lacquer/config/theme.dart';
 import 'package:lacquer/presentation/pages/home/widgets/flashcard_confirm_delete.dart';
+import 'package:lacquer/presentation/pages/home/widgets/flashcard_confirm_reset.dart';
 import 'package:lacquer/presentation/pages/home/widgets/flashcard_topic_edit.dart';
 
 class FlashcardOptionDialog extends StatefulWidget {
@@ -9,12 +12,14 @@ class FlashcardOptionDialog extends StatefulWidget {
   final String title;
   final List<String> tags;
   final String imagePath;
+  final bool isDone;
   const FlashcardOptionDialog({
     super.key,
     required this.id,
     required this.title,
     required this.tags,
     required this.imagePath,
+    required this.isDone,
   });
 
   @override
@@ -23,41 +28,47 @@ class FlashcardOptionDialog extends StatefulWidget {
 
 class _FlashcardOptionDialogState extends State<FlashcardOptionDialog> {
   int selectedIndex = -1;
+  late final List<Map<String, dynamic>> options;
 
-  final List<Map<String, dynamic>> options = [
-    {
-      "icon": FontAwesomeIcons.play,
-      "title": "Explore",
-      "subtitle": "10 new cards",
-      "action": () {
-        print("revise");
+  @override
+  void initState() {
+    super.initState();
+
+    options = [
+      {
+        "icon": FontAwesomeIcons.play,
+        "title": "Explore",
+        "subtitle": "",
+        "action": () {
+          context.go(RouteName.learn(widget.id));
+        },
       },
-    },
-    {
-      "icon": FontAwesomeIcons.rotateRight,
-      "title": "Revise",
-      "subtitle": "Repeat 10 cards",
-      "action": () {
-        print("revise");
+      {
+        "icon": FontAwesomeIcons.rotateRight,
+        "title": "Revise",
+        "subtitle": "",
+        "action": () {
+          print("Revise clicked");
+        },
       },
-    },
-    {
-      "icon": FontAwesomeIcons.question,
-      "title": "Multi-choice Questions",
-      "subtitle": "",
-      "action": () {
-        print("revise");
+      {
+        "icon": FontAwesomeIcons.question,
+        "title": "Multi-choice Questions",
+        "subtitle": "",
+        "action": () {
+          print("Multi-choice Questions clicked");
+        },
       },
-    },
-    {
-      "icon": FontAwesomeIcons.penToSquare,
-      "title": "Fill In Game",
-      "subtitle": "",
-      "action": () {
-        print("revise");
+      {
+        "icon": FontAwesomeIcons.penToSquare,
+        "title": "Fill In Game",
+        "subtitle": "",
+        "action": () {
+          print("Fill In Game clicked");
+        },
       },
-    },
-  ];
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -135,6 +146,36 @@ class _FlashcardOptionDialogState extends State<FlashcardOptionDialog> {
                               imagePath: widget.imagePath,
                             ),
                       );
+                    },
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      FontAwesomeIcons.rotateLeft,
+                      size: 20,
+                      color: Colors.black,
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      showDialog(
+                        context: context,
+                        builder:
+                            (context) => FlashcardConfirmReset(
+                              id: widget.id,
+                              title: widget.title,
+                              isDone: widget.isDone,
+                            ),
+                      );
+                    },
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      FontAwesomeIcons.listUl,
+                      size: 20,
+                      color: Colors.black,
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      context.go(RouteName.edit(widget.id));
                     },
                   ),
                   IconButton(

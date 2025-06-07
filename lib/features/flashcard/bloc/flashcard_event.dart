@@ -1,6 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'dart:io';
 
+import 'package:lacquer/features/flashcard/dtos/card_dto.dart';
+
 abstract class FlashcardEvent extends Equatable {
   const FlashcardEvent();
 
@@ -12,29 +14,27 @@ class CreateDeckRequested extends FlashcardEvent {
   final String title;
   final String description;
   final List<String> tags;
-  final List<String> cardIds;
+  final List<CardDto> cards;
   final File? imageFile;
 
   const CreateDeckRequested({
     required this.title,
     required this.description,
     required this.tags,
-    required this.cardIds,
+    required this.cards,
     this.imageFile,
   });
 
   @override
-  List<Object?> get props => [
-    title,
-    description,
-    tags,
-    cardIds,
-    imageFile?.path,
-  ];
+  List<Object?> get props => [title, description, tags, cards, imageFile?.path];
 }
 
 class LoadDecksRequested extends FlashcardEvent {
   const LoadDecksRequested();
+}
+
+class LoadUserAllDecksRequested extends FlashcardEvent {
+  const LoadUserAllDecksRequested();
 }
 
 class LoadTagsRequested extends FlashcardEvent {
@@ -50,14 +50,14 @@ class CreateTagRequested extends FlashcardEvent {
   List<Object> get props => [name];
 }
 
-// class LoadDeckByIdRequested extends FlashcardEvent {
-//   final String deckId;
+class LoadDeckByIdRequested extends FlashcardEvent {
+  final String deckId;
 
-//   const LoadDeckByIdRequested(this.deckId);
+  const LoadDeckByIdRequested(this.deckId);
 
-//   @override
-//   List<Object> get props => [deckId];
-// }
+  @override
+  List<Object> get props => [deckId];
+}
 
 class DeleteDeckRequested extends FlashcardEvent {
   final String deckId;
@@ -106,6 +106,32 @@ class DeleteTagRequested extends FlashcardEvent {
   List<Object> get props => [tagId];
 }
 
+class DeleteCardRequested extends FlashcardEvent {
+  final String deckId;
+  final String cardId;
+
+  const DeleteCardRequested(this.deckId, this.cardId);
+
+  @override
+  List<Object> get props => [deckId, cardId];
+}
+
+class CopyCardsRequested extends FlashcardEvent {
+  final String sourceDeckId;
+  final String targetDeckId;
+  final List<String> cardIds;
+
+  const CopyCardsRequested(this.sourceDeckId, this.targetDeckId, this.cardIds);
+}
+
+class MoveCardsRequested extends FlashcardEvent {
+  final String sourceDeckId;
+  final String targetDeckId;
+  final List<String> cardIds;
+
+  const MoveCardsRequested(this.sourceDeckId, this.targetDeckId, this.cardIds);
+}
+
 class SearchDecksRequested extends FlashcardEvent {
   final String query;
 
@@ -113,4 +139,23 @@ class SearchDecksRequested extends FlashcardEvent {
 
   @override
   List<Object> get props => [query];
+}
+
+class AddCardToDeckRequested extends FlashcardEvent {
+  final String deckId;
+  final String cardId;
+
+  const AddCardToDeckRequested({required this.deckId, required this.cardId});
+
+  @override
+  List<Object?> get props => [deckId, cardId];
+}
+
+class FinishDeckRequested extends FlashcardEvent {
+  final String deckId;
+
+  const FinishDeckRequested({required this.deckId});
+
+  @override
+  List<Object?> get props => [deckId];
 }

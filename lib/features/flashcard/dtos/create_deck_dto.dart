@@ -1,14 +1,16 @@
+import 'package:lacquer/features/flashcard/dtos/card_dto.dart';
+
 class CreateDeckDto {
   final String title;
   final String description;
   final List<String> tags;
-  final List<String> cardIds;
+  final List<CardDto> cards;
 
   CreateDeckDto({
     required this.title,
     required this.description,
     required this.tags,
-    required this.cardIds,
+    required this.cards,
   });
 
   Map<String, dynamic> toJson() {
@@ -16,12 +18,11 @@ class CreateDeckDto {
       'title': title,
       'description': description,
       'tags': tags,
-      'cards': cardIds,
+      'cards': cards.map((card) => card.toJson()).toList(),
     };
   }
 
   factory CreateDeckDto.fromJson(Map<String, dynamic> json) {
-    // Handle tags parsing - they might be objects or strings
     List<String> parsedTags = [];
     final tagsData = json['tags'];
     if (tagsData is List) {
@@ -29,24 +30,17 @@ class CreateDeckDto {
         if (tag is String) {
           parsedTags.add(tag);
         } else if (tag is Map<String, dynamic>) {
-          // If tag is an object, extract the ID or name
           parsedTags.add(tag['_id'] as String? ?? tag['id'] as String? ?? '');
         }
       }
     }
 
-    // Handle cards parsing - they might be objects or strings
-    List<String> parsedCards = [];
+    List<CardDto> parsedCards = [];
     final cardsData = json['cards'];
     if (cardsData is List) {
       for (var card in cardsData) {
-        if (card is String) {
-          parsedCards.add(card);
-        } else if (card is Map<String, dynamic>) {
-          // If card is an object, extract the ID
-          parsedCards.add(
-            card['_id'] as String? ?? card['id'] as String? ?? '',
-          );
+        if (card is Map<String, dynamic>) {
+          parsedCards.add(CardDto.fromJson(card));
         }
       }
     }
@@ -55,7 +49,7 @@ class CreateDeckDto {
       title: json['title'] as String,
       description: json['description'] as String,
       tags: parsedTags,
-      cardIds: parsedCards,
+      cards: parsedCards,
     );
   }
 }
@@ -66,9 +60,10 @@ class CreateDeckResponseDto {
   final String? description;
   final String? img;
   final List<String>? tags;
-  final List<String>? cardIds;
+  final List<CardDto>? cards;
   final String? userId;
   final DateTime? createdAt;
+  final bool? isDone;
 
   CreateDeckResponseDto({
     this.id,
@@ -76,13 +71,13 @@ class CreateDeckResponseDto {
     this.description,
     this.img,
     this.tags,
-    this.cardIds,
+    this.cards,
     this.userId,
     this.createdAt,
+    this.isDone,
   });
 
   factory CreateDeckResponseDto.fromJson(Map<String, dynamic> json) {
-    // Handle tags parsing - they might be objects or strings
     List<String>? parsedTags;
     final tagsData = json['tags'];
     if (tagsData is List) {
@@ -91,25 +86,18 @@ class CreateDeckResponseDto {
         if (tag is String) {
           parsedTags.add(tag);
         } else if (tag is Map<String, dynamic>) {
-          // If tag is an object, extract the ID or name
           parsedTags.add(tag['_id'] as String? ?? tag['id'] as String? ?? '');
         }
       }
     }
 
-    // Handle cards parsing - they might be objects or strings
-    List<String>? parsedCards;
+    List<CardDto>? parsedCards;
     final cardsData = json['cards'];
     if (cardsData is List) {
       parsedCards = [];
       for (var card in cardsData) {
-        if (card is String) {
-          parsedCards.add(card);
-        } else if (card is Map<String, dynamic>) {
-          // If card is an object, extract the ID
-          parsedCards.add(
-            card['_id'] as String? ?? card['id'] as String? ?? '',
-          );
+        if (card is Map<String, dynamic>) {
+          parsedCards.add(CardDto.fromJson(card));
         }
       }
     }
@@ -120,12 +108,13 @@ class CreateDeckResponseDto {
       description: json['description'] as String?,
       img: json['img'] as String?,
       tags: parsedTags,
-      cardIds: parsedCards,
+      cards: parsedCards,
       userId: json['userId'] as String?,
       createdAt:
           json['createdAt'] != null
               ? DateTime.tryParse(json['createdAt'] as String)
               : null,
+      isDone: json['isDone'] as bool? ?? false,
     );
   }
 

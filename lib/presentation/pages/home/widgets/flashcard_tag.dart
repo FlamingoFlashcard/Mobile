@@ -154,6 +154,7 @@ class FlashcardTag extends StatelessWidget {
                 cardCount: decks[index].cards?.length ?? 0,
                 tags: decks[index].tags,
                 imagePath: decks[index].img ?? 'assets/images/lacquerBlack.png',
+                isDone: decks[index].isDone ?? false,
               );
             },
           ),

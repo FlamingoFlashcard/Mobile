@@ -49,7 +49,7 @@ class _FlashcardTopicCreateState extends State<FlashcardTopicCreate> {
         title: _titleController.text,
         description: 'Description here',
         tags: [_selectedTagId!],
-        cardIds: [],
+        cards: [],
         imageFile: _selectedImage,
       ),
     );
@@ -59,6 +59,7 @@ class _FlashcardTopicCreateState extends State<FlashcardTopicCreate> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 24.0),
       backgroundColor: Colors.white,
       title: const Text(
         'Create New Topic',
@@ -69,7 +70,6 @@ class _FlashcardTopicCreateState extends State<FlashcardTopicCreate> {
         textAlign: TextAlign.center,
       ),
       content: SizedBox(
-        width: 300,
         child: ConstrainedBox(
           constraints: BoxConstraints(
             maxHeight: MediaQuery.of(context).size.height * 0.7,
@@ -81,7 +81,7 @@ class _FlashcardTopicCreateState extends State<FlashcardTopicCreate> {
                 Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 8,
-                    vertical: 8,
+                    vertical: 4,
                   ),
                   child: TextFormField(
                     controller: _titleController,
@@ -101,7 +101,7 @@ class _FlashcardTopicCreateState extends State<FlashcardTopicCreate> {
                   ),
                 ),
                 SizedBox(
-                  width: 180,
+                  width: 200,
                   child: TextButton(
                     onPressed: () {
                       showDialog(

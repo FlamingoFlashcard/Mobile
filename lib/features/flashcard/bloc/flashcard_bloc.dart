@@ -11,14 +11,20 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
   FlashcardBloc({required this.repository}) : super(const FlashcardState()) {
     on<CreateDeckRequested>(_onCreateDeckRequested);
     on<LoadDecksRequested>(_onLoadDecksRequested);
+    on<LoadUserAllDecksRequested>(_onLoadUserAllDecksRequested);
     on<LoadTagsRequested>(_onLoadTagsRequested);
     on<CreateTagRequested>(_onCreateTagRequested);
     on<UpdateTagRequested>(_onUpdateTagRequested);
-    // on<LoadDeckByIdRequested>(_onLoadDeckByIdRequested);
+    on<LoadDeckByIdRequested>(_onLoadDeckByIdRequested);
     on<DeleteDeckRequested>(_onDeleteDeckRequested);
     on<UpdateDeckRequested>(_onUpdateDeckRequested);
     on<DeleteTagRequested>(_onDeleteTagRequested);
+    on<DeleteCardRequested>(_onDeleteCardRequested);
     on<SearchDecksRequested>(_onSearchDecksRequested);
+    on<AddCardToDeckRequested>(_onAddCardToDeckRequested);
+    on<FinishDeckRequested>(_onFinishDeckRequested);
+    on<CopyCardsRequested>(_onCopyCardsRequested);
+    on<MoveCardsRequested>(_onMoveCardsRequested);
   }
 
   Future<void> _onCreateDeckRequested(
@@ -32,7 +38,7 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
         title: event.title,
         description: event.description,
         tags: event.tags,
-        cardIds: event.cardIds,
+        cards: event.cards,
         imageFile: event.imageFile,
       );
 
@@ -68,6 +74,96 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
           status: FlashcardStatus.success,
           groupedDecks: groupedDecks,
           searchResult: true,
+        ),
+      );
+    } catch (e) {
+      emit(
+        state.copyWith(
+          status: FlashcardStatus.failure,
+          errorMessage: e.toString(),
+        ),
+      );
+    }
+  }
+
+  Future<void> _onLoadUserAllDecksRequested(
+    LoadUserAllDecksRequested event,
+    Emitter<FlashcardState> emit,
+  ) async {
+    emit(state.copyWith(status: FlashcardStatus.loading));
+
+    try {
+      final decks = await repository.getUserAllDecks();
+      emit(
+        state.copyWith(
+          status: FlashcardStatus.success,
+          decks: decks,
+          searchResult: true,
+        ),
+      );
+    } catch (e) {
+      emit(
+        state.copyWith(
+          status: FlashcardStatus.failure,
+          errorMessage: e.toString(),
+        ),
+      );
+    }
+  }
+
+  Future<void> _onCopyCardsRequested(
+    CopyCardsRequested event,
+    Emitter<FlashcardState> emit,
+  ) async {
+    try {
+      emit(state.copyWith(status: FlashcardStatus.loading));
+      for (final cardId in event.cardIds) {
+        await repository.addCardToDeck(
+          deckId: event.targetDeckId,
+          cardId: cardId,
+        );
+      }
+      final deck = await repository.getDeckById(event.sourceDeckId);
+      final groupedDecks = await repository.getDecks();
+      emit(
+        state.copyWith(
+          status: FlashcardStatus.success,
+          selectedDeck: deck,
+          groupedDecks: groupedDecks,
+        ),
+      );
+    } catch (e) {
+      emit(
+        state.copyWith(
+          status: FlashcardStatus.failure,
+          errorMessage: e.toString(),
+        ),
+      );
+    }
+  }
+
+  Future<void> _onMoveCardsRequested(
+    MoveCardsRequested event,
+    Emitter<FlashcardState> emit,
+  ) async {
+    try {
+      emit(state.copyWith(status: FlashcardStatus.loading));
+      for (final cardId in event.cardIds) {
+        await repository.addCardToDeck(
+          deckId: event.targetDeckId,
+          cardId: cardId,
+        );
+      }
+      for (final cardId in event.cardIds) {
+        await repository.deleteCard(event.sourceDeckId, cardId);
+      }
+      final deck = await repository.getDeckById(event.sourceDeckId);
+      final groupedDecks = await repository.getDecks();
+      emit(
+        state.copyWith(
+          status: FlashcardStatus.success,
+          selectedDeck: deck,
+          groupedDecks: groupedDecks,
         ),
       );
     } catch (e) {
@@ -146,25 +242,24 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
     }
   }
 
-  // Future<void> _onLoadDeckByIdRequested(
-  //   LoadDeckByIdRequested event,
-  //   Emitter<FlashcardState> emit,
-  // ) async {
-  //   emit(state.copyWith(status: FlashcardStatus.loading));
+  Future<void> _onLoadDeckByIdRequested(
+    LoadDeckByIdRequested event,
+    Emitter<FlashcardState> emit,
+  ) async {
+    emit(state.copyWith(status: FlashcardStatus.loading));
 
-  //   try {
-  //     final deck = await repository.getDeckById(event.deckId);
-  //     emit(state.copyWith(
-  //       status: FlashcardStatus.success,
-  //       selectedDeck: deck,
-  //     ));
-  //   } catch (e) {
-  //     emit(state.copyWith(
-  //       status: FlashcardStatus.failure,
-  //       errorMessage: e.toString(),
-  //     ));
-  //   }
-  // }
+    try {
+      final deck = await repository.getDeckById(event.deckId);
+      emit(state.copyWith(status: FlashcardStatus.success, selectedDeck: deck));
+    } catch (e) {
+      emit(
+        state.copyWith(
+          status: FlashcardStatus.failure,
+          errorMessage: e.toString(),
+        ),
+      );
+    }
+  }
 
   Future<void> _onDeleteDeckRequested(
     DeleteDeckRequested event,
@@ -260,6 +355,35 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
     }
   }
 
+  Future<void> _onDeleteCardRequested(
+    DeleteCardRequested event,
+    Emitter<FlashcardState> emit,
+  ) async {
+    emit(state.copyWith(status: FlashcardStatus.loading));
+
+    try {
+      await repository.deleteCard(event.deckId, event.cardId);
+
+      final updatedDeck = await repository.getDeckById(event.deckId);
+      final groupedDecks = await repository.getDecks();
+
+      emit(
+        state.copyWith(
+          status: FlashcardStatus.success,
+          selectedDeck: updatedDeck,
+          groupedDecks: groupedDecks,
+        ),
+      );
+    } catch (e) {
+      emit(
+        state.copyWith(
+          status: FlashcardStatus.failure,
+          errorMessage: e.toString(),
+        ),
+      );
+    }
+  }
+
   void _onSearchDecksRequested(
     SearchDecksRequested event,
     Emitter<FlashcardState> emit,
@@ -281,6 +405,42 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
         searchResult: filteredDecks != null,
       ),
     );
+  }
+
+  Future<void> _onAddCardToDeckRequested(
+    AddCardToDeckRequested event,
+    Emitter<FlashcardState> emit,
+  ) async {
+    emit(state.copyWith(status: FlashcardStatus.loading));
+
+    try {
+      await repository.addCardToDeck(
+        deckId: event.deckId,
+        cardId: event.cardId,
+      );
+
+      final groupedDecks = await repository.getDecks();
+      final updatedDeck = await repository.getDeckById(event.deckId);
+
+      emit(
+        state.copyWith(
+          status: FlashcardStatus.success,
+          selectedDeck: updatedDeck,
+          groupedDecks: groupedDecks,
+        ),
+      );
+    } catch (e) {
+      if (e.toString().contains('already exists')) {
+        emit(state.copyWith(status: FlashcardStatus.success));
+      } else {
+        emit(
+          state.copyWith(
+            status: FlashcardStatus.failure,
+            errorMessage: e.toString(),
+          ),
+        );
+      }
+    }
   }
 
   GroupedDecksResponseDto? filterDecksByName(
@@ -314,5 +474,33 @@ class FlashcardBloc extends Bloc<FlashcardEvent, FlashcardState> {
       (sum, item) => sum + item.decks.length,
     );
     return GroupedDecksResponseDto(count: newCount, data: filteredItems);
+  }
+
+  Future<void> _onFinishDeckRequested(
+    FinishDeckRequested event,
+    Emitter<FlashcardState> emit,
+  ) async {
+    emit(state.copyWith(status: FlashcardStatus.loading));
+
+    try {
+      await repository.finishDeck(event.deckId);
+      final groupedDecks = await repository.getDecks();
+      final updatedDeck = await repository.getDeckById(event.deckId);
+
+      emit(
+        state.copyWith(
+          status: FlashcardStatus.success,
+          selectedDeck: updatedDeck,
+          groupedDecks: groupedDecks,
+        ),
+      );
+    } catch (e) {
+      emit(
+        state.copyWith(
+          status: FlashcardStatus.failure,
+          errorMessage: e.toString(),
+        ),
+      );
+    }
   }
 }

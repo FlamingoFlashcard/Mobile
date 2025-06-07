@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:lacquer/presentation/pages/home/widgets/flashcard_options.dart';
 
 class FlashcardTopic extends StatefulWidget {
@@ -8,6 +7,7 @@ class FlashcardTopic extends StatefulWidget {
   final int cardCount;
   final List<String> tags;
   final String imagePath;
+  final bool isDone;
 
   const FlashcardTopic({
     super.key,
@@ -16,6 +16,7 @@ class FlashcardTopic extends StatefulWidget {
     required this.cardCount,
     required this.tags,
     required this.imagePath,
+    required this.isDone,
   });
 
   @override
@@ -27,6 +28,7 @@ class FlashcardTopicState extends State<FlashcardTopic> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
     return GestureDetector(
       onTap: () {
         showDialog(
@@ -37,6 +39,7 @@ class FlashcardTopicState extends State<FlashcardTopic> {
                 title: widget.title,
                 tags: widget.tags,
                 imagePath: widget.imagePath,
+                isDone: widget.isDone,
               ),
         );
       },
@@ -49,7 +52,7 @@ class FlashcardTopicState extends State<FlashcardTopic> {
         child: Material(
           borderRadius: BorderRadius.circular(12),
           child: Container(
-            width: 350,
+            width: size.width - 30,
             height: 200,
             decoration: BoxDecoration(
               color: Colors.white,
@@ -106,19 +109,19 @@ class FlashcardTopicState extends State<FlashcardTopic> {
                             ),
                           ),
                           const SizedBox(width: 12),
-                          CircularPercentIndicator(
-                            radius: 20.0,
-                            lineWidth: 4.0,
-                            percent: 0.8,
-                            center: const Text(
-                              "80%",
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 12,
-                              ),
+                          Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color:
+                                  widget.isDone ? Colors.green.shade100 : null,
                             ),
-                            backgroundColor: Colors.grey.shade300,
-                            progressColor: Colors.green,
+                            padding: const EdgeInsets.all(8),
+                            child: Icon(
+                              widget.isDone ? Icons.check_circle : null,
+                              color:
+                                  widget.isDone ? Colors.green.shade700 : null,
+                              size: 24,
+                            ),
                           ),
                         ],
                       ),
