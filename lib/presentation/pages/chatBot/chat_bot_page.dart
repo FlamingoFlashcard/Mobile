@@ -49,7 +49,14 @@ class _ChatBotPageState extends State<ChatBotPage>
   // Lắng nghe thay đổi về bàn phím
   @override
   void didChangeMetrics() {
-    final bottomInset = WidgetsBinding.instance.platformDispatcher.views.first.viewInsets.bottom;
+    final bottomInset =
+        WidgetsBinding
+            .instance
+            .platformDispatcher
+            .views
+            .first
+            .viewInsets
+            .bottom;
     final isVisible = bottomInset > 0.0;
 
     if (isVisible != _isKeyboardVisible) {
@@ -67,9 +74,7 @@ class _ChatBotPageState extends State<ChatBotPage>
 
     var chatbotWidget = (switch (chatbotState) {
       ChatbotInitial() => _buildInitialChatbotWidget(null),
-      ChatbotFetchingFailure() => _buildInitialChatbotWidget(
-        chatbotState.message,
-      ),
+      ChatbotFetchingFailure() => _buildInitialChatbotWidget(null),
       ChatbotFetchingInProgress() => _buildInitialChatbotWidget(null),
       _ => _buildInConversationWidget(),
     });
@@ -109,11 +114,27 @@ class _ChatBotPageState extends State<ChatBotPage>
       child: chatbotWidget,
     );
 
-    return Scaffold(
-      appBar: AppBar(backgroundColor: CustomTheme.white, title: title),
-      backgroundColor: CustomTheme.white,
-      resizeToAvoidBottomInset: true,
-      body: chatbotWidget,
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: <Color>[
+            CustomTheme.loginGradientStart,
+            CustomTheme.loginGradientEnd,
+          ],
+          begin: FractionalOffset(0.5, 0.0),
+          end: FractionalOffset(0.5, 1.0),
+          stops: <double>[0.0, 1.0],
+          tileMode: TileMode.clamp,
+        ),
+      ),
+      child: Scaffold(
+        appBar: AppBar(backgroundColor: Colors.transparent, title: title),
+        backgroundColor: Colors.transparent,
+        resizeToAvoidBottomInset: true,
+        body: chatbotWidget,
+      ),
     );
   }
 
@@ -179,7 +200,10 @@ class _ChatBotPageState extends State<ChatBotPage>
         foreground:
             Paint()
               ..shader = LinearGradient(
-                colors: <Color>[CustomTheme.chatbotprimary, CustomTheme.chatbotsecondary],
+                colors: <Color>[
+                  CustomTheme.chatbotprimary,
+                  CustomTheme.chatbotsecondary,
+                ],
               ).createShader(Rect.fromLTWH(0.0, 0.0, 200.0, 70.0)),
       ),
     );
@@ -297,15 +321,15 @@ class _ChatBotPageState extends State<ChatBotPage>
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20), // Bo góc
           gradient: LinearGradient(
-                colors: <Color>[
-                  CustomTheme.chatbotprimary,
-                  CustomTheme.chatbotsecondary,
-                ],
-                begin: FractionalOffset(0.0, 1.0),
-                end: FractionalOffset(1.0, 1.0),
-                stops: <double>[0.0, 1.0],
-                tileMode: TileMode.clamp,
-              ),
+            colors: <Color>[
+              CustomTheme.chatbotprimary,
+              CustomTheme.chatbotsecondary,
+            ],
+            begin: FractionalOffset(0.0, 1.0),
+            end: FractionalOffset(1.0, 1.0),
+            stops: <double>[0.0, 1.0],
+            tileMode: TileMode.clamp,
+          ),
         ),
         child: Text(
           message,
