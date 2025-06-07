@@ -18,6 +18,7 @@ import 'package:lacquer/features/profile/bloc/profile_event.dart';
 import 'package:lacquer/presentation/pages/home/quiz_page.dart';
 import 'package:lacquer/presentation/pages/home/translator_page.dart';
 import 'package:lacquer/presentation/pages/chat/chat_screen.dart';
+import 'package:lacquer/presentation/pages/history/history_page.dart';
 
 import 'package:lacquer/presentation/pages/mainscreen.dart';
 import 'package:flutter/widgets.dart';
@@ -36,6 +37,7 @@ class RouteName {
   static const String friends = '/friends';
   static const String quiz = '/quiz';
   static const String chat = '/chat';
+  static const String history = '/history';
 
   static const publicRoutes = [login, forgotPassword, verify, register];
 }
@@ -130,6 +132,10 @@ final router = GoRouter(
     noTransitionRoute(
       path: '/chat',
       builder: (context, state) => const ChatScreen(),
+    ),
+    noTransitionRoute(
+      path: RouteName.history,
+      builder: (context, state) => const HistoryPage(),
     ),
   ],
 );
