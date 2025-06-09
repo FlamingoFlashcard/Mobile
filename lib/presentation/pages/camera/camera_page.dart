@@ -14,6 +14,7 @@ import '../../../features/post/bloc/post_bloc.dart';
 import '../../../features/post/bloc/post_event.dart';
 import '../../../features/post/bloc/post_state.dart';
 import '../../../services/user_service.dart';
+import '../../../services/ai_service.dart';
 import '../../widgets/qr_scanner_dialog.dart';
 import '../history/history_page.dart';
 import '../../../features/friendship/bloc/friendship_bloc.dart';
@@ -418,14 +419,19 @@ class _CameraPageState extends State<CameraPage> with TickerProviderStateMixin {
     if (pickedFile != null) {
       setState(() {
         _image = File(pickedFile.path);
+        _isShotMode = true; // Enable shot mode to show slider options
+        _currentSliderIndex = 0; // Reset to first option (Caption)
       });
-      _navigateToAboutScreen();
     }
   }
 
-  void _navigateToAboutScreen() {
+  void _navigateToAboutScreen({AIResult? aiResult}) {
     if (_image != null) {
-      context.push('/about', extra: _image!.path).then((_) {
+      final Map<String, dynamic> extra = {
+        'imagePath': _image!.path,
+        'aiResult': aiResult,
+      };
+      context.push('/about', extra: extra).then((_) {
         // Reset the image and shot mode when returning from about screen
         setState(() {
           _image = null;
@@ -468,13 +474,62 @@ class _CameraPageState extends State<CameraPage> with TickerProviderStateMixin {
     );
   }
 
-  void _sendImage() {
+  void _sendImage() async {
     if (_image == null) return;
 
-    // If AI option is selected, navigate to about screen
+    // If AI option is selected, classify image and get AI info
     if (_currentSliderIndex == 2) {
       // ✨AI✨ option
-      _navigateToAboutScreen();
+      // Show loading
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Row(
+            children: [
+              SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+              SizedBox(width: 16),
+              Text('Analyzing image...'),
+            ],
+          ),
+          duration: Duration(seconds: 30),
+        ),
+      );
+
+      try {
+        final aiResult = await AIService.classifyImageAndGetInfo(_image!);
+        
+        // Hide loading
+        if (mounted) {
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        }
+        
+        if (aiResult != null && mounted) {
+          _navigateToAboutScreen(aiResult: aiResult);
+        } else if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Could not identify the object in the image'),
+              backgroundColor: Colors.orange,
+              duration: Duration(seconds: 3),
+            ),
+          );
+        }
+      } catch (e) {
+        // Hide loading and show error
+        if (mounted) {
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error analyzing image: $e'),
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        }
+      }
       return;
     }
 
