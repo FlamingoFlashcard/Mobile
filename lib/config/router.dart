@@ -9,6 +9,7 @@ import 'package:lacquer/presentation/pages/auth/login_page.dart';
 import 'package:lacquer/presentation/pages/auth/verify_page.dart';
 import 'package:lacquer/presentation/pages/camera/camera_page.dart';
 import 'package:lacquer/presentation/pages/camera/about_screen.dart';
+import 'package:lacquer/services/ai_service.dart';
 import 'package:lacquer/presentation/pages/home/add_new_word_page.dart';
 import 'package:lacquer/presentation/pages/home/edit_card_list_page.dart';
 import 'package:lacquer/presentation/pages/home/dictionary_page.dart';
@@ -20,6 +21,7 @@ import 'package:lacquer/presentation/pages/friends/friends_page.dart';
 import 'package:lacquer/features/profile/bloc/profile_bloc.dart';
 import 'package:lacquer/features/profile/bloc/profile_event.dart';
 import 'package:lacquer/presentation/pages/home/translator_page.dart';
+import 'package:lacquer/presentation/pages/chat/chat_screen.dart';
 
 import 'package:lacquer/presentation/pages/mainscreen.dart';
 import 'package:flutter/widgets.dart';
@@ -41,6 +43,7 @@ class RouteName {
   static const String friends = '/friends';
   static const String quiz = '/quiz';
   static String addNewWord(String deckId) => '/add-new-word/$deckId';
+  static const String chat = '/chat';
 
   static const publicRoutes = [login, forgotPassword, verify, register];
 }
@@ -98,8 +101,10 @@ final router = GoRouter(
     noTransitionRoute(
       path: RouteName.about,
       builder: (context, state) {
-        final imagePath = state.extra as String;
-        return AboutScreen(imagePath: imagePath);
+        final extra = state.extra as Map<String, dynamic>;
+        final imagePath = extra['imagePath'] as String;
+        final aiResult = extra['aiResult'] as AIResult?;
+        return AboutScreen(imagePath: imagePath, aiResult: aiResult);
       },
     ),
     noTransitionRoute(
@@ -134,10 +139,6 @@ final router = GoRouter(
       builder: (context, state) => const TranslatorScreen(),
     ),
     noTransitionRoute(
-      path: RouteName.translator,
-      builder: (context, state) => const TranslatorScreen(),
-    ),
-    noTransitionRoute(
       path: '/edit/:deckId',
       builder: (context, state) {
         final deckId = state.pathParameters['deckId']!;
@@ -150,6 +151,10 @@ final router = GoRouter(
         final deckId = state.pathParameters['deckId']!;
         return AddNewWordPage(deckId: deckId);
       },
+    ),
+    noTransitionRoute(
+      path: RouteName.chat,
+      builder: (context, state) => const ChatScreen(),
     ),
   ],
 );
