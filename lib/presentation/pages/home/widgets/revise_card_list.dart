@@ -129,12 +129,8 @@ class _ReviseCardListState extends State<ReviseCardList>
                                     child: Container(
                                       color:
                                           _dragOffset.dx < -50
-                                              ? Colors.red.withValues(
-                                                alpha: 0.8,
-                                              )
-                                              : Colors.red.withValues(
-                                                alpha: 0.2,
-                                              ),
+                                              ? Colors.red
+                                              : Colors.red,
                                       child: Center(
                                         child: Text(
                                           'Forget',
@@ -152,12 +148,8 @@ class _ReviseCardListState extends State<ReviseCardList>
                                     child: Container(
                                       color:
                                           _dragOffset.dx > 50
-                                              ? Colors.green.withValues(
-                                                alpha: 0.8,
-                                              )
-                                              : Colors.green.withValues(
-                                                alpha: 0.2,
-                                              ),
+                                              ? Colors.green
+                                              : Colors.green,
                                       child: Center(
                                         child: Text(
                                           'Remember',
