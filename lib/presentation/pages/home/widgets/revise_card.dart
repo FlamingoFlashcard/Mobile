@@ -186,7 +186,6 @@ class _ReviseCardState extends State<ReviseCard> {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         child: Column(
           children: [
-            // Meaning content centered
             Expanded(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -226,7 +225,6 @@ class _ReviseCardState extends State<ReviseCard> {
               ),
             ),
 
-            // Countdown & Show Button
             Align(
               alignment: Alignment.bottomCenter,
               child: ElevatedButton.icon(

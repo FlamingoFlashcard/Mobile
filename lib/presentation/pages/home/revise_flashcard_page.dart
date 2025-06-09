@@ -8,6 +8,7 @@ import 'package:lacquer/features/flashcard/bloc/flashcard_bloc.dart';
 import 'package:lacquer/features/flashcard/bloc/flashcard_event.dart';
 import 'package:lacquer/features/flashcard/bloc/flashcard_state.dart';
 import 'package:lacquer/presentation/pages/home/widgets/revise_card_list.dart';
+import 'package:lacquer/presentation/pages/home/widgets/revise_instruction_dialog.dart';
 import 'package:lacquer/presentation/pages/home/widgets/speech_adjustment.dart';
 
 class ReviseFlashcardPage extends StatefulWidget {
@@ -243,10 +244,15 @@ class _ReviseFlashcardPageState extends State<ReviseFlashcardPage> {
               ),
               IconButton(
                 icon: const Icon(
-                  FontAwesomeIcons.ellipsisVertical,
+                  FontAwesomeIcons.question,
                   color: Colors.white,
                 ),
-                onPressed: null,
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => const ReviseCardInstructionsDialog(),
+                  );
+                },
               ),
               const SizedBox(width: 10),
             ],

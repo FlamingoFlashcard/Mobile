@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lacquer/config/router.dart';
 import 'package:lacquer/features/flashcard/dtos/card_dto.dart';
 import 'package:lacquer/presentation/pages/home/widgets/revise_card.dart';
+import 'dart:math';
 
 class ReviseCardList extends StatefulWidget {
   final String deckId;
@@ -24,51 +25,167 @@ class ReviseCardList extends StatefulWidget {
   State<ReviseCardList> createState() => _ReviseCardListState();
 }
 
-class _ReviseCardListState extends State<ReviseCardList> {
-  late final PageController _pageController;
-  int _highestPageReached = 0;
+class _ReviseCardListState extends State<ReviseCardList>
+    with SingleTickerProviderStateMixin {
+  List<CardDto> _cardStack = [];
+  Offset _dragOffset = Offset.zero;
+  double _rotation = 0.0;
+  bool _isDragging = false;
 
   @override
   void initState() {
     super.initState();
-    _pageController = PageController();
+    _cardStack = List.from(widget.cards);
   }
 
-  void _onPageChanged(int index) {
-    if (index > _highestPageReached) {
-      _highestPageReached = index;
-      final maxPages = widget.cards.length;
-      final progress = maxPages > 0 ? index / maxPages : 0.0;
+  void _handleDragUpdate(DragUpdateDetails details) {
+    setState(() {
+      _dragOffset += details.delta;
+      _rotation = _dragOffset.dx / 300;
+      _isDragging = true;
+    });
+  }
+
+  void _handleDragEnd(DragEndDetails details) {
+    final threshold = 150;
+    final draggedRight = _dragOffset.dx > threshold;
+    final draggedLeft = _dragOffset.dx < -threshold;
+
+    if (draggedRight || draggedLeft) {
+      final card = _cardStack.last;
+      setState(() {
+        _cardStack.removeLast();
+        _dragOffset = Offset.zero;
+        _rotation = 0.0;
+        _isDragging = false;
+      });
+
+      if (draggedRight) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          setState(() {
+            _cardStack.insert(0, card);
+          });
+        });
+      }
+
+      final initialCount = widget.cards.length;
+      final remainingCount = _cardStack.length;
+      final progress =
+          initialCount > 0
+              ? (initialCount - remainingCount) / initialCount
+              : 0.0;
       widget.onScrollProgress?.call(progress.clamp(0.0, 1.0));
+    } else {
+      setState(() {
+        _dragOffset = Offset.zero;
+        _rotation = 0.0;
+        _isDragging = false;
+      });
     }
   }
 
   @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final hasCards = widget.cards.isNotEmpty;
-    final totalPages = hasCards ? widget.cards.length + 1 : 0;
+    if (_cardStack.isEmpty) {
+      return _buildCompletionCard(context, widget.deckId);
+    }
 
-    return PageView.builder(
-      controller: _pageController,
-      itemCount: totalPages,
-      onPageChanged: _onPageChanged,
-      itemBuilder: (context, index) {
-        if (index < widget.cards.length) {
-          return ReviseCard(
-            card: widget.cards[index],
-            speechRate: widget.speechRate,
-            selectedAccent: widget.selectedAccent,
-          );
-        } else {
-          return _buildCompletionCard(context, widget.deckId);
-        }
-      },
+    return Stack(
+      children:
+          List.generate(min(3, _cardStack.length), (index) {
+            final cardIndex = _cardStack.length - 1 - index;
+            final card = _cardStack[cardIndex];
+            final isTopCard = index == 0;
+
+            final offset = isTopCard ? _dragOffset : Offset.zero;
+            final angle = isTopCard ? _rotation : 0.0;
+
+            final transform = Transform.translate(
+              offset: offset,
+              child: Transform.rotate(
+                angle: angle,
+                child: ReviseCard(
+                  card: card,
+                  speechRate: widget.speechRate,
+                  selectedAccent: widget.selectedAccent,
+                ),
+              ),
+            );
+
+            return Positioned(
+              top: index * 10.0,
+              left: 0,
+              right: 0,
+              child:
+                  isTopCard
+                      ? Stack(
+                        children: [
+                          if (_isDragging)
+                            Positioned.fill(
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Container(
+                                      color:
+                                          _dragOffset.dx < -50
+                                              ? Colors.red.withValues(
+                                                alpha: 0.8,
+                                              )
+                                              : Colors.red.withValues(
+                                                alpha: 0.2,
+                                              ),
+                                      child: Center(
+                                        child: Text(
+                                          'Forget',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+
+                                  Expanded(
+                                    child: Container(
+                                      color:
+                                          _dragOffset.dx > 50
+                                              ? Colors.green.withValues(
+                                                alpha: 0.8,
+                                              )
+                                              : Colors.green.withValues(
+                                                alpha: 0.2,
+                                              ),
+                                      child: Center(
+                                        child: Text(
+                                          'Remember',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          GestureDetector(
+                            onPanUpdate: _handleDragUpdate,
+                            onPanEnd: _handleDragEnd,
+                            child: transform,
+                          ),
+                        ],
+                      )
+                      : Transform.scale(
+                        scale: 1 - (index * 0.03),
+                        child: transform,
+                      ),
+            );
+          }).reversed.toList(),
     );
   }
 }
