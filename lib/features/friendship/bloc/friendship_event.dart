@@ -15,15 +15,15 @@ class FriendshipEventSendRequest extends FriendshipEvent {
 }
 
 class FriendshipEventAcceptRequest extends FriendshipEvent {
-  final String friendId;
+  final String friendshipId;
 
-  FriendshipEventAcceptRequest({required this.friendId});
+  FriendshipEventAcceptRequest({required this.friendshipId});
 }
 
 class FriendshipEventRejectRequest extends FriendshipEvent {
-  final String friendId;
+  final String friendshipId;
 
-  FriendshipEventRejectRequest({required this.friendId});
+  FriendshipEventRejectRequest({required this.friendshipId});
 }
 
 class FriendshipEventBlockFriend extends FriendshipEvent {

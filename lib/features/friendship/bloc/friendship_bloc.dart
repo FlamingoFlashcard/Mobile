@@ -84,7 +84,7 @@ class FriendshipBloc extends Bloc<FriendshipEvent, FriendshipState> {
   ) async {
     emit(FriendshipAcceptRequestInProgress());
     final result = await friendshipRepository.acceptFriendRequest(
-      event.friendId,
+      event.friendshipId,
     );
     return (switch (result) {
       Success() => emit(FriendshipAcceptRequestSuccess()),
@@ -98,7 +98,7 @@ class FriendshipBloc extends Bloc<FriendshipEvent, FriendshipState> {
   ) async {
     emit(FriendshipRejectRequestInProgress());
     final result = await friendshipRepository.rejectFriendRequest(
-      event.friendId,
+      event.friendshipId,
     );
     return (switch (result) {
       Success() => emit(FriendshipRejectRequestSuccess()),

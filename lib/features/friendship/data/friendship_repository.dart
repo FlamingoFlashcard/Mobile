@@ -40,18 +40,18 @@ class FriendshipRepository {
     }
   }
 
-  Future<Result<void>> acceptFriendRequest(String friendId) async {
+  Future<Result<void>> acceptFriendRequest(String friendshipId) async {
     try {
-      await _userService.acceptFriendRequest(friendId);
+      await _userService.acceptFriendRequest(friendshipId);
       return Success(null);
     } catch (e) {
       return Failure(e.toString());
     }
   }
 
-  Future<Result<void>> rejectFriendRequest(String friendId) async {
+  Future<Result<void>> rejectFriendRequest(String friendshipId) async {
     try {
-      await _userService.rejectFriendRequest(friendId);
+      await _userService.rejectFriendRequest(friendshipId);
       return Success(null);
     } catch (e) {
       return Failure(e.toString());

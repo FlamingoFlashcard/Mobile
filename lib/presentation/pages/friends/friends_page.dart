@@ -735,11 +735,8 @@ class _FriendsPageState extends State<FriendsPage>
     final email = requestInfo['email'] ?? '';
     final avatarUrl = requestInfo['avatarUrl'] ?? '';
 
-    // For accept/reject operations, use the requester ID (person who sent the request)
-    // This is likely what the API expects as the friendId parameter
-    final requesterId = request['requester'] ?? '';
-    final requestId = request['_id'] ?? request['id'] ?? '';
-    final idToUse = requesterId.isNotEmpty ? requesterId : requestId;
+    // Use the friendship ID for accept/reject operations
+    final friendshipId = request['_id'] ?? request['id'] ?? '';
 
     return Container(
       margin: EdgeInsets.only(bottom: 12),
@@ -820,7 +817,7 @@ class _FriendsPageState extends State<FriendsPage>
                   child: ElevatedButton(
                     onPressed: () {
                       context.read<FriendshipBloc>().add(
-                        FriendshipEventAcceptRequest(friendId: idToUse),
+                        FriendshipEventAcceptRequest(friendshipId: friendshipId),
                       );
                     },
                     style: ElevatedButton.styleFrom(
@@ -850,7 +847,7 @@ class _FriendsPageState extends State<FriendsPage>
                   child: ElevatedButton(
                     onPressed: () {
                       context.read<FriendshipBloc>().add(
-                        FriendshipEventRejectRequest(friendId: idToUse),
+                        FriendshipEventRejectRequest(friendshipId: friendshipId),
                       );
                     },
                     style: ElevatedButton.styleFrom(

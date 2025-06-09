@@ -166,9 +166,9 @@ class UserService {
   }
 
   // Accept friend request
-  Future<Map<String, dynamic>> acceptFriendRequest(String friendId) async {
+  Future<Map<String, dynamic>> acceptFriendRequest(String friendshipId) async {
     try {
-      return await _apiClient.post('/friend/accept', {'friendId': friendId});
+      return await _apiClient.post('/friend/accept', {'friendshipId': friendshipId});
     } catch (e) {
       print('Accept friend request error: $e');
       rethrow;
@@ -176,9 +176,9 @@ class UserService {
   }
 
   // Reject friend request
-  Future<Map<String, dynamic>> rejectFriendRequest(String friendId) async {
+  Future<Map<String, dynamic>> rejectFriendRequest(String friendshipId) async {
     try {
-      return await _apiClient.post('/friend/reject', {'friendId': friendId});
+      return await _apiClient.post('/friend/reject', {'friendshipId': friendshipId});
     } catch (e) {
       print('Reject friend request error: $e');
       rethrow;
