@@ -48,7 +48,7 @@ class _FlashcardOptionDialogState extends State<FlashcardOptionDialog> {
         "title": "Revise",
         "subtitle": "",
         "action": () {
-          print("Revise clicked");
+          context.go(RouteName.revise(widget.id));
         },
       },
       {

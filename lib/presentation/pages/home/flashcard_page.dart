@@ -51,84 +51,100 @@ class _FlashcardPageState extends State<FlashcardPage> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (didPop, result) async {
-        if (didPop) return;
-        context.go('/');
-      },
-      child: Scaffold(
-        backgroundColor: CustomTheme.lightbeige,
-        body: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildAppBar(context),
-              const SizedBox(height: 16),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                child: _buildSearchBar(),
-              ),
-              BlocBuilder<FlashcardBloc, FlashcardState>(
-                builder: (context, state) {
-                  if (state.status == FlashcardStatus.loading) {
-                    return const Padding(
-                      padding: EdgeInsets.only(top: 16.0),
-                      child: Center(child: CircularProgressIndicator()),
-                    );
-                  } else if (state.status == FlashcardStatus.failure) {
-                    return Center(
-                      child: Text(
-                        'Error: ${state.errorMessage ?? 'Unknown error'}',
-                      ),
-                    );
-                  } else if (state.status == FlashcardStatus.success) {
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (!state.searchResult)
-                          SizedBox(
-                            height: 30,
-                            child: Center(
-                              child: Text(
-                                'No result',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.grey.shade600,
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: <Color>[
+            CustomTheme.loginGradientStart,
+            CustomTheme.loginGradientEnd,
+          ],
+          begin: FractionalOffset(0.5, 0.0),
+          end: FractionalOffset(0.5, 1.0),
+          stops: <double>[0.0, 1.0],
+          tileMode: TileMode.clamp,
+        ),
+      ),
+      child: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) async {
+          if (didPop) return;
+          context.go('/');
+        },
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          body: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildAppBar(context),
+                const SizedBox(height: 16),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                  child: _buildSearchBar(),
+                ),
+                BlocBuilder<FlashcardBloc, FlashcardState>(
+                  builder: (context, state) {
+                    if (state.status == FlashcardStatus.loading) {
+                      return const Padding(
+                        padding: EdgeInsets.only(top: 16.0),
+                        child: Center(child: CircularProgressIndicator()),
+                      );
+                    } else if (state.status == FlashcardStatus.failure) {
+                      return Center(
+                        child: Text(
+                          'Error: ${state.errorMessage ?? 'Unknown error'}',
+                        ),
+                      );
+                    } else if (state.status == FlashcardStatus.success) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (!state.searchResult)
+                            SizedBox(
+                              height: 30,
+                              child: Center(
+                                child: Text(
+                                  'No result',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.grey.shade600,
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        if (state.groupedDecks != null &&
-                            state.groupedDecks!.data.isNotEmpty)
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children:
-                                state.groupedDecks!.data.map((group) {
-                                  return group.decks.isNotEmpty
-                                      ? FlashcardTag(
-                                        key: ValueKey(group.tag.id),
-                                        tagId: group.tag.id,
-                                        title: group.tag.name,
-                                        decks: group.decks,
-                                      )
-                                      : const SizedBox.shrink();
-                                }).toList(),
-                          )
-                        else if (state.groupedDecks == null)
-                          const Padding(
-                            padding: EdgeInsets.only(left: 16.0, top: 8.0),
-                            child: Text('No decks available'),
-                          ),
-                      ],
-                    );
-                  } else {
-                    return const SizedBox.shrink();
-                  }
-                },
-              ),
-              const SizedBox(height: 20),
-            ],
+                          if (state.groupedDecks != null &&
+                              state.groupedDecks!.data.isNotEmpty)
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children:
+                                  state.groupedDecks!.data.map((group) {
+                                    return group.decks.isNotEmpty
+                                        ? FlashcardTag(
+                                          key: ValueKey(group.tag.id),
+                                          tagId: group.tag.id,
+                                          title: group.tag.name,
+                                          decks: group.decks,
+                                        )
+                                        : const SizedBox.shrink();
+                                  }).toList(),
+                            )
+                          else if (state.groupedDecks == null)
+                            const Padding(
+                              padding: EdgeInsets.only(left: 16.0, top: 8.0),
+                              child: Text('No decks available'),
+                            ),
+                        ],
+                      );
+                    } else {
+                      return const SizedBox.shrink();
+                    }
+                  },
+                ),
+                const SizedBox(height: 20),
+              ],
+            ),
           ),
         ),
       ),
