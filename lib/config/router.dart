@@ -12,6 +12,7 @@ import 'package:lacquer/presentation/pages/camera/about_screen.dart';
 import 'package:lacquer/presentation/pages/home/add_new_word_page.dart';
 import 'package:lacquer/presentation/pages/home/edit_card_list_page.dart';
 import 'package:lacquer/presentation/pages/home/dictionary_page.dart';
+import 'package:lacquer/presentation/pages/home/revise_flashcard_page.dart';
 import 'package:lacquer/presentation/pages/home/quiz_page.dart';
 import 'package:lacquer/presentation/pages/profile/profile_page.dart';
 import 'package:lacquer/presentation/pages/home/flashcard_page.dart';
@@ -35,6 +36,7 @@ class RouteName {
   static const String profile = '/profile';
   static const String flashcards = '/flashcards';
   static String learn(String deckId) => '/learn/$deckId';
+  static String revise(String deckId) => '/revise/$deckId';
   static String edit(String deckId) => '/edit/$deckId';
   static const String dictionary = '/dictionary';
   static const String translator = '/translator';
@@ -127,6 +129,13 @@ final router = GoRouter(
       builder: (context, state) {
         final deckId = state.pathParameters['deckId']!;
         return LearningFlashcardPage(deckId: deckId);
+      },
+    ),
+    noTransitionRoute(
+      path: '/revise/:deckId',
+      builder: (context, state) {
+        final deckId = state.pathParameters['deckId']!;
+        return ReviseFlashcardPage(deckId: deckId);
       },
     ),
     noTransitionRoute(
