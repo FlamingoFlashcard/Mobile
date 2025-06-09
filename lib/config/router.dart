@@ -12,6 +12,7 @@ import 'package:lacquer/presentation/pages/camera/about_screen.dart';
 import 'package:lacquer/presentation/pages/home/add_new_word_page.dart';
 import 'package:lacquer/presentation/pages/home/edit_card_list_page.dart';
 import 'package:lacquer/presentation/pages/home/dictionary_page.dart';
+import 'package:lacquer/presentation/pages/home/quiz_page.dart';
 import 'package:lacquer/presentation/pages/profile/profile_page.dart';
 import 'package:lacquer/presentation/pages/home/flashcard_page.dart';
 import 'package:lacquer/presentation/pages/home/learning_flashcard_page.dart';
@@ -38,6 +39,7 @@ class RouteName {
   static const String dictionary = '/dictionary';
   static const String translator = '/translator';
   static const String friends = '/friends';
+  static const String quiz = '/quiz';
   static String addNewWord(String deckId) => '/add-new-word/$deckId';
 
   static const publicRoutes = [login, forgotPassword, verify, register];
@@ -111,6 +113,10 @@ final router = GoRouter(
     noTransitionRoute(
       path: RouteName.dictionary,
       builder: (context, state) => const Dictionarypage(),
+    ),
+    noTransitionRoute(
+      path: RouteName.quiz,
+      builder: (context, state) => const QuizPage(),
     ),
     noTransitionRoute(
       path: RouteName.friends,

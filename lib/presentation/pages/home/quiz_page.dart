@@ -108,12 +108,6 @@ class _QuizPageState extends State<QuizPage> {
                 ),
                 const SizedBox(height: 16),
                 _buildRuleItem(
-                  icon: Icons.timer,
-                  title: 'Time Limit',
-                  description: 'Each question has a 30-second time limit',
-                ),
-                const SizedBox(height: 12),
-                _buildRuleItem(
                   icon: Icons.radio_button_checked,
                   title: 'Multiple Choice',
                   description: 'Select one answer from the given options',
