@@ -14,7 +14,7 @@ class BadgePage extends StatefulWidget {
 }
 
 class _BadgePageState extends State<BadgePage> {
-  List<Badge> badges = [];
+  List<UserBadge> badges = [];
   bool isLoading = true;
   String? errorMessage;
 
@@ -45,7 +45,7 @@ class _BadgePageState extends State<BadgePage> {
         final badgesList = data['data'] as List? ?? [];
 
         setState(() {
-          badges = badgesList.map((badge) => Badge.fromJson(badge)).toList();
+          badges = badgesList.map((badge) => UserBadge.fromJson(badge)).toList();
           isLoading = false;
         });
       } else {
@@ -135,7 +135,7 @@ class _BadgePageState extends State<BadgePage> {
     );
   }
 
-  Widget _buildBadgeCard(Badge badge) {
+  Widget _buildBadgeCard(UserBadge badge) {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -210,13 +210,13 @@ class _BadgePageState extends State<BadgePage> {
   }
 }
 
-class Badge {
+class UserBadge {
   final String name;
   final String iconUrl;
 
-  Badge({required this.name, required this.iconUrl});
+  UserBadge({required this.name, required this.iconUrl});
 
-  factory Badge.fromJson(Map<String, dynamic> json) {
-    return Badge(name: json['name'] ?? '', iconUrl: json['iconUrl'] ?? '');
+  factory UserBadge.fromJson(Map<String, dynamic> json) {
+    return UserBadge(name: json['name'] ?? '', iconUrl: json['iconUrl'] ?? '');
   }
 }

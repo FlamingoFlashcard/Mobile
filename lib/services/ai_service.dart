@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:math' as math;
 import '../config/api_client.dart';
 import '../services/location_weather_service.dart';
+import '../services/badge_service.dart' as badge_service;
 import '../features/auth/data/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -17,6 +18,12 @@ class AIService {
       if (position != null) {
         final landmarkResult = await _classifyLandmark(imageFile, position.latitude, position.longitude);
         if (landmarkResult != null) {
+          // Check for badge award after landmark identification
+          final awardedBadge = await _checkAndAwardBadge(landmarkResult.name);
+          if (awardedBadge != null) {
+            landmarkResult.awardedBadge = awardedBadge;
+          }
+          
           final chatbotInfo = await _getChatbotInfo("what is ${landmarkResult.name}?");
           return AIResult(
             type: 'landmark',
@@ -24,6 +31,7 @@ class AIService {
             confidence: landmarkResult.confidence,
             description: chatbotInfo ?? 'Information not available',
             distance: landmarkResult.distance,
+            awardedBadge: landmarkResult.awardedBadge,
           );
         }
       }
@@ -61,8 +69,32 @@ class AIService {
       if (response['success'] == true && response['data'] != null) {
         final data = response['data'];
         
-        // Check if data is a List (array of landmarks) or single landmark object
-        if (data is List && data.isNotEmpty) {
+        // Handle new response format with landmarks and badge info
+        if (data is Map<String, dynamic> && data['landmarks'] != null) {
+          final landmarks = data['landmarks'] as List;
+          if (landmarks.isNotEmpty) {
+            final landmark = landmarks.first as Map<String, dynamic>;
+            final landmarkResult = LandmarkResult(
+              name: landmark['name']?.toString() ?? 'Unknown Landmark',
+              confidence: landmark['confidence']?.toString() ?? 'N/A',
+              distance: landmark['distance']?.toString() ?? 'N/A',
+            );
+            
+            // Check for awarded badge
+            if (data['awardedBadge'] != null) {
+              final badgeData = data['awardedBadge'] as Map<String, dynamic>;
+              landmarkResult.awardedBadge = BadgeInfo(
+                id: badgeData['id']?.toString() ?? '',
+                name: badgeData['name']?.toString() ?? '',
+                iconUrl: badgeData['iconUrl']?.toString() ?? '',
+              );
+            }
+            
+            return landmarkResult;
+          }
+        }
+        // Handle legacy formats...
+        else if (data is List && data.isNotEmpty) {
           // Handle array format
           final landmark = data.first as Map<String, dynamic>;
           return LandmarkResult(
@@ -154,6 +186,98 @@ class AIService {
     }
   }
 
+  static Future<BadgeInfo?> _checkAndAwardBadge(String landmarkName) async {
+    try {
+      // Get all available badges
+      final allBadges = await badge_service.BadgeService.getAllBadges();
+      
+      // Check if any badge name matches the landmark name
+      badge_service.Badge? matchingBadge;
+      
+      // Try exact match first
+      matchingBadge = allBadges.firstWhere(
+        (badge) => badge.name.toLowerCase() == landmarkName.toLowerCase(),
+        orElse: () => badge_service.Badge(id: '', name: '', iconUrl: ''),
+      );
+      
+      // If no exact match, try partial match
+      if (matchingBadge?.id.isEmpty ?? true) {
+        matchingBadge = allBadges.firstWhere(
+          (badge) => badge.name.toLowerCase().contains(landmarkName.toLowerCase()) ||
+                    landmarkName.toLowerCase().contains(badge.name.toLowerCase()),
+          orElse: () => badge_service.Badge(id: '', name: '', iconUrl: ''),
+        );
+      }
+      
+      // If no partial match, try keyword matching
+      if (matchingBadge?.id.isEmpty ?? true) {
+        final landmarkKeywords = _extractKeywords(landmarkName);
+        for (final badge in allBadges) {
+          final badgeKeywords = _extractKeywords(badge.name);
+          if (_hasKeywordMatch(landmarkKeywords, badgeKeywords)) {
+            matchingBadge = badge;
+            break;
+          }
+        }
+      }
+      
+      // If we found a matching badge, try to award it
+      if (matchingBadge != null && matchingBadge.id.isNotEmpty) {
+        final success = await _awardBadgeToUser(matchingBadge.id);
+        if (success) {
+          return BadgeInfo(
+            id: matchingBadge.id,
+            name: matchingBadge.name,
+            iconUrl: matchingBadge.iconUrl,
+          );
+        }
+      }
+      
+      return null;
+    } catch (e) {
+      print('Error checking and awarding badge: $e');
+      return null;
+    }
+  }
+
+  static Future<bool> _awardBadgeToUser(String badgeId) async {
+    try {
+      final response = await _apiClient.post('/badge/$badgeId/award', {});
+      return response['success'] == true;
+    } catch (e) {
+      print('Error awarding badge: $e');
+      return false;
+    }
+  }
+
+  static List<String> _extractKeywords(String text) {
+    // Common stop words to ignore
+    const stopWords = {
+      'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 
+      'of', 'with', 'by', 'is', 'are', 'was', 'were', 'be', 'been', 'being',
+      'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 
+      'should', 'may', 'might', 'can', 'must', 'shall'
+    };
+    
+    return text
+        .toLowerCase()
+        .replaceAll(RegExp(r'[^\w\s]'), ' ') // Remove punctuation
+        .split(RegExp(r'\s+')) // Split by whitespace
+        .where((word) => word.length > 2 && !stopWords.contains(word))
+        .toList();
+  }
+
+  static bool _hasKeywordMatch(List<String> keywords1, List<String> keywords2) {
+    for (final keyword1 in keywords1) {
+      for (final keyword2 in keywords2) {
+        if (keyword1.contains(keyword2) || keyword2.contains(keyword1)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   // Haversine formula to calculate distance between two coordinates in kilometers
   static double _calculateDistance(double lat1, double lon1, double lat2, double lon2) {
     const double R = 6371; // Radius of the Earth in km
@@ -175,6 +299,7 @@ class AIResult {
   final String confidence;
   final String description;
   final String? distance; // Only for landmarks
+  final BadgeInfo? awardedBadge; // Badge info if awarded
 
   AIResult({
     required this.type,
@@ -182,6 +307,7 @@ class AIResult {
     required this.confidence,
     required this.description,
     this.distance,
+    this.awardedBadge,
   });
 }
 
@@ -189,11 +315,13 @@ class LandmarkResult {
   final String name;
   final String confidence;
   final String distance;
+  BadgeInfo? awardedBadge;
 
   LandmarkResult({
     required this.name,
     required this.confidence,
     required this.distance,
+    this.awardedBadge,
   });
 }
 
@@ -204,5 +332,17 @@ class ObjectResult {
   ObjectResult({
     required this.name,
     required this.confidence,
+  });
+}
+
+class BadgeInfo {
+  final String id;
+  final String name;
+  final String iconUrl;
+
+  BadgeInfo({
+    required this.id,
+    required this.name,
+    required this.iconUrl,
   });
 } 

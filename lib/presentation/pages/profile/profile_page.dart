@@ -440,6 +440,14 @@ class _ProfilePageState extends State<ProfilePage>
         ),
         SizedBox(height: 12),
         _buildActionCard(
+          icon: Icons.emoji_events,
+          title: 'Badge Collection',
+          subtitle: 'View your earned badges and achievements',
+          onTap: () => context.push('/badges'),
+          color: Colors.amber,
+        ),
+        SizedBox(height: 12),
+        _buildActionCard(
           icon: Icons.logout_outlined,
           title: 'Logout',
           subtitle: 'Sign out of your account',

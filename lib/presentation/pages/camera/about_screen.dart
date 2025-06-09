@@ -92,6 +92,71 @@ class AboutScreen extends StatelessWidget {
                   textAlign: TextAlign.center,
                 ),
               ),
+              // Show badge info if available
+              if (aiResult!.awardedBadge != null) ...[
+                const SizedBox(height: 20),
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 20.0),
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Colors.amber.shade50, Colors.orange.shade50],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.orange.shade200),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 50,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: LinearGradient(
+                            colors: [Colors.amber.shade400, Colors.orange.shade600],
+                          ),
+                        ),
+                        child: aiResult!.awardedBadge!.iconUrl.isNotEmpty
+                            ? ClipOval(
+                                child: Image.network(
+                                  aiResult!.awardedBadge!.iconUrl,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      const Icon(Icons.emoji_events, color: Colors.white, size: 24),
+                                ),
+                              )
+                            : const Icon(Icons.emoji_events, color: Colors.white, size: 24),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              '🎉 Badge Earned!',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.orange,
+                              ),
+                            ),
+                            Text(
+                              aiResult!.awardedBadge!.name,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black87,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ] else
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20.0),

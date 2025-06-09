@@ -507,6 +507,10 @@ class _CameraPageState extends State<CameraPage> with TickerProviderStateMixin {
         }
         
         if (aiResult != null && mounted) {
+          // Show badge notification if a badge was awarded
+          if (aiResult.awardedBadge != null) {
+            _showBadgeAwardedNotification(aiResult.awardedBadge!);
+          }
           _navigateToAboutScreen(aiResult: aiResult);
         } else if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -675,6 +679,109 @@ class _CameraPageState extends State<CameraPage> with TickerProviderStateMixin {
     setState(() {
       _dragOffset = 0;
     });
+  }
+
+  void _showBadgeAwardedNotification(BadgeInfo badge) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: LinearGradient(
+                    colors: [Colors.amber.shade400, Colors.orange.shade600],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.amber.withOpacity(0.3),
+                      blurRadius: 15,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
+                ),
+                child: badge.iconUrl.isNotEmpty
+                    ? ClipOval(
+                        child: Image.network(
+                          badge.iconUrl,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) =>
+                              const Icon(Icons.emoji_events, color: Colors.white, size: 40),
+                        ),
+                      )
+                    : const Icon(Icons.emoji_events, color: Colors.white, size: 40),
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                '🎉 Badge Awarded! 🎉',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                badge.name,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.orange,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'You\'ve discovered a new landmark!',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.black54,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () => Navigator.of(context).pop(),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                ),
+                child: const Text(
+                  'Awesome!',
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _buildSliderOverlay() {
