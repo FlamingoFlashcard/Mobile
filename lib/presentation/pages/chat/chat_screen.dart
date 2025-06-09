@@ -151,20 +151,6 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 context.read<ChatBloc>().add(ChatEventLoadChats());
               }
             });
-            
-            // Show notification
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('New message: ${state.message.text}'),
-                action: SnackBarAction(
-                  label: 'View',
-                  onPressed: () {
-                    final chat = _chats.firstWhere((chat) => chat.id == state.chatId);
-                    _navigateToConversation(chat);
-                  },
-                ),
-              ),
-            );
           } else if (state is ChatPrivateChatCreated) {
             _navigateToConversation(state.chat);
           } else if (state is ChatGroupChatCreated) {

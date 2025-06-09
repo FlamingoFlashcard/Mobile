@@ -106,13 +106,18 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
     }
   }
 
-  void _scrollToBottom() {
-    if (_scrollController.hasClients) {
-      _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      );
+  void _scrollToBottom({bool animate = true}) {
+    if (_scrollController.hasClients && _messages.isNotEmpty) {
+      if (animate) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      } else {
+        // Jump directly for initial load
+        _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+      }
     }
   }
 
@@ -258,7 +263,10 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
             // Auto-scroll to bottom only on first load
             if (_currentPage == 1) {
               WidgetsBinding.instance.addPostFrameCallback((_) {
-                _scrollToBottom();
+                // Add a slight delay to ensure ListView is fully built
+                Future.delayed(const Duration(milliseconds: 100), () {
+                  _scrollToBottom(animate: false); // Jump directly for initial load
+                });
               });
             }
           } else if (state is ChatMessageReceived) {
