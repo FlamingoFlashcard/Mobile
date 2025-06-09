@@ -122,6 +122,18 @@ class VerifyEmailPageState extends State<VerifyEmailPage>
                       ),
                     ),
                   ),
+                  const SizedBox(height: 20),
+                  TextButton(
+                    onPressed: () => _onBackPressed(context),
+                    child: const Text(
+                      'Back to Login',
+                      style: TextStyle(
+                        color: CustomTheme.mainColor1,
+                        decoration: TextDecoration.underline,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),

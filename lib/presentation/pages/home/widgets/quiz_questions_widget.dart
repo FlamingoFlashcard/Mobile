@@ -269,13 +269,7 @@ class _QuizQuestionsWidget extends State<QuizQuestionsWidget> {
 
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.white, Colors.grey.shade700],
-          ),
-        ),
+        color: Colors.white,
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(20.0),
