@@ -21,6 +21,7 @@ import 'package:lacquer/presentation/pages/friends/friends_page.dart';
 import 'package:lacquer/features/profile/bloc/profile_bloc.dart';
 import 'package:lacquer/features/profile/bloc/profile_event.dart';
 import 'package:lacquer/presentation/pages/home/translator_page.dart';
+import 'package:lacquer/presentation/pages/chat/chat_screen.dart';
 
 import 'package:lacquer/presentation/pages/mainscreen.dart';
 import 'package:flutter/widgets.dart';
@@ -43,6 +44,7 @@ class RouteName {
   static const String friends = '/friends';
   static const String quiz = '/quiz';
   static String addNewWord(String deckId) => '/add-new-word/$deckId';
+  static const String chat = '/chat';
 
   static const publicRoutes = [login, forgotPassword, verify, register];
 }
@@ -143,10 +145,6 @@ final router = GoRouter(
       builder: (context, state) => const TranslatorScreen(),
     ),
     noTransitionRoute(
-      path: RouteName.translator,
-      builder: (context, state) => const TranslatorScreen(),
-    ),
-    noTransitionRoute(
       path: '/edit/:deckId',
       builder: (context, state) {
         final deckId = state.pathParameters['deckId']!;
@@ -159,6 +157,10 @@ final router = GoRouter(
         final deckId = state.pathParameters['deckId']!;
         return AddNewWordPage(deckId: deckId);
       },
+    ),
+    noTransitionRoute(
+      path: RouteName.chat,
+      builder: (context, state) => const ChatScreen(),
     ),
   ],
 );
