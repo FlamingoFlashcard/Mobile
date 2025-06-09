@@ -51,22 +51,6 @@ class _FlashcardOptionDialogState extends State<FlashcardOptionDialog> {
           context.go(RouteName.revise(widget.id));
         },
       },
-      {
-        "icon": FontAwesomeIcons.question,
-        "title": "Multi-choice Questions",
-        "subtitle": "",
-        "action": () {
-          print("Multi-choice Questions clicked");
-        },
-      },
-      {
-        "icon": FontAwesomeIcons.penToSquare,
-        "title": "Fill In Game",
-        "subtitle": "",
-        "action": () {
-          print("Fill In Game clicked");
-        },
-      },
     ];
   }
 

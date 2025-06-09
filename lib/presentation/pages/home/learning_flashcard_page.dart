@@ -242,13 +242,6 @@ class _LearningFlashcardPageState extends State<LearningFlashcardPage> {
                 icon: const Icon(FontAwesomeIcons.gear, color: Colors.white),
                 onPressed: _showTtsSettings,
               ),
-              IconButton(
-                icon: const Icon(
-                  FontAwesomeIcons.ellipsisVertical,
-                  color: Colors.white,
-                ),
-                onPressed: null,
-              ),
               const SizedBox(width: 10),
             ],
           ),
