@@ -9,6 +9,7 @@ import 'package:lacquer/presentation/pages/auth/login_page.dart';
 import 'package:lacquer/presentation/pages/auth/verify_page.dart';
 import 'package:lacquer/presentation/pages/camera/camera_page.dart';
 import 'package:lacquer/presentation/pages/camera/about_screen.dart';
+import 'package:lacquer/services/ai_service.dart';
 import 'package:lacquer/presentation/pages/home/add_new_word_page.dart';
 import 'package:lacquer/presentation/pages/home/edit_card_list_page.dart';
 import 'package:lacquer/presentation/pages/home/dictionary_page.dart';
@@ -102,8 +103,10 @@ final router = GoRouter(
     noTransitionRoute(
       path: RouteName.about,
       builder: (context, state) {
-        final imagePath = state.extra as String;
-        return AboutScreen(imagePath: imagePath);
+        final extra = state.extra as Map<String, dynamic>;
+        final imagePath = extra['imagePath'] as String;
+        final aiResult = extra['aiResult'] as AIResult?;
+        return AboutScreen(imagePath: imagePath, aiResult: aiResult);
       },
     ),
     noTransitionRoute(
