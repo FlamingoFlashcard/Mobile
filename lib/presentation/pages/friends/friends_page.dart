@@ -565,6 +565,7 @@ class _FriendsPageState extends State<FriendsPage>
     final email = friendInfo['email'] ?? '';
     final avatarUrl = friendInfo['avatarUrl'] ?? '';
     final friendId = friendInfo['id'] ?? '';
+    final friendshipId = friend['_id'] ?? friend['id'] ?? '';
 
     final isSelected = selectedFriendIds.contains(friendId);
 
@@ -680,7 +681,7 @@ class _FriendsPageState extends State<FriendsPage>
                     _showBlockConfirmDialog(friendId, username);
                     break;
                   case 'remove':
-                    _showRemoveConfirmDialog(friendId, username);
+                    _showRemoveConfirmDialog(friendshipId, username);
                     break;
                 }
               },
@@ -1034,7 +1035,7 @@ class _FriendsPageState extends State<FriendsPage>
     );
   }
 
-  void _showRemoveConfirmDialog(String friendId, String username) {
+  void _showRemoveConfirmDialog(String friendshipId, String username) {
     showDialog(
       context: context,
       builder:
@@ -1061,7 +1062,7 @@ class _FriendsPageState extends State<FriendsPage>
                 onPressed: () {
                   Navigator.pop(context);
                   context.read<FriendshipBloc>().add(
-                    FriendshipEventRemoveFriend(friendId: friendId),
+                    FriendshipEventRemoveFriend(friendshipId: friendshipId),
                   );
                 },
                 style: ElevatedButton.styleFrom(

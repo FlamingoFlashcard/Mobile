@@ -76,9 +76,9 @@ class FriendshipRepository {
     }
   }
 
-  Future<Result<void>> removeFriend(String friendId) async {
+  Future<Result<void>> removeFriend(String friendshipId) async {
     try {
-      await _userService.removeFriend(friendId);
+      await _userService.removeFriend(friendshipId);
       return Success(null);
     } catch (e) {
       return Failure(e.toString());

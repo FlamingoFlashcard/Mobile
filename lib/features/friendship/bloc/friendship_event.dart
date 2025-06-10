@@ -39,7 +39,7 @@ class FriendshipEventUnblockFriend extends FriendshipEvent {
 }
 
 class FriendshipEventRemoveFriend extends FriendshipEvent {
-  final String friendId;
+  final String friendshipId;
 
-  FriendshipEventRemoveFriend({required this.friendId});
+  FriendshipEventRemoveFriend({required this.friendshipId});
 }

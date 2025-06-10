@@ -135,7 +135,7 @@ class FriendshipBloc extends Bloc<FriendshipEvent, FriendshipState> {
     Emitter<FriendshipState> emit,
   ) async {
     emit(FriendshipRemoveFriendInProgress());
-    final result = await friendshipRepository.removeFriend(event.friendId);
+    final result = await friendshipRepository.removeFriend(event.friendshipId);
     return (switch (result) {
       Success() => emit(FriendshipRemoveFriendSuccess()),
       Failure() => emit(FriendshipRemoveFriendFailure(result.message)),

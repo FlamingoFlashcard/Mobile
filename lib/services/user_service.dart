@@ -240,9 +240,9 @@ class UserService {
   }
 
   // Remove friend
-  Future<Map<String, dynamic>> removeFriend(String friendId) async {
+  Future<Map<String, dynamic>> removeFriend(String friendshipId) async {
     try {
-      return await _apiClient.post('/friend/remove', {'friendId': friendId});
+      return await _apiClient.post('/friend/reject', {'friendshipId': friendshipId});
     } catch (e) {
       print('Remove friend error: $e');
       rethrow;
